@@ -14,60 +14,57 @@
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tvMainField"
-            android:background="@color/primary_light"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/primary_light"
             android:text="@string/oneSymbol"
             android:textIsSelectable="false"
+            android:textStyle="bold"
             android:typeface="monospace" />
 
     </FrameLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp">
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/ibUp"
+            style="@style/MyImageButton"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:contentDescription="@string/descButtonUp"
+            android:src="@drawable/circled_up" />
 
         <ImageView
             android:id="@+id/ivCenter"
-            android:layout_width="@dimen/directionsButtonSize"
-            android:layout_height="@dimen/directionsButtonSize"
+            style="@style/MyImageButton"
+            android:layout_below="@id/ibUp"
             android:layout_centerInParent="true"
+            android:contentDescription="@string/descCentralImage"
             android:src="@drawable/all_directions" />
 
         <ImageButton
-            android:layout_width="@dimen/directionsButtonSize"
-            android:layout_height="@dimen/directionsButtonSize"
-            android:layout_above="@id/ivCenter"
-            android:layout_centerHorizontal="true"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
-            android:src="@drawable/circled_up" />
-
-        <ImageButton
-            android:layout_width="@dimen/directionsButtonSize"
-            android:layout_height="@dimen/directionsButtonSize"
+            style="@style/MyImageButton"
             android:layout_below="@id/ivCenter"
             android:layout_centerHorizontal="true"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
+            android:contentDescription="@string/descButtonDown"
             android:src="@drawable/circled_down" />
 
         <ImageButton
-            android:layout_width="@dimen/directionsButtonSize"
-            android:layout_height="@dimen/directionsButtonSize"
+            style="@style/MyImageButton"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/ivCenter"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
+            android:layout_toStartOf="@id/ivCenter"
+            android:contentDescription="@string/descButtonLeft"
             android:src="@drawable/circled_left" />
 
         <ImageButton
-            android:layout_width="@dimen/directionsButtonSize"
-            android:layout_height="@dimen/directionsButtonSize"
+            style="@style/MyImageButton"
             android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/ivCenter"
             android:layout_toRightOf="@id/ivCenter"
-            android:background="@android:color/transparent"
-            android:scaleType="fitCenter"
+            android:contentDescription="@string/descButtonRight"
             android:src="@drawable/circled_right" />
 
     </RelativeLayout>
@@ -75,6 +72,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:background="@color/primary"
         android:gravity="center"
         android:orientation="horizontal">

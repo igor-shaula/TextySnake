@@ -9,18 +9,23 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
 
-    private char food = '$'; // +1 to length
-    private char foodBonus = '^'; // +2 to length
-    private char foodMinus = '*'; // -1 from length
-    private char foodSpeedSlow = '-'; // slows by 25%
-    private char foodSpeedUp = '+'; // speeds up by 25%
+    private final char SNAKE = '@';
+    private final char SPACE = ' ';
+    private final char FOOD = '$'; // +1 to length
+    private final char LENGTH_PLUS = '^'; // +2 to length
+    private final char LENGTH_MINUS = '*'; // -1 from length
+    private final char SPEED_SLOW = '-'; // slows by 25%
+    private final char SPEED_UP = '+'; // speeds up by 25%
+
     private Snake snake;
 
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
-    private int mainFieldSymbolsInLine, mainFieldLineCount; // in items - for arrays \
+    private int symbolsInFieldLine, fieldLinesCount; // in items - for arrays \
 
     private ArrayList<char[]> mainCharArrayList;
 
@@ -54,12 +59,13 @@ public class MainActivity extends AppCompatActivity {
                         else
                             actvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 
-                        // moving on to separate method \
+                        // moving everything to separate methods \
                         prepareTextField();
+
+                        setInitialSnake();
+                        setInitialFood();
                     }
                 });
-
-        // TODO: 20.03.2016 make method to set food and bonuses initially on screen \
 
         // TODO: 20.03.2016 make method to randomly choose initial direction \
 
@@ -74,8 +80,8 @@ public class MainActivity extends AppCompatActivity {
         MyLog.i("measuredSymbolWidth " + measuredSymbolWidth);
 
         // getting our first valuable parameter - the size of main array \
-        mainFieldSymbolsInLine = fieldPixelWidth / measuredSymbolWidth;
-        MyLog.i("mainFieldSymbolsInLine " + mainFieldSymbolsInLine);
+        symbolsInFieldLine = fieldPixelWidth / measuredSymbolWidth;
+        MyLog.i("symbolsInFieldLine " + symbolsInFieldLine);
 
         // clearing the text field to properly initialize it for game \
         actvMainField.setText(null);
@@ -85,32 +91,83 @@ public class MainActivity extends AppCompatActivity {
         mainCharArrayList = new ArrayList<>();
         do {
             // filling up out TextView to measure its lines and set initial state at once \
-            char[] charArray = new char[mainFieldSymbolsInLine + 1];
+            char[] charArray = new char[symbolsInFieldLine + 1];
             // setting end element for a new line on the next array \
-            charArray[mainFieldSymbolsInLine] = '\n';
+            charArray[symbolsInFieldLine] = '\n';
             // setting other elements to their default values \
-            for (int j = 0; j < mainFieldSymbolsInLine; j++) {
-                charArray[j] = '+';
+            for (int j = 0; j < symbolsInFieldLine; j++) {
+                charArray[j] = SPACE;
             }
             // now single char array is ready and has to be added to the list \
             mainCharArrayList.add(i, charArray);
-            MyLog.i("added " + new String(mainCharArrayList.get(i)));
+//            MyLog.i("added " + new String(mainCharArrayList.get(i)));
 
             String previousText = actvMainField.getText().toString();
             String newText = previousText + new String(mainCharArrayList.get(i));
             actvMainField.setText(newText);
-            MyLog.i("newText \n" + newText);
+//            MyLog.i("newText \n" + newText);
 
             i++;
 
             actvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
             measuredTextHeight = actvMainField.getMeasuredHeight();
-            MyLog.i("measuredTextHeight " + measuredTextHeight);
+//            MyLog.i("measuredTextHeight " + measuredTextHeight);
 
         } while (measuredTextHeight <= fieldPixelHeight);
 
-        mainFieldLineCount = i;
-        MyLog.i("mainFieldLineCount " + mainFieldLineCount);
+        fieldLinesCount = i;
+        MyLog.i("fieldLinesCount " + fieldLinesCount);
+    }
+
+    private Snake setInitialSnake() {
+
+        int snakeLength = 3;
+        snake = new Snake(snakeLength);
+
+        // TODO: 20.03.2016 determine snake's direction here \
+
+        // now i assume that the snake is placed into right-direction \
+        for (int i = 0; i <snakeLength; i++){
+            mainCharArrayList.get(fieldLinesCount/2)[symbolsInFieldLine/2 + i] = SNAKE;
+        }
+
+        updateTextView(mainCharArrayList);
+
+        return snake;
+    }
+
+    private void setInitialFood() {
+
+        Random random = new Random();
+
+        // this method gets called after the snake is initialized - so we have to check collisions \
+        int foodPositionRow, foodPositionSymbol;
+        // i decided to do all in one cycle because of low probability of collisions \
+        do {
+            // increased by one to include the whole range of values \
+            foodPositionRow = random.nextInt(fieldLinesCount) + 1;
+            foodPositionSymbol = random.nextInt(symbolsInFieldLine) + 1;
+            MyLog.i("random foodPositionRow " + foodPositionRow);
+            MyLog.i("random foodPositionSymbol " + foodPositionSymbol);
+        } while (mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol-1] == SNAKE);
+
+        // substracting 1 because we know that these are indexes - counted from zero \
+        mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] = FOOD;
+        updateTextView(mainCharArrayList);
+
+        new Timer("timer", true);
+    }
+
+    /**
+     * @param charArrayList model to set into our main text field \
+     */
+    private void updateTextView(ArrayList<char[]> charArrayList) {
+
+        StringBuilder newStringToSet = new StringBuilder();
+        for (int i = 0; i < fieldLinesCount; i++) {
+            newStringToSet.append(charArrayList.get(i));
+        }
+        actvMainField.setText(newStringToSet);
     }
 
     @Override

@@ -1,15 +1,23 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar"/>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar" />
 
     <style name="MyText">
         <item name="android:singleLine">true</item>
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="MyImageButton">
+        <item name="android:layout_height">@dimen/directionsButtonSize</item>
+        <item name="android:layout_width">@dimen/directionsButtonSize</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:background">@android:color/transparent</item>
     </style>
 
 </resources>
