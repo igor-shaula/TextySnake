@@ -7,25 +7,75 @@
     tools:context="com.tryings.my.dev_challenge_2016.MainActivity">
 
     <FrameLayout
-        android:layout_width="match_parent"
         android:id="@+id/flMain"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
         <android.support.v7.widget.AppCompatTextView
             android:id="@+id/tvMainField"
-            android:text="@string/space"
+            android:background="@color/primary_light"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/oneSymbol"
             android:textIsSelectable="false"
             android:typeface="monospace" />
 
     </FrameLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="160dp">
+
+        <ImageView
+            android:id="@+id/ivCenter"
+            android:layout_width="@dimen/directionsButtonSize"
+            android:layout_height="@dimen/directionsButtonSize"
+            android:layout_centerInParent="true"
+            android:src="@drawable/all_directions" />
+
+        <ImageButton
+            android:layout_width="@dimen/directionsButtonSize"
+            android:layout_height="@dimen/directionsButtonSize"
+            android:layout_above="@id/ivCenter"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/circled_up" />
+
+        <ImageButton
+            android:layout_width="@dimen/directionsButtonSize"
+            android:layout_height="@dimen/directionsButtonSize"
+            android:layout_below="@id/ivCenter"
+            android:layout_centerHorizontal="true"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/circled_down" />
+
+        <ImageButton
+            android:layout_width="@dimen/directionsButtonSize"
+            android:layout_height="@dimen/directionsButtonSize"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/ivCenter"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/circled_left" />
+
+        <ImageButton
+            android:layout_width="@dimen/directionsButtonSize"
+            android:layout_height="@dimen/directionsButtonSize"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/ivCenter"
+            android:background="@android:color/transparent"
+            android:scaleType="fitCenter"
+            android:src="@drawable/circled_right" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="@color/primary"
         android:gravity="center"
         android:orientation="horizontal">
 
