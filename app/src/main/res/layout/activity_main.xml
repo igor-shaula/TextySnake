@@ -45,6 +45,7 @@
             android:src="@drawable/all_directions" />
 
         <ImageButton
+            android:id="@+id/ibDown"
             style="@style/MyImageButton"
             android:layout_below="@id/ivCenter"
             android:layout_centerHorizontal="true"
@@ -52,6 +53,7 @@
             android:src="@drawable/circled_down" />
 
         <ImageButton
+            android:id="@+id/ibLeft"
             style="@style/MyImageButton"
             android:layout_centerVertical="true"
             android:layout_toLeftOf="@id/ivCenter"
@@ -60,6 +62,7 @@
             android:src="@drawable/circled_left" />
 
         <ImageButton
+            android:id="@+id/ibRight"
             style="@style/MyImageButton"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/ivCenter"

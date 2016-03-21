@@ -1,4 +1,4 @@
-package com.tryings.my.dev_challenge_2016;
+package com.tryings.my.dev_challenge_2016.util;
 
 import android.util.Log;
 
