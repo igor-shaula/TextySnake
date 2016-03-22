@@ -6,15 +6,21 @@ package com.tryings.my.dev_challenge_2016.entity;
 public class Snake {
 
     private int length;
-    private SnakeCell[] snakeCells = new SnakeCell[length];
+
+    private SnakeCell[] snakeCells;
+    // TODO: 22.03.2016 transform array to linked list \
 
     public Snake(int length) {
         this.length = length;
-
+        snakeCells = new SnakeCell[length];
     }
 
     public int getLength() {
         return length;
+    }
+
+    public void addSnakeCell(int index, SnakeCell newCell) {
+        snakeCells[index] = newCell;
     }
 
     public SnakeCell getSnakeCell(int index) {
@@ -26,14 +32,20 @@ public class Snake {
      */
     public static class SnakeCell {
 
-        private int rowNumber, symbolInRow;
+        private int rowIndex, indexInRow;
 
-        public int getRowNumber() {
-            return rowNumber;
+        // i decided to set every cell as a simple object \
+        public SnakeCell(int rowIndex, int indexInRow) {
+            this.rowIndex = rowIndex;
+            this.indexInRow = indexInRow;
         }
 
-        public int getSymbolInRow() {
-            return symbolInRow;
+        public int getRowIndex() {
+            return rowIndex;
+        }
+
+        public int getIndexInRow() {
+            return indexInRow;
         }
     }
 }
