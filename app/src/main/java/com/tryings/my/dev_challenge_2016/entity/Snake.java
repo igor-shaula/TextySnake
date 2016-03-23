@@ -8,7 +8,7 @@ public class Snake {
     private int length;
 
     private SnakeCell[] snakeCells;
-    // TODO: 22.03.2016 transform array to linked list \
+    // TODO: 22.03.2016 may be transform array to LinkedList or something like this ? \
 
     public Snake(int length) {
         this.length = length;

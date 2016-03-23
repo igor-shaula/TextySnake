@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -13,11 +16,11 @@ import android.widget.ImageButton;
 import com.tryings.my.dev_challenge_2016.R;
 import com.tryings.my.dev_challenge_2016.entity.Snake;
 import com.tryings.my.dev_challenge_2016.util.MyLog;
-import com.tryings.my.dev_challenge_2016.util.MyTimerTask;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -29,58 +32,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final char SPEED_SLOW = '-'; // slows by 25%
     private final char SPEED_UP = '+'; // speeds up by 25%
 
-    private Snake snake;
-    private int mSpeed = 3;
-    private int snakeDirection;
-
     private Random random = new Random();
 
+    // definition of the snake \
+    private Snake snake;
+    private int snakeSpeed = 3;
+    private int snakeDirection;
+
+    // definition of the field \
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
     private int symbolsInFieldLine, fieldLinesCount; // in items - for arrays \
 
+    // main data storage \
     private ArrayList<char[]> mainCharArrayList;
 
+    // active widgets \
     private AppCompatTextView actvMainField;
     private Button bStart;
 
-    private int mScore;
+    // game parameters \
+    private int score;
     private boolean alreadyLaunched = false;
-    private Timer mTimer;
+    private Timer timer;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        actvMainField = (AppCompatTextView) findViewById(R.id.tvMainField);
 
+        // from the very beginning we have to define available field \
+        actvMainField = (AppCompatTextView) findViewById(R.id.tvMainField);
         assert actvMainField != null;
         actvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
-
-                        // getting current screen size in pixels \
-                        fieldPixelWidth = actvMainField.getWidth();
-                        MyLog.d("fieldPixelWidth " + fieldPixelWidth);
-
-                        FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
-                        assert flMain != null;
-                        fieldPixelHeight = flMain.getHeight();
-//                        fieldPixelHeight = actvMainField.getHeight();
-                        MyLog.d("fieldPixelHeight " + fieldPixelHeight);
-
-                        // now removing the listener - it's not needed any more \
-                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
-                            actvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        else
-                            //noinspection deprecation
-                            actvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-
                         // moving everything to separate methods \
-                        prepareTextField();
-//                        setFieldBorders();
-                        setInitialSnake();
-                        setInitialFood();
+                        detectFieldParameters(); // 0
+                        prepareTextField(); // 1
+                        setFieldBorders(); // 2
+                        setInitialSnake(); // 3
+                        setInitialFood(); // 4
                     }
                 });
 
@@ -99,9 +93,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             ibDown.setOnClickListener(this);
 
         bStart = (Button) findViewById(R.id.bStartPause);
+        assert bStart != null;
         bStart.setOnClickListener(this);
     } // end of onCreate-method \\
 
+    // 0 - from onGlobalLayout-method
+    private void detectFieldParameters() {
+        // getting current screen size in pixels \
+        fieldPixelWidth = actvMainField.getWidth();
+        MyLog.d("fieldPixelWidth " + fieldPixelWidth);
+
+        FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
+        assert flMain != null;
+        fieldPixelHeight = flMain.getHeight();
+//                        fieldPixelHeight = actvMainField.getHeight();
+        MyLog.d("fieldPixelHeight " + fieldPixelHeight);
+
+        // now removing the listener - it's not needed any more \
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+            actvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(MainActivity.this);
+        else
+            //noinspection deprecation
+            actvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+    } // end of detectFieldParameters-method \\
+
+    // 1 - from onGlobalLayout-method
     private void prepareTextField() {
 
         // here we get pixel width of a single symbol - initial TextView has only one symbol \
@@ -149,6 +165,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyLog.i("fieldLinesCount " + fieldLinesCount);
     } // end of prepareTextField-method \\
 
+    /**
+     * 3 - from onGlobalLayout-method
+     * @return snake which is ready to start playing
+     */
     private Snake setInitialSnake() {
 
         int snakeLength = 3;
@@ -191,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return snake;
     } // end of setInitialSnake-method \\
 
+    // 4 - from onGlobalLayout-method
     private void setInitialFood() {
 
         // this method gets called after the snake is initialized - so we have to check collisions \
@@ -224,66 +245,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
+     * all game is passing inside this method \
      * @param speed - needed to calculate delay inside this method \
      */
     private void moveSnake(int speed) {
         // at first we are shifting cells - the last one becomes a new head \
-
         int delay = 1000 / speed;
-/*
-        // 1
-        while (!collisionHappened()) {
-            // main time-consuming actions take place here \
-            Timer timer = new Timer();
-            timer.schedule(new MyTimerTask(), delay);
-//            timer.schedule(new MyTimerTask(), 0, speed);
-            mScore++;
-            MyLog.i("moveSnake - from inside main loop");
-
-        }
-        gameOver();
-*/
-
-        // 2
-        mTimer = new Timer();
-        mTimer.schedule(new MyTimerTask(), 0, delay);
-        if (collisionHappened()) gameOver();
-        else mScore++;
-        MyLog.i("moveSnake - from inside main loop");
-
-    }
-
-    private boolean collisionHappened() {
-        // we have only to check what happens to the snake's head - other cells are inactive \
-        Snake.SnakeCell snakesHead = snake.getSnakeCell(0);
-        int snakeHeadY = snakesHead.getRowIndex();
-        int snakeHeadX = snakesHead.getIndexInRow();
-
-        if (snake.getLength() <= 4) { // snake with less length cannot collide with itself \
-            return touchedBounds(snakeHeadY, snakeHeadX);
-        } else return touchedBounds(snakeHeadY, snakeHeadX) || touchedItelf(snakeHeadY, snakeHeadX);
-    }
-
-    private boolean touchedBounds(int snakeHeadY, int snakeHeadX) {
-        // we can avoid loop here assuming that snake's head has index of 0 \
-        return snakeHeadY == 0 || snakeHeadY == fieldLinesCount ||
-                snakeHeadX == 0 || snakeHeadX == symbolsInFieldLine;
-    }
-
-    private boolean touchedItelf(int snakeHeadY, int snakeHeadX) {
-        // snake can collide with itself beginning only from fifth element = fourth index \
-        for (int i = 4; i < snake.getLength(); i++) {
-            Snake.SnakeCell snakeCell = snake.getSnakeCell(i);
-            if (snakeHeadY == snakeCell.getRowIndex() || snakeHeadX == snakeCell.getRowIndex())
-                return true;
-        }
-        return false;
+        timer = new Timer();
+        timer.schedule(new MyTimerTask(), 0, delay);
     }
 
     private void gameOver() {
-        MyLog.i("game ended with score " + mScore);
+
+        MyLog.i("game ended with score " + score);
     }
 
+    // MENU ========================================================================================
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.selectDistricts: {
+                return showDialog();
+            }
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    // SAVE_RESTORE ================================================================================
 
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
@@ -294,6 +292,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onRestoreInstanceState(savedInstanceState, persistentState);
     }
+
+    // LISTENER ====================================================================================
 
     @Override
     public void onClick(View v) {
@@ -316,17 +316,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.bStartPause:
                 if (alreadyLaunched) { // initial value is false \
-                    if (mTimer != null) {
-                        mTimer.cancel();
-                        mTimer = null;
+                    if (timer != null) {
+                        timer.cancel();
+                        timer = null;
                     }
                     bStart.setText(R.string.start);
                 } else {
                     bStart.setText(R.string.stop);
-                    moveSnake(mSpeed);
+                    moveSnake(snakeSpeed);
                 }
                 alreadyLaunched = !alreadyLaunched;
                 break;
+        }
+    }
+
+    /**
+     * special class defined for repeating operations and usage of Timer \
+     */
+    public class MyTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            MyLog.i("move done");
+            if (collisionHappened()) gameOver(); // this is the only way out from loop \
+            else score++;
+        }
+
+        private boolean collisionHappened() {
+            // we have only to check what happens to the snake's head - other cells are inactive \
+            Snake.SnakeCell snakesHead = snake.getSnakeCell(0);
+            int snakeHeadY = snakesHead.getRowIndex();
+            int snakeHeadX = snakesHead.getIndexInRow();
+
+            if (snake.getLength() <= 4) { // snake with less length cannot collide with itself \
+                return touchedBounds(snakeHeadY, snakeHeadX);
+            } else return touchedBounds(snakeHeadY, snakeHeadX) || touchedItelf(snakeHeadY, snakeHeadX);
+        }
+
+        // connected to collisionHappened-method \
+        private boolean touchedBounds(int snakeHeadY, int snakeHeadX) {
+            // we can avoid loop here assuming that snake's head has index of 0 \
+            return snakeHeadY == 0 || snakeHeadY == fieldLinesCount ||
+                    snakeHeadX == 0 || snakeHeadX == symbolsInFieldLine;
+        }
+
+        // connected to collisionHappened-method \
+        private boolean touchedItelf(int snakeHeadY, int snakeHeadX) {
+            // snake can collide with itself beginning only from fifth element = fourth index \
+            for (int i = 4; i < snake.getLength(); i++) {
+                Snake.SnakeCell snakeCell = snake.getSnakeCell(i);
+                if (snakeHeadY == snakeCell.getRowIndex() || snakeHeadX == snakeCell.getRowIndex())
+                    return true;
+            }
+            return false;
         }
     }
 }
