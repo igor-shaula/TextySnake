@@ -36,5 +36,11 @@
     <string name="descButtonDown">button down</string>
     <string name="descButtonLeft">button left</string>
     <string name="descButtonRight">button right</string>
+    <string name="setSpeed">Set speed</string>
+    <string name="speedVerySlow">1 - very slow</string>
+    <string name="speedSlow">2 - slow</string>
+    <string name="speedNormal">3 - normal</string>
+    <string name="speedFast">4 - fast</string>
+    <string name="speedVeryFast">5 - very fast</string>
 
 </resources>

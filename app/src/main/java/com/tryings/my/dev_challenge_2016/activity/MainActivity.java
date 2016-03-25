@@ -27,10 +27,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final char SNAKE = '@';
     private final char SPACE = ' ';
     private final char FOOD = '$'; // +1 to length
-    private final char LENGTH_PLUS = '^'; // +2 to length
+    private final char BORDER = '+';
+    private final char LENGTH_PLUS = '&'; // +2 to length
     private final char LENGTH_MINUS = '*'; // -1 from length
     private final char SPEED_SLOW = '-'; // slows by 25%
-    private final char SPEED_UP = '+'; // speeds up by 25%
+    private final char SPEED_UP = '#'; // speeds up by 25%
 
     private Random random = new Random();
 
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Timer timer;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onGlobalLayout() {
                         // moving everything to separate methods \
-                        detectFieldParameters(); // 0
+                        ViewTreeObserver.OnGlobalLayoutListener listener = this;
+                        detectFieldParameters(listener); // 0
                         prepareTextField(); // 1
                         setFieldBorders(); // 2
                         setInitialSnake(); // 3
@@ -98,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     } // end of onCreate-method \\
 
     // 0 - from onGlobalLayout-method
-    private void detectFieldParameters() {
+    private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
         // getting current screen size in pixels \
         fieldPixelWidth = actvMainField.getWidth();
         MyLog.d("fieldPixelWidth " + fieldPixelWidth);
@@ -111,10 +112,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // now removing the listener - it's not needed any more \
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
-            actvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(MainActivity.this);
+            actvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
         else
             //noinspection deprecation
-            actvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+            actvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
     } // end of detectFieldParameters-method \\
 
     // 1 - from onGlobalLayout-method
@@ -166,7 +167,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     } // end of prepareTextField-method \\
 
     /**
+     * 2 - from onGlobalLayout-method
+     */
+    private void setFieldBorders() {
+        for (int i = 0; i < fieldLinesCount; i++)
+            for (int j = 0; j < symbolsInFieldLine; j++)
+                if (i == 0 || i == fieldLinesCount - 1 || j == 0 || j == symbolsInFieldLine - 1)
+                    mainCharArrayList.get(i)[j] = BORDER;
+    }
+
+    /**
      * 3 - from onGlobalLayout-method
+     *
      * @return snake which is ready to start playing
      */
     private Snake setInitialSnake() {
@@ -201,11 +213,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             // now it is time to create new snake cell \
-            Snake.SnakeCell newCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
-            snake.addSnakeCell(i, newCell);
+            Snake.SnakeCell newCell = new Snake.SnakeCell(cellPositionY, cellPositionX);
+            snake.addCell(i, newCell);
             // placing the this snake cell to our field \
             mainCharArrayList.get(cellPositionY)[cellPositionX] = SNAKE;
-        }
+
+            MyLog.i("after head move: snakeCell.getIndexOfSymbol() = " + snake.getCell(0).getIndexOfSymbol());
+            MyLog.i("after head move: snakeCell.getIndexOfRow() = " + snake.getCell(0).getIndexOfRow());
+        } // end of for-loop
         updateTextView(mainCharArrayList);
 
         return snake;
@@ -219,14 +234,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // i decided to do all in one cycle because of low probability of collisions \
         do {
             // increased by one to include the whole range of values \
-            foodPositionRow = random.nextInt(fieldLinesCount) + 1;
-            foodPositionSymbol = random.nextInt(symbolsInFieldLine) + 1;
+            foodPositionRow = random.nextInt(fieldLinesCount) - 1;
+            foodPositionSymbol = random.nextInt(symbolsInFieldLine) - 1;
+            // -1 instead of +1 just to avoid placing food on the boards \
             MyLog.i("random foodPositionRow " + foodPositionRow);
             MyLog.i("random foodPositionSymbol " + foodPositionSymbol);
-        } while (mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] == SNAKE);
+        } while (mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] == SNAKE);
+//        } while (mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] == SNAKE);
+        // TODO: 25.03.2016 check this algorithm \
 
         // substracting 1 because we know that these are indexes - counted from zero \
-        mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] = FOOD;
+        mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] = FOOD;
+//        mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] = FOOD;
         updateTextView(mainCharArrayList);
 
         new Timer("timer", true);
@@ -246,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * all game is passing inside this method \
+     *
      * @param speed - needed to calculate delay inside this method \
      */
     private void moveSnake(int speed) {
@@ -272,13 +292,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+//        if (item.getItemId() == R.id.setComplexity) {
+        int newSnakeSpeed = 0;
         switch (item.getItemId()) {
-            case R.id.selectDistricts: {
-                return showDialog();
-            }
-            default:
-                return super.onOptionsItemSelected(item);
+            case R.id.speed_5:
+                newSnakeSpeed++;
+            case R.id.speed_4:
+                newSnakeSpeed++;
+            case R.id.speed_3:
+                newSnakeSpeed++;
+            case R.id.speed_2:
+                newSnakeSpeed++;
+            case R.id.speed_1:
+                newSnakeSpeed++;
         }
+        if (newSnakeSpeed != 0)
+            snakeSpeed = newSnakeSpeed;
+        MyLog.i("newSnakeSpeed = " + newSnakeSpeed);
+        return super.onOptionsItemSelected(item);
     }
 
     // SAVE_RESTORE ================================================================================
@@ -330,26 +361,108 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    // MOVEMENT ====================================================================================
+
     /**
      * special class defined for repeating operations and usage of Timer \
      */
     public class MyTimerTask extends TimerTask {
+
+        // this method handles movement of the snake \
         @Override
         public void run() {
-            MyLog.i("move done");
+            // defining all reusable variables here \
+            int newCellX = 0, newCellY = 0;
+            Snake.SnakeCell snakeCell; // to use only one object
+            snakeCell = snake.getCell(0); // for head of the snake
+//            Snake.SnakeCell snakesHead = snake.getCell(0);
+
+            MyLog.i("before head move: snakeCell.getIndexOfSymbol() = " + snakeCell.getIndexOfSymbol());
+            MyLog.i("before head move: snakeCell.getIndexOfRow() = " + snakeCell.getIndexOfRow());
+
+            switch (snakeDirection) {
+                case 0: // tail to right - head moves to left \
+                    newCellX = snakeCell.getIndexOfSymbol() + 1;
+                    newCellY = snakeCell.getIndexOfRow();
+                    break;
+                case 1: // tail is set up - head moves down \
+                    newCellX = snakeCell.getIndexOfSymbol();
+                    newCellY = snakeCell.getIndexOfRow() + 1;
+                    break;
+                case 2: // tail to left - head moves to right \
+                    newCellX = snakeCell.getIndexOfSymbol() - 1;
+                    newCellY = snakeCell.getIndexOfRow();
+                    break;
+                case 3: // tail is set down - head moves up \
+                    newCellX = snakeCell.getIndexOfSymbol();
+                    newCellY = snakeCell.getIndexOfRow() - 1;
+                    break;
+            }
+            // moving snake's head \
+            snakeCell.setIndexOfSymbol(newCellX);
+            snakeCell.setIndexOfRow(newCellY);
+
+            MyLog.i("after head move: snakeCell.getIndexOfSymbol() = " + snakeCell.getIndexOfSymbol());
+            MyLog.i("after head move: snakeCell.getIndexOfRow() = " + snakeCell.getIndexOfRow());
+
+            // saving information about the last cell position - it will be freed in the end \
+            snakeCell = snake.getCell(snake.getLength() - 1);
+            int cellToFreeX = snakeCell.getIndexOfSymbol();
+            int cellToFreeY = snakeCell.getIndexOfRow();
+            MyLog.i("cellToFree -> snake length = " + snake.getLength());
+            // making single change to every cell in the model of snake \
+            for (int i = 1; i < snake.getLength(); i++) {
+                snakeCell = snake.getCell(i - 1); // to get position of every previous cell
+                // shifting 1 cell at a step \
+                newCellX = snakeCell.getIndexOfSymbol();
+                newCellY = snakeCell.getIndexOfRow();
+                // moving every cell of the snake's body \
+                snakeCell = snake.getCell(i); // to update current cell vith position of previous \
+                snakeCell.setIndexOfSymbol(newCellX);
+                snakeCell.setIndexOfRow(newCellY);
+            }
+            // here we have just finished to update snake's model \
+            MyLog.i("move done in snake's model");
+            // now it's obvious to update model for field with snake's new data and display this all \
+            int cellPositionX, cellPositionY;
+            for (int i = 0; i < snake.getLength(); i++) {
+                snakeCell = snake.getCell(i);
+                cellPositionX = snakeCell.getIndexOfSymbol();
+                cellPositionY = snakeCell.getIndexOfRow();
+                try {
+                    // setting the snake body \
+                    mainCharArrayList.get(cellPositionY)[cellPositionX] = SNAKE;
+                    // recovering the field after the snake's tail \
+                    mainCharArrayList.get(cellToFreeY)[cellToFreeX] = SPACE;
+                } catch (IndexOutOfBoundsException ioobe) {
+                    // ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException
+                    gameOver();
+                    return;
+                }
+            }
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateTextView(mainCharArrayList);
+                }
+            });
+            // exit conditions check is the last thing to do \
             if (collisionHappened()) gameOver(); // this is the only way out from loop \
             else score++;
-        }
+        } // end of run-method \\
+
+        // VERIFICATIONS ===========================================================================
 
         private boolean collisionHappened() {
             // we have only to check what happens to the snake's head - other cells are inactive \
-            Snake.SnakeCell snakesHead = snake.getSnakeCell(0);
-            int snakeHeadY = snakesHead.getRowIndex();
-            int snakeHeadX = snakesHead.getIndexInRow();
+            Snake.SnakeCell snakesHead = snake.getCell(0);
+            int snakeHeadY = snakesHead.getIndexOfRow();
+            int snakeHeadX = snakesHead.getIndexOfSymbol();
 
             if (snake.getLength() <= 4) { // snake with less length cannot collide with itself \
                 return touchedBounds(snakeHeadY, snakeHeadX);
-            } else return touchedBounds(snakeHeadY, snakeHeadX) || touchedItelf(snakeHeadY, snakeHeadX);
+            } else
+                return touchedBounds(snakeHeadY, snakeHeadX) || touchedItelf(snakeHeadY, snakeHeadX);
         }
 
         // connected to collisionHappened-method \
@@ -363,8 +476,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         private boolean touchedItelf(int snakeHeadY, int snakeHeadX) {
             // snake can collide with itself beginning only from fifth element = fourth index \
             for (int i = 4; i < snake.getLength(); i++) {
-                Snake.SnakeCell snakeCell = snake.getSnakeCell(i);
-                if (snakeHeadY == snakeCell.getRowIndex() || snakeHeadX == snakeCell.getRowIndex())
+                Snake.SnakeCell snakeCell = snake.getCell(i);
+                if (snakeHeadY == snakeCell.getIndexOfRow() || snakeHeadX == snakeCell.getIndexOfRow())
                     return true;
             }
             return false;

@@ -19,11 +19,11 @@ public class Snake {
         return length;
     }
 
-    public void addSnakeCell(int index, SnakeCell newCell) {
+    public void addCell(int index, SnakeCell newCell) {
         snakeCells[index] = newCell;
     }
 
-    public SnakeCell getSnakeCell(int index) {
+    public SnakeCell getCell(int index) {
         return snakeCells[index];
     }
 
@@ -32,20 +32,28 @@ public class Snake {
      */
     public static class SnakeCell {
 
-        private int rowIndex, indexInRow;
+        private int indexOfRow, indexOfSymbol;
 
         // i decided to set every cell as a simple object \
-        public SnakeCell(int rowIndex, int indexInRow) {
-            this.rowIndex = rowIndex;
-            this.indexInRow = indexInRow;
+        public SnakeCell(int indexOfRow, int indexOfSymbol) {
+            this.indexOfRow = indexOfRow;
+            this.indexOfSymbol = indexOfSymbol;
         }
 
-        public int getRowIndex() {
-            return rowIndex;
+        public int getIndexOfRow() {
+            return indexOfRow;
         }
 
-        public int getIndexInRow() {
-            return indexInRow;
+        public int getIndexOfSymbol() {
+            return indexOfSymbol;
+        }
+
+        public void setIndexOfRow(int indexOfRow) {
+            this.indexOfRow = indexOfRow;
+        }
+
+        public void setIndexOfSymbol(int indexOfSymbol) {
+            this.indexOfSymbol = indexOfSymbol;
         }
     }
 }
