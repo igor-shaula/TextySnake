@@ -27,12 +27,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private final char SNAKE = '@';
     private final char SPACE = ' ';
-    private final char FOOD = '$'; // +1 to length
     private final char BORDER = '+';
-    private final char LENGTH_PLUS = '&'; // +2 to length
+
+    // types of food for the snake \
+    private final char LENGTH_PLUS = '$'; // +1 to length
     private final char LENGTH_MINUS = '*'; // -1 from length
-    private final char SPEED_SLOW = '-'; // slows by 25%
-    private final char SPEED_UP = '#'; // speeds up by 25%
+    private final char SPEED_UP = '#'; // +1 to speed
+    private final char SPEED_SLOW = '-'; // -1 from speed
 
     private Random random = new Random();
 
@@ -46,13 +47,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
     private int symbolsInFieldLine, fieldLinesCount; // in items - for arrays \
     private int foodPositionRow, foodPositionSymbol;
+    private char[] foodTypeArray = {LENGTH_PLUS, LENGTH_MINUS, SPEED_SLOW, SPEED_UP};
+    private char foodType;
 
     // main data storage \
     private ArrayList<char[]> mainCharArrayList;
 
     // active widgets \
     private AppCompatTextView actvMainField, actvTime, actvScore;
-    private Button bStart;
+    private Button bStartStop;
 
     // game parameters \
     private long timeInGame;
@@ -64,6 +67,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // TODO: 25.03.2016 investigate specifics of ANSI symbolss \
+
+        /*
+        1.1.5. “Їжа”  та бонуси зявляються випадковим чином як за часом, так і за позицією.
+        Зникають за 10 секунд після появи.
+        При контакті голови змії з їжею чи бонусом - поведінка гри повинна бути відповідною
+        - збільшення довжини змії чи активація бонусу.
+
+        1.1.6. Швидкість руху  змії повинна залежати від довжини змії,
+        проте не бути занадто повільною на початку та не занадто швидкою при досягненні великої довжини.
+
+        1.1.7. Гра має підтримувати як ланшафтну, так и портретну орієнтацію.
+        */
 
         // from the very beginning we have to define available field \
         actvMainField = (AppCompatTextView) findViewById(R.id.actvMainField);
@@ -99,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         actvTime = (AppCompatTextView) findViewById(R.id.actvTime);
         actvScore = (AppCompatTextView) findViewById(R.id.actvScore);
 
-        bStart = (Button) findViewById(R.id.bStartPause);
-        assert bStart != null;
-        bStart.setOnClickListener(this);
+        bStartStop = (Button) findViewById(R.id.bStartPause);
+        assert bStartStop != null;
+        bStartStop.setOnClickListener(this);
     } // end of onCreate-method \\
 
     // 0 - from onGlobalLayout-method
@@ -221,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             // now it is time to create new snake cell \
-            Snake.SnakeCell newCell = new Snake.SnakeCell(cellPositionY, cellPositionX);
+            Snake.SnakeCell newCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
             // updating the snake's model \
             snake.addCell(i, newCell);
             // placing the this snake cell to our field \
@@ -237,14 +254,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // 4 - from onGlobalLayout-method
     private void setInitialFood() {
-    // this method gets called after the snake is initialized - so we have to check collisions \
-
-        // i decided to do all in one cycle because of low probability of collisions \
+/*
+        this method gets called after the snake is initialized -so we have to check collisions \
+        i decided to do all in one cycle because of low probability of collisions \
+*/
         do {
-            /* range for random: +1 -2 = -1
-             increased by one to include the whole range of values \
-             decreased by two to exclude visible field borders \
-             */
+            /*
+            range for random: +1 -2 = -1
+            increased by one to include the whole range of values \
+            decreased by two to exclude visible field borders \
+            */
             foodPositionRow = random.nextInt(fieldLinesCount - 1) + 1;
             foodPositionSymbol = random.nextInt(symbolsInFieldLine - 1) + 1;
             // -1 instead of +1 just to avoid placing food on the boards \
@@ -254,8 +273,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        } while (mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] == SNAKE);
         // TODO: 25.03.2016 check this algorithm \
 
+        foodType = foodTypeArray[random.nextInt(foodTypeArray.length)];
+
         // substracting 1 because we know that these are indexes - counted from zero \
-        mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] = FOOD;
+        mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] = foodType;
 //        mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] = FOOD;
         updateTextView(mainCharArrayList);
 
@@ -286,10 +307,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void gameOver() {
-
+        MyLog.i("game ended with score " + score);
         timer.cancel();
         timer.purge();
-        MyLog.i("game ended with score " + score);
+        // resetting the start-stop button to its primary state \
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bStartStop.setText(R.string.start);
+                score = 0;
+            }
+        });
     }
 
     // MENU ========================================================================================
@@ -304,7 +332,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        if (item.getItemId() == R.id.setComplexity) {
         int newSnakeSpeed = 0;
         switch (item.getItemId()) {
             case R.id.speed_5:
@@ -363,9 +390,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         timer.cancel();
                         timer = null;
                     }
-                    bStart.setText(R.string.start);
+                    bStartStop.setText(R.string.start);
                 } else {
-                    bStart.setText(R.string.stop);
+                    bStartStop.setText(R.string.stop);
                     moveSnake(snakeSpeed);
                 }
                 alreadyLaunched = !alreadyLaunched;
@@ -451,6 +478,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return;
                 }
             }
+            // updating the field with new snake's position \
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -460,21 +488,97 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     // TODO: 25.03.2016 adjust getting and showing time \
                 }
             });
+            MyLog.i("ui updated");
+            // now handling eating of food and bonuses - it's taken by the head only \
+            if (isFoodFound()) {
+//                MyLog.i("food eaten");
+                eatFood();
+//                eatSomething();
+            }
             // exit conditions check is the last thing to do \
             if (collisionHappened()) gameOver(); // this is the only way out from loop \
-            else {
-                score++;
-                checkFood();
-            }
+            else score++;
+
         } // end of run-method \\
 
         // VERIFICATIONS ===========================================================================
 
+        private boolean isFoodFound() {
+            return snake.getCell(0).getIndexOfRow() == foodPositionRow
+                    && snake.getCell(0).getIndexOfSymbol() == foodPositionSymbol;
+        }
+
+        private void eatFood() {
+            int cellPositionX, cellPositionY;
+            Snake.SnakeCell currentCell;
+            MyLog.i("eaten = " + mainCharArrayList.get(foodPositionRow)[foodPositionSymbol]);
+            switch (foodType) {
+
+                case LENGTH_PLUS: // length +1
+                    /*
+                    i decided to add a new cell at the snake 's head - because we know the direction \
+                    new cell will get visible only at the net move\
+                    right now i 'm only updating the model - not the view \
+                    */
+                    cellPositionX = foodPositionSymbol + shiftAfterFood(snakeDirection, true);
+                    cellPositionY = foodPositionRow + shiftAfterFood(snakeDirection, false);
+                    currentCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
+                    snake.addCell(snake.getLength(), currentCell);
+                    MyLog.i("LENGTH_PLUS taken!");
+                    break;
+
+                case LENGTH_MINUS: // length -1
+                    // just removing the last cell \
+                    if (snake.getLength() > 1) { // to avoid snake's dissappearing \
+                        // first updating field to clear snake's tail - while it's available \
+                        currentCell = snake.getCell(snake.getLength() - 1);
+                        cellPositionX = currentCell.getIndexOfSymbol();
+                        cellPositionY = currentCell.getIndexOfRow();
+                        mainCharArrayList.get(cellPositionY)[cellPositionX] = SPACE;
+                        // now it is safe to update the model \
+                        snake.removeCell(snake.getLength() - 1);
+                    }
+                    MyLog.i("LENGTH_MINUS taken!");
+                    break;
+
+                case SPEED_UP: // speed +1
+                    snakeSpeed++;
+                    MyLog.i("SPEED_UP taken!");
+                    break;
+
+                case SPEED_SLOW: // speed -1
+                    if (snakeSpeed > 1) // to avoid falling after division by zero \
+                        snakeSpeed--;
+                    MyLog.i("SPEED_SLOW taken!");
+                    break;
+            }
+        }
+
+        private int shiftAfterFood(int direction, boolean isForX) {
+            if (isForX)
+                switch (direction) {
+                    case 0: // to right - for X
+                        return 1;
+                    case 2: // to left - for X
+                        return -1;
+                    default: // up and dowm - 1, 3 cases don't affect X
+                        return 0;
+                }
+            else
+                switch (direction) {
+                    case 1: // up - for Y
+                        return 1;
+                    case 3: // down - for Y
+                        return -1;
+                    default: // to right and left - 0, 2 cases don't affect Y
+                        return 0;
+                }
+        }
+
         private boolean collisionHappened() {
             // we have only to check what happens to the snake's head - other cells are inactive \
-            Snake.SnakeCell snakesHead = snake.getCell(0);
-            int snakeHeadY = snakesHead.getIndexOfRow();
-            int snakeHeadX = snakesHead.getIndexOfSymbol();
+            int snakeHeadY = snake.getCell(0).getIndexOfRow();
+            int snakeHeadX = snake.getCell(0).getIndexOfSymbol();
 
             if (snake.getLength() <= 4) { // snake with less length cannot collide with itself \
                 return touchedBounds(snakeHeadY, snakeHeadX);
@@ -487,8 +591,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // we can avoid loop here assuming that snake's head has index of 0 \
             return snakeHeadY == 0 || snakeHeadY == fieldLinesCount ||
                     snakeHeadX == 0 || snakeHeadX == symbolsInFieldLine;
-
-            // TODO: 25.03.2016 adjust to avoid moving on bounds \
         }
 
         // connected to collisionHappened-method \
@@ -500,10 +602,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return true;
             }
             return false;
-        }
-
-        private void checkFood() {
-
         }
     }
 }

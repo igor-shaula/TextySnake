@@ -13,6 +13,10 @@ public class Snake {
         snakeCellArrayList.add(index, newCell);
     }
 
+    public void removeCell(int index) {
+        snakeCellArrayList.remove(index);
+    }
+
     public SnakeCell getCell(int index) {
         return snakeCellArrayList.get(index);
     }
@@ -29,9 +33,9 @@ public class Snake {
         private int indexOfRow, indexOfSymbol;
 
         // i decided to set every cell as a simple object \
-        public SnakeCell(int indexOfRow, int indexOfSymbol) {
-            this.indexOfRow = indexOfRow;
-            this.indexOfSymbol = indexOfSymbol;
+        public SnakeCell(int x, int y) {
+            this.indexOfSymbol = x;
+            this.indexOfRow = y;
         }
 
         public int getIndexOfRow() {

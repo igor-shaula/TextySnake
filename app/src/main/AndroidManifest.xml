@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tryings.my.dev_challenge_2016">
+    <!-- package name was specially done like this - to exclude any links to author in code -->
 
     <application
         android:allowBackup="true"
