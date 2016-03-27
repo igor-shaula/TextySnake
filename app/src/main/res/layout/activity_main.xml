@@ -16,8 +16,9 @@
             android:id="@+id/actvMainField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/primary_light"
+            android:background="@color/primary_dark"
             android:text="@string/oneSymbol"
+            android:textColor="@color/primary_light"
             android:textIsSelectable="false"
             android:textStyle="bold"
             android:typeface="monospace" />
@@ -25,9 +26,10 @@
     </FrameLayout>
 
     <RelativeLayout
+        android:id="@+id/rlButtons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_8">
+        android:layout_marginTop="@dimen/size_8dp">
 
         <ImageButton
             android:id="@+id/ibUp"
@@ -76,7 +78,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_8"
+        android:layout_marginTop="@dimen/size_8dp"
         android:background="@color/primary"
         android:gravity="center"
         android:orientation="horizontal">
@@ -88,9 +90,8 @@
 
         <Button
             android:id="@+id/bStartPause"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="@string/start" />
 
         <android.support.v7.widget.AppCompatTextView

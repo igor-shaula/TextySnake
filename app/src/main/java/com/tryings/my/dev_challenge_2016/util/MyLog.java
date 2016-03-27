@@ -2,6 +2,9 @@ package com.tryings.my.dev_challenge_2016.util;
 
 import android.util.Log;
 
+/**
+ * just a useful wrapper for system Log \
+ */
 public class MyLog {
 
     private static final String TAG = "LOG";

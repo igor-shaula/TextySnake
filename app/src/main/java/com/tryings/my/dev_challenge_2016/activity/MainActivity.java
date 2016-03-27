@@ -31,17 +31,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // types of food for the snake \
     private final char LENGTH_PLUS = '$'; // +1 to length
-    private final char LENGTH_MINUS = '*'; // -1 from length
+    private final char LENGTH_MINUS = '-'; // -1 from length
     private final char SPEED_UP = '#'; // +1 to speed
-    private final char SPEED_SLOW = '-'; // -1 from speed
-
-    private Random random = new Random();
-
-    // definition of the snake \
-    private Snake snake;
-    private int snakeSpeed = 3;
-    private int snakeDirection;
-    private int startingLength = 3;
+    private final char SPEED_SLOW = '*'; // -1 from speed
 
     // definition of the field \
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
@@ -49,6 +41,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private int foodPositionRow, foodPositionSymbol;
     private char[] foodTypeArray = {LENGTH_PLUS, LENGTH_MINUS, SPEED_SLOW, SPEED_UP};
     private char foodType;
+    private final int updateFoodPeriod = 10 * 1000;
+    private int oldFoodPositionX, oldFoodPositionY;
+
+    private Random random = new Random();
+
+    // definition of the snake \
+    private Snake snake;
+    private int snakeSpeed = 3;
+    private int snakeDirection;
+    private int startingSnakeLength = 3;
 
     // main data storage \
     private ArrayList<char[]> mainCharArrayList;
@@ -58,10 +60,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button bStartStop;
 
     // game parameters \
-    private long timeInGame;
     private int score;
-    private boolean alreadyLaunched = false;
+    private boolean alreadyLaunched = false, wasGameOver = false;
     private Timer timer;
+
+    // LIFECYCLE ===================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,18 +72,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         // TODO: 25.03.2016 investigate specifics of ANSI symbolss \
-
-        /*
-        1.1.5. “Їжа”  та бонуси зявляються випадковим чином як за часом, так і за позицією.
-        Зникають за 10 секунд після появи.
-        При контакті голови змії з їжею чи бонусом - поведінка гри повинна бути відповідною
-        - збільшення довжини змії чи активація бонусу.
-
-        1.1.6. Швидкість руху  змії повинна залежати від довжини змії,
-        проте не бути занадто повільною на початку та не занадто швидкою при досягненні великої довжини.
-
-        1.1.7. Гра має підтримувати як ланшафтну, так и портретну орієнтацію.
-        */
 
         // from the very beginning we have to define available field \
         actvMainField = (AppCompatTextView) findViewById(R.id.actvMainField);
@@ -94,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         detectFieldParameters(listener); // 0
                         prepareTextField(); // 1
                         setFieldBorders(); // 2
-                        setInitialSnake(startingLength); // 3
+                        setInitialSnake(); // 3
                         setInitialFood(); // 4
                     }
                 });
@@ -121,17 +112,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bStartStop.setOnClickListener(this);
     } // end of onCreate-method \\
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    // BEFORE START ================================================================================
+
     // 0 - from onGlobalLayout-method
     private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
         // getting current screen size in pixels \
         fieldPixelWidth = actvMainField.getWidth();
-        MyLog.d("fieldPixelWidth " + fieldPixelWidth);
+        MyLog.i("fieldPixelWidth " + fieldPixelWidth);
 
         FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
         assert flMain != null;
         fieldPixelHeight = flMain.getHeight();
-//                        fieldPixelHeight = actvMainField.getHeight();
-        MyLog.d("fieldPixelHeight " + fieldPixelHeight);
+        MyLog.i("fieldPixelHeight " + fieldPixelHeight);
 
         // now removing the listener - it's not needed any more \
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
@@ -144,15 +146,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // 1 - from onGlobalLayout-method
     private void prepareTextField() {
 
-        // here we get pixel width of a single symbol - initial TextView has only one symbol \
-        actvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        int measuredSymbolWidth = actvMainField.getMeasuredWidth();
-        MyLog.i("measuredSymbolWidth " + measuredSymbolWidth);
+        if (!wasGameOver) {
+            // here we get pixel width of a single symbol - initial TextView has only one symbol \
+            actvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            int measuredSymbolWidth = actvMainField.getMeasuredWidth();
+            MyLog.i("measuredSymbolWidth " + measuredSymbolWidth);
 
-        // getting our first valuable parameter - the size of main array \
-        symbolsInFieldLine = fieldPixelWidth / measuredSymbolWidth;
-        MyLog.i("symbolsInFieldLine " + symbolsInFieldLine);
-
+            // getting our first valuable parameter - the size of main array \
+            symbolsInFieldLine = fieldPixelWidth / measuredSymbolWidth;
+            MyLog.i("symbolsInFieldLine " + symbolsInFieldLine);
+        }
         // clearing the text field to properly initialize it for game \
         actvMainField.setText(null);
 
@@ -201,17 +204,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 3 - from onGlobalLayout-method
-     *
-     * @param snakeLength defines the starting number of cells inside the snake \
-     * @return snake which is ready to start playing \
      */
-    private Snake setInitialSnake(int snakeLength) {
+    private Snake setInitialSnake() {
 
         snake = new Snake();
 
         // 1 - defining start directions to properly set up the snake \
         snakeDirection = random.nextInt(3) + 1;
-        for (int i = 0; i < snakeLength; i++) {
+        for (int i = 0; i < startingSnakeLength; i++) {
             // here we define position of every snake's cell \
             int cellPositionX = 0, cellPositionY = 0;
             // setting tail in the opposite direction here - to free space for head \
@@ -243,81 +243,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             snake.addCell(i, newCell);
             // placing the this snake cell to our field \
             mainCharArrayList.get(cellPositionY)[cellPositionX] = SNAKE;
-
-            MyLog.i("after head move: snakeCell.getIndexOfSymbol() = " + snake.getCell(0).getIndexOfSymbol());
-            MyLog.i("after head move: snakeCell.getIndexOfRow() = " + snake.getCell(0).getIndexOfRow());
         } // end of for-loop
-        updateTextView(mainCharArrayList);
+        updateTextView();
 
         return snake;
     } // end of setInitialSnake-method \\
 
     // 4 - from onGlobalLayout-method
     private void setInitialFood() {
+        updateFood();
+        updateTextView();
+    } // end of setInitialFood-method \\
+
+    private void updateFood() {
 /*
         this method gets called after the snake is initialized -so we have to check collisions \
         i decided to do all in one cycle because of low probability of collisions \
 */
+        // first of all clearing old place \
+        char replaceToSpace = mainCharArrayList.get(oldFoodPositionY)[oldFoodPositionX];
+        if (replaceToSpace != BORDER) // this might happen at the very start \
+            mainCharArrayList.get(oldFoodPositionY)[oldFoodPositionX] = SPACE;
+        // now everything is clear and we can set new food type and position \
         do {
             /*
             range for random: +1 -2 = -1
             increased by one to include the whole range of values \
             decreased by two to exclude visible field borders \
             */
-            foodPositionRow = random.nextInt(fieldLinesCount - 1) + 1;
-            foodPositionSymbol = random.nextInt(symbolsInFieldLine - 1) + 1;
+            foodPositionRow = random.nextInt(fieldLinesCount - 2) + 1;
+            foodPositionSymbol = random.nextInt(symbolsInFieldLine - 2) + 1;
             // -1 instead of +1 just to avoid placing food on the boards \
             MyLog.i("random foodPositionRow " + foodPositionRow);
             MyLog.i("random foodPositionSymbol " + foodPositionSymbol);
         } while (mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] == SNAKE);
-//        } while (mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] == SNAKE);
-        // TODO: 25.03.2016 check this algorithm \
+
+        oldFoodPositionX = foodPositionSymbol;
+        oldFoodPositionY = foodPositionRow;
 
         foodType = foodTypeArray[random.nextInt(foodTypeArray.length)];
 
         // substracting 1 because we know that these are indexes - counted from zero \
         mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] = foodType;
 //        mainCharArrayList.get(foodPositionRow - 1)[foodPositionSymbol - 1] = FOOD;
-        updateTextView(mainCharArrayList);
+    }
 
-        new Timer("timer", true);
-    } // end of setInitialFood-method \\
-
-    /**
-     * @param charArrayList model to set into our main text field \
-     */
-    private void updateTextView(ArrayList<char[]> charArrayList) {
+    private void updateTextView() {
 
         StringBuilder newStringToSet = new StringBuilder();
         for (int i = 0; i < fieldLinesCount; i++) {
-            newStringToSet.append(charArrayList.get(i));
+            newStringToSet.append(mainCharArrayList.get(i));
         }
         actvMainField.setText(newStringToSet);
-    }
-
-    /**
-     * all game is passing inside this method \
-     *
-     * @param speed - needed to calculate delay inside this method \
-     */
-    private void moveSnake(int speed) {
-        int delay = 1000 / speed;
-        timer = new Timer();
-        timer.schedule(new MyTimerTask(), 0, delay);
-    }
-
-    private void gameOver() {
-        MyLog.i("game ended with score " + score);
-        timer.cancel();
-        timer.purge();
-        // resetting the start-stop button to its primary state \
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                bStartStop.setText(R.string.start);
-                score = 0;
-            }
-        });
     }
 
     // MENU ========================================================================================
@@ -390,14 +367,53 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         timer.cancel();
                         timer = null;
                     }
+                    int stopTextColor = getResources().getColor(R.color.primary_light);
+                    actvMainField.setTextColor(stopTextColor);
                     bStartStop.setText(R.string.start);
                 } else {
+                    if (wasGameOver) {
+                        // everything is reset to later start from scratch \
+                        prepareTextField();
+                        setFieldBorders();
+                        setInitialSnake();
+                        setInitialFood();
+                        wasGameOver = false;
+                    }
+                    int startTextColor = getResources().getColor(android.R.color.white);
+                    actvMainField.setTextColor(startTextColor);
+                    actvMainField.setBackgroundResource(R.color.primary_dark);
                     bStartStop.setText(R.string.stop);
-                    moveSnake(snakeSpeed);
+                    // launching everything \
+                    int delay = 1000 / snakeSpeed;
+                    timer = new Timer();
+                    timer.schedule(new SnakeMoveTimerTask(), 0, delay);
+                    timer.schedule(new FoodUpdateTimerTask(), updateFoodPeriod, updateFoodPeriod);
+                    timer.schedule(new TimeUpdateTimerTask(), 0, 1);
                 }
                 alreadyLaunched = !alreadyLaunched;
                 break;
         }
+    } // end of onClick-method \\
+
+    private void gameOver() {
+        wasGameOver = true;
+        alreadyLaunched = false;
+        MyLog.i("game ended with score " + score);
+        timer.cancel();
+        timer.purge();
+        timer = null;
+        // resetting the start-stop button to its primary state \
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bStartStop.setText(R.string.start);
+                int endTextColor = getResources().getColor(android.R.color.primary_text_light);
+                actvMainField.setTextColor(endTextColor);
+                actvMainField.setBackgroundResource(R.color.primary_light);
+                // updating score for the next launch \
+                score = 0;
+            }
+        });
     }
 
     // MOVEMENT ====================================================================================
@@ -405,7 +421,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * special class defined for repeating operations and usage of Timer \
      */
-    public class MyTimerTask extends TimerTask {
+    public class SnakeMoveTimerTask extends TimerTask {
 
         // this method handles movement of the snake \
         @Override
@@ -482,23 +498,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateTextView(mainCharArrayList);
-                    actvScore.setText(String.valueOf(score));
-                    actvTime.setText(DateFormat.format("mm:ss:sss", timeInGame));
-                    // TODO: 25.03.2016 adjust getting and showing time \
+                    updateTextView();
+                    String scoreComplex = getString(R.string.score) + ": " + score;
+                    actvScore.setText(scoreComplex);
                 }
             });
             MyLog.i("ui updated");
             // now handling eating of food and bonuses - it's taken by the head only \
             if (isFoodFound()) {
-//                MyLog.i("food eaten");
                 eatFood();
-//                eatSomething();
+                MyLog.i("food eaten");
             }
             // exit conditions check is the last thing to do \
             if (collisionHappened()) gameOver(); // this is the only way out from loop \
             else score++;
-
         } // end of run-method \\
 
         // VERIFICATIONS ===========================================================================
@@ -524,6 +537,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cellPositionY = foodPositionRow + shiftAfterFood(snakeDirection, false);
                     currentCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
                     snake.addCell(snake.getLength(), currentCell);
+                    snakeSpeed++;
                     MyLog.i("LENGTH_PLUS taken!");
                     break;
 
@@ -537,6 +551,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mainCharArrayList.get(cellPositionY)[cellPositionX] = SPACE;
                         // now it is safe to update the model \
                         snake.removeCell(snake.getLength() - 1);
+                        if (snakeSpeed > 1) snakeSpeed--;
                     }
                     MyLog.i("LENGTH_MINUS taken!");
                     break;
@@ -589,8 +604,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // connected to collisionHappened-method \
         private boolean touchedBounds(int snakeHeadY, int snakeHeadX) {
             // we can avoid loop here assuming that snake's head has index of 0 \
-            return snakeHeadY == 0 || snakeHeadY == fieldLinesCount ||
-                    snakeHeadX == 0 || snakeHeadX == symbolsInFieldLine;
+            return snakeHeadY == 0 || snakeHeadY == fieldLinesCount - 1 ||
+                    snakeHeadX == 0 || snakeHeadX == symbolsInFieldLine - 1;
         }
 
         // connected to collisionHappened-method \
@@ -603,5 +618,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             return false;
         }
+    } // end of SnakeMoveTimerTask-class \\
+
+    public class FoodUpdateTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            updateFood();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateTextView();
+                }
+            });
+            MyLog.i("foodType updated");
+        }
     }
+
+    public class TimeUpdateTimerTask extends TimerTask {
+        // code here is called every milisecond - it has to be really fast \
+        long initialSystemTime = System.currentTimeMillis();
+
+        @Override
+        public void run() {
+            long elapsedTimeLong = System.currentTimeMillis() - initialSystemTime;
+/*
+            00 added to the beginning of the string to avoid situation <=99 difference
+            that means less than three digits and ArrayOutOfBoundsException as a result
+*/
+            String systemTimeString = String.valueOf("00" + elapsedTimeLong);
+            final StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append(DateFormat.format("mm:ss", elapsedTimeLong));
+            stringBuilder.append(":").append(getMilliseconds(systemTimeString));
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    actvTime.setText(stringBuilder);
+                }
+            });
+        }
+
+        private String getMilliseconds(String systemTimeString) {
+
+            int stringIndex = systemTimeString.length() - 1;
+            int innerIndex = 3 - 1;
+            char[] digits = new char[3];
+            for (int i = stringIndex; i > stringIndex - 3; i--) {
+                digits[innerIndex] = systemTimeString.charAt(i);
+                innerIndex--;
+            }
+            return new String(digits);
+        }
+    } // end of TimeUpdateTimerTask-class \\
 }
