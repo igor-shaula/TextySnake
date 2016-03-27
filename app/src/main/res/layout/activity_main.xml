@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
-    <FrameLayout
+    <android.support.v7.widget.ContentFrameLayout
         android:id="@+id/flMain"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -23,7 +23,7 @@
             android:textStyle="bold"
             android:typeface="monospace" />
 
-    </FrameLayout>
+    </android.support.v7.widget.ContentFrameLayout>
 
     <RelativeLayout
         android:id="@+id/rlButtons"
@@ -31,7 +31,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/size_8dp">
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ibUp"
             style="@style/MyImageButton"
             android:layout_alignParentTop="true"
@@ -39,7 +39,7 @@
             android:contentDescription="@string/descButtonUp"
             android:src="@drawable/circled_up" />
 
-        <ImageView
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ivCenter"
             style="@style/MyImageButton"
             android:layout_below="@id/ibUp"
@@ -47,7 +47,7 @@
             android:contentDescription="@string/descCentralImage"
             android:src="@drawable/all_directions" />
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ibDown"
             style="@style/MyImageButton"
             android:layout_below="@id/ivCenter"
@@ -55,7 +55,7 @@
             android:contentDescription="@string/descButtonDown"
             android:src="@drawable/circled_down" />
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ibLeft"
             style="@style/MyImageButton"
             android:layout_centerVertical="true"
@@ -64,7 +64,7 @@
             android:contentDescription="@string/descButtonLeft"
             android:src="@drawable/circled_left" />
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             android:id="@+id/ibRight"
             style="@style/MyImageButton"
             android:layout_centerVertical="true"
@@ -75,7 +75,7 @@
 
     </RelativeLayout>
 
-    <LinearLayout
+    <android.support.v7.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/size_8dp"
@@ -88,7 +88,7 @@
             style="@style/MyText"
             android:text="@string/defaultTime" />
 
-        <Button
+        <android.support.v7.widget.AppCompatButton
             android:id="@+id/bStartPause"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -99,6 +99,6 @@
             style="@style/MyText"
             android:text="@string/score" />
 
-    </LinearLayout>
+    </android.support.v7.widget.LinearLayoutCompat>
 
-</LinearLayout>
+</android.support.v7.widget.LinearLayoutCompat>

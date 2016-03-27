@@ -1,8 +1,10 @@
 package com.tryings.my.dev_challenge_2016.activity;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
+import android.os.Vibrator;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.format.DateFormat;
 import android.view.Menu;
@@ -10,7 +12,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
@@ -24,45 +25,68 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-
+/*
+    // keys for saving-restoring after screen orientation change \
+    private final String KEY_SNAKE = "snake";
+    private final String KEY_SNAKE_LENGTH = "snakeLength";
+    private final String KEY_SNAKE_SPEED = "snakeSpeed";
+    private final String KEY_SNAKE_DIRECTION = "snakeDirection";
+    private final String KEY_SCORE = "score";
+    private final String KEY_ALREADY_LAUNCHED = "alreadyLaunched";
+    private final String KEY_WAS_GAME_OVER = "wasGameOver";
+*/
+    // basic symbols to create starting game field \
     private final char SNAKE = '@';
     private final char SPACE = ' ';
     private final char BORDER = '+';
 
     // types of food for the snake \
-    private final char LENGTH_PLUS = '$'; // +1 to length
+    private final char LENGTH_PLUS = '$'; // +1 to length - this is the main type of food \
     private final char LENGTH_MINUS = '-'; // -1 from length
     private final char SPEED_UP = '#'; // +1 to speed
     private final char SPEED_SLOW = '*'; // -1 from speed
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int LONG_VIBRAION = 300;
+    private final int SHORT_VIBRAION = 100;
+
+    // following fields are safely rebuilt after changing screen configuration \\\\\\\\\\\\\\\\\\\\\
+
     // definition of the field \
+    private char foodType;
+    private char[] foodTypeArray = // LENGTH_PLUS will be as often as other values in sum \
+            {LENGTH_PLUS, LENGTH_PLUS, LENGTH_PLUS, LENGTH_MINUS, SPEED_SLOW, SPEED_UP};
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int updateFoodPeriod = 10 * 1000;
+    private int foodPositionRow, foodPositionSymbol;
+    private int oldFoodPositionX, oldFoodPositionY;
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
     private int symbolsInFieldLine, fieldLinesCount; // in items - for arrays \
-    private int foodPositionRow, foodPositionSymbol;
-    private char[] foodTypeArray = {LENGTH_PLUS, LENGTH_MINUS, SPEED_SLOW, SPEED_UP};
-    private char foodType;
-    private final int updateFoodPeriod = 10 * 1000;
-    private int oldFoodPositionX, oldFoodPositionY;
-
-    private Random random = new Random();
-
-    // definition of the snake \
-    private Snake snake;
-    private int snakeSpeed = 3;
-    private int snakeDirection;
-    private int startingSnakeLength = 3;
 
     // main data storage \
     private ArrayList<char[]> mainCharArrayList;
 
     // active widgets \
     private AppCompatTextView actvMainField, actvTime, actvScore;
-    private Button bStartStop;
+    private AppCompatButton acbStartStop;
+
+    // utils from the system \
+    private Vibrator vibrator;
+    private Random random = new Random();
+    private Timer timer;
+
+    // following values have to be saved after changing screen orientation \\\\\\\\\\\\\\\\\\\\\\\\\
+
+    // definition of the snake \
+    private Snake snake;
+    @SuppressWarnings("FieldCanBeLocal")
+    private int snakeLength = 3;
+    private int snakeSpeed = 3;
+    private int snakeDirection;
 
     // game parameters \
     private int score;
     private boolean alreadyLaunched = false, wasGameOver = false;
-    private Timer timer;
 
     // LIFECYCLE ===================================================================================
 
@@ -70,8 +94,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+/*
+        //noinspection StatementWithEmptyBody
+        if (savedInstanceState != null) {
 
-        // TODO: 25.03.2016 investigate specifics of ANSI symbolss \
+            // doesn't work fine yet - i have no time to fix it right now \
+
+            snake = savedInstanceState.getParcelable(KEY_SNAKE);
+            snakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
+            snakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
+            snakeLength = savedInstanceState.getInt(KEY_SNAKE_LENGTH);
+            score = savedInstanceState.getInt(KEY_SCORE);
+            alreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
+            wasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
+        } else {}
+*/
+        /*
+        * NOTE !!! as for now - after changing configuration everything has to be restarted from scratch
+        * because the main parameters - numbers of rows and symbols in a row - are changed \
+        */
 
         // from the very beginning we have to define available field \
         actvMainField = (AppCompatTextView) findViewById(R.id.actvMainField);
@@ -107,19 +148,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         actvTime = (AppCompatTextView) findViewById(R.id.actvTime);
         actvScore = (AppCompatTextView) findViewById(R.id.actvScore);
 
-        bStartStop = (Button) findViewById(R.id.bStartPause);
-        assert bStartStop != null;
-        bStartStop.setOnClickListener(this);
+        acbStartStop = (AppCompatButton) findViewById(R.id.bStartPause);
+        assert acbStartStop != null;
+        acbStartStop.setOnClickListener(this);
+
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     } // end of onCreate-method \\
+
+    // SAVE_RESTORE ================================================================================
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+/*
+        outState.putParcelable(KEY_SNAKE, snake);
+        outState.putInt(KEY_SNAKE_DIRECTION, snakeDirection);
+        outState.putInt(KEY_SNAKE_SPEED, snakeSpeed);
+        outState.putInt(KEY_SNAKE_LENGTH, snakeLength);
+        outState.putInt(KEY_SCORE, score);
+        outState.putBoolean(KEY_ALREADY_LAUNCHED, alreadyLaunched);
+        outState.putBoolean(KEY_WAS_GAME_OVER, wasGameOver);
+*/
+        MyLog.i("onSaveInstanceState worked");
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+/*
+        snake = savedInstanceState.getParcelable(KEY_SNAKE);
+        snakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
+        snakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
+        snakeLength = savedInstanceState.getInt(KEY_SNAKE_LENGTH);
+        score = savedInstanceState.getInt(KEY_SCORE);
+        alreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
+        wasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
+*/
     }
 
     // BEFORE START ================================================================================
@@ -205,13 +269,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * 3 - from onGlobalLayout-method
      */
-    private Snake setInitialSnake() {
+    private void setInitialSnake() {
 
         snake = new Snake();
 
         // 1 - defining start directions to properly set up the snake \
         snakeDirection = random.nextInt(3) + 1;
-        for (int i = 0; i < startingSnakeLength; i++) {
+        for (int i = 0; i < snakeLength; i++) {
             // here we define position of every snake's cell \
             int cellPositionX = 0, cellPositionY = 0;
             // setting tail in the opposite direction here - to free space for head \
@@ -245,8 +309,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mainCharArrayList.get(cellPositionY)[cellPositionX] = SNAKE;
         } // end of for-loop
         updateTextView();
-
-        return snake;
     } // end of setInitialSnake-method \\
 
     // 4 - from onGlobalLayout-method
@@ -328,18 +390,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    // SAVE_RESTORE ================================================================================
-
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState, PersistableBundle persistentState) {
-        super.onRestoreInstanceState(savedInstanceState, persistentState);
-    }
-
     // LISTENER ====================================================================================
 
     @Override
@@ -347,29 +397,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.ibRight:
                 snakeDirection = 0;
-                MyLog.i("ibRight");
+                MyLog.i("turned Right");
                 break;
             case R.id.ibUp:
                 snakeDirection = 1;
-                MyLog.i("ibUp");
+                MyLog.i("turned Up");
                 break;
             case R.id.ibLeft:
                 snakeDirection = 2;
-                MyLog.i("ibLeft");
+                MyLog.i("turned Left");
                 break;
             case R.id.ibDown:
                 snakeDirection = 3;
-                MyLog.i("ibDown");
+                MyLog.i("turned Down");
                 break;
             case R.id.bStartPause:
+                vibrator.vibrate(SHORT_VIBRAION);
                 if (alreadyLaunched) { // initial value is false \
                     if (timer != null) {
                         timer.cancel();
                         timer = null;
                     }
-                    int stopTextColor = getResources().getColor(R.color.primary_light);
+                    int stopTextColor = ContextCompat.getColor(this, R.color.primary_light);
                     actvMainField.setTextColor(stopTextColor);
-                    bStartStop.setText(R.string.start);
+                    acbStartStop.setText(R.string.start);
                 } else {
                     if (wasGameOver) {
                         // everything is reset to later start from scratch \
@@ -377,12 +428,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setFieldBorders();
                         setInitialSnake();
                         setInitialFood();
+                        score = 0;
                         wasGameOver = false;
                     }
-                    int startTextColor = getResources().getColor(android.R.color.white);
+                    int startTextColor = ContextCompat.getColor(this, android.R.color.white);
                     actvMainField.setTextColor(startTextColor);
                     actvMainField.setBackgroundResource(R.color.primary_dark);
-                    bStartStop.setText(R.string.stop);
+                    acbStartStop.setText(R.string.stop);
                     // launching everything \
                     int delay = 1000 / snakeSpeed;
                     timer = new Timer();
@@ -396,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     } // end of onClick-method \\
 
     private void gameOver() {
+        vibrator.vibrate(LONG_VIBRAION);
         wasGameOver = true;
         alreadyLaunched = false;
         MyLog.i("game ended with score " + score);
@@ -406,12 +459,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                bStartStop.setText(R.string.start);
-                int endTextColor = getResources().getColor(android.R.color.primary_text_light);
+                acbStartStop.setText(R.string.start);
+                int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
                 actvMainField.setTextColor(endTextColor);
                 actvMainField.setBackgroundResource(R.color.primary_light);
-                // updating score for the next launch \
-                score = 0;
             }
         });
     }
@@ -426,7 +477,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // this method handles movement of the snake \
         @Override
         public void run() {
-
             // defining all reusable variables here \
             int newCellX = 0, newCellY = 0;
             Snake.SnakeCell snakeCell; // to use only one object for the whole snake \
@@ -435,8 +485,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             snakeCell = snake.getCell(snake.getLength() - 1);
             int cellToFreeX = snakeCell.getIndexOfSymbol();
             int cellToFreeY = snakeCell.getIndexOfRow();
-            MyLog.i("cellToFreeX: snakeCell.getIndexOfSymbol() = " + snakeCell.getIndexOfSymbol());
-            MyLog.i("cellToFreeX: snakeCell.getIndexOfRow() = " + snakeCell.getIndexOfRow());
 
             // 2 - making single change to every cell in the model of snake - except the head \
             for (int i = snake.getLength() - 1; i > 0; i--) {
@@ -483,6 +531,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 snakeCell = snake.getCell(i);
                 newCellX = snakeCell.getIndexOfSymbol();
                 newCellY = snakeCell.getIndexOfRow();
+/*
+                // setting the snake body \
+                mainCharArrayList.get(newCellY)[newCellX] = SNAKE;
+                // recovering the field after the snake's tail \
+                mainCharArrayList.get(cellToFreeY)[cellToFreeX] = SPACE;
+*/
+                // this is a crutch - the game somehow may fall after screen rotation \
                 try {
                     // setting the snake body \
                     mainCharArrayList.get(newCellY)[newCellX] = SNAKE;
@@ -490,7 +545,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mainCharArrayList.get(cellToFreeY)[cellToFreeX] = SPACE;
                 } catch (IndexOutOfBoundsException ioobe) {
                     // ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException
-                    gameOver();
+                    MyLog.i("exception happened: " + ioobe.getMessage());
                     return;
                 }
             }
@@ -501,17 +556,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     updateTextView();
                     String scoreComplex = getString(R.string.score) + ": " + score;
                     actvScore.setText(scoreComplex);
+                    MyLog.i("actvScore updated");
                 }
             });
-            MyLog.i("ui updated");
+
+            // exit conditions check is the last thing to do \
+            if (collisionHappened()) gameOver(); // this is the only way out from loop \
+            else score++;
+
             // now handling eating of food and bonuses - it's taken by the head only \
             if (isFoodFound()) {
                 eatFood();
                 MyLog.i("food eaten");
             }
-            // exit conditions check is the last thing to do \
-            if (collisionHappened()) gameOver(); // this is the only way out from loop \
-            else score++;
         } // end of run-method \\
 
         // VERIFICATIONS ===========================================================================
@@ -522,9 +579,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         private void eatFood() {
+            // user must be happy with such a vibration :)
+            vibrator.vibrate(SHORT_VIBRAION);
+
             int cellPositionX, cellPositionY;
             Snake.SnakeCell currentCell;
             MyLog.i("eaten = " + mainCharArrayList.get(foodPositionRow)[foodPositionSymbol]);
+
             switch (foodType) {
 
                 case LENGTH_PLUS: // length +1
@@ -536,6 +597,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     cellPositionX = foodPositionSymbol + shiftAfterFood(snakeDirection, true);
                     cellPositionY = foodPositionRow + shiftAfterFood(snakeDirection, false);
                     currentCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
+//                    snake.addCell(snakeLength, currentCell);
                     snake.addCell(snake.getLength(), currentCell);
                     snakeSpeed++;
                     MyLog.i("LENGTH_PLUS taken!");
