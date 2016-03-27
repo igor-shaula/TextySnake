@@ -24,6 +24,9 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * i know this class is really big and includes three subclasses - but i had no time to refactor this issue \
+ */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     /*
         // keys for saving-restoring after screen orientation change \

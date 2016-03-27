@@ -16,7 +16,7 @@ public class Snake implements Parcelable {
         // required after Parcelable implementation \
     }
 
-    protected Snake(Parcel in) {
+    protected Snake(@SuppressWarnings("UnusedParameters") Parcel in) {
         // added after Parcelable implementation \
     }
 
