@@ -62,28 +62,28 @@ public class Snake implements Parcelable {
      */
     public static class SnakeCell {
 
-        private int indexOfRow, indexOfSymbol;
+        private int indexByY, indexByX;
 
         // i decided to set every cell as a simple object \
-        public SnakeCell(int x, int y) {
-            this.indexOfSymbol = x;
-            this.indexOfRow = y;
+        public SnakeCell(int indexByX, int indexByY) {
+            this.indexByX = indexByX;
+            this.indexByY = indexByY;
         }
 
-        public int getIndexOfRow() {
-            return indexOfRow;
+        public int getIndexByY() {
+            return indexByY;
         }
 
-        public void setIndexOfRow(int indexOfRow) {
-            this.indexOfRow = indexOfRow;
+        public void setIndexByY(int indexByY) {
+            this.indexByY = indexByY;
         }
 
-        public int getIndexOfSymbol() {
-            return indexOfSymbol;
+        public int getIndexByX() {
+            return indexByX;
         }
 
-        public void setIndexOfSymbol(int indexOfSymbol) {
-            this.indexOfSymbol = indexOfSymbol;
+        public void setIndexByX(int indexByX) {
+            this.indexByX = indexByX;
         }
     }
 }

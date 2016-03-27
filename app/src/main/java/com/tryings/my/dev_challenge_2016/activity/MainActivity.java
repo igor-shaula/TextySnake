@@ -25,16 +25,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-/*
-    // keys for saving-restoring after screen orientation change \
-    private final String KEY_SNAKE = "snake";
-    private final String KEY_SNAKE_LENGTH = "snakeLength";
-    private final String KEY_SNAKE_SPEED = "snakeSpeed";
-    private final String KEY_SNAKE_DIRECTION = "snakeDirection";
-    private final String KEY_SCORE = "score";
-    private final String KEY_ALREADY_LAUNCHED = "alreadyLaunched";
-    private final String KEY_WAS_GAME_OVER = "wasGameOver";
-*/
+    /*
+        // keys for saving-restoring after screen orientation change \
+        private final String KEY_SNAKE = "snake";
+        private final String KEY_SNAKE_SPEED = "snakeSpeed";
+        private final String KEY_SNAKE_DIRECTION = "snakeDirection";
+        private final String KEY_SCORE = "score";
+        private final String KEY_ALREADY_LAUNCHED = "alreadyLaunched";
+        private final String KEY_WAS_GAME_OVER = "wasGameOver";
+    */
     // basic symbols to create starting game field \
     private final char SNAKE = '@';
     private final char SPACE = ' ';
@@ -46,9 +45,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private final char SPEED_UP = '#'; // +1 to speed
     private final char SPEED_SLOW = '*'; // -1 from speed
 
+    private final int SHORT_VIBRATION = 100;
     @SuppressWarnings("FieldCanBeLocal")
-    private final int LONG_VIBRAION = 300;
-    private final int SHORT_VIBRAION = 100;
+    private final int LONG_VIBRATION = 300;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int STARTING_SNAKE_LENGTH = 3;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int STARTING_SNAKE_SPEED = 3;
 
     // following fields are safely rebuilt after changing screen configuration \\\\\\\\\\\\\\\\\\\\\
 
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private char[] foodTypeArray = // LENGTH_PLUS will be as often as other values in sum \
             {LENGTH_PLUS, LENGTH_PLUS, LENGTH_PLUS, LENGTH_MINUS, SPEED_SLOW, SPEED_UP};
     @SuppressWarnings("FieldCanBeLocal")
-    private final int updateFoodPeriod = 10 * 1000;
+    private int updateFoodPeriod = 10 * 1000;
     private int foodPositionRow, foodPositionSymbol;
     private int oldFoodPositionX, oldFoodPositionY;
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
@@ -80,8 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // definition of the snake \
     private Snake snake;
     @SuppressWarnings("FieldCanBeLocal")
-    private int snakeLength = 3;
-    private int snakeSpeed = 3;
+    private int snakeSpeed;
     private int snakeDirection;
 
     // game parameters \
@@ -103,7 +105,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             snake = savedInstanceState.getParcelable(KEY_SNAKE);
             snakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
             snakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
-            snakeLength = savedInstanceState.getInt(KEY_SNAKE_LENGTH);
             score = savedInstanceState.getInt(KEY_SCORE);
             alreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
             wasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
@@ -164,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putParcelable(KEY_SNAKE, snake);
         outState.putInt(KEY_SNAKE_DIRECTION, snakeDirection);
         outState.putInt(KEY_SNAKE_SPEED, snakeSpeed);
-        outState.putInt(KEY_SNAKE_LENGTH, snakeLength);
         outState.putInt(KEY_SCORE, score);
         outState.putBoolean(KEY_ALREADY_LAUNCHED, alreadyLaunched);
         outState.putBoolean(KEY_WAS_GAME_OVER, wasGameOver);
@@ -179,7 +179,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         snake = savedInstanceState.getParcelable(KEY_SNAKE);
         snakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
         snakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
-        snakeLength = savedInstanceState.getInt(KEY_SNAKE_LENGTH);
         score = savedInstanceState.getInt(KEY_SCORE);
         alreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
         wasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
@@ -272,10 +271,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setInitialSnake() {
 
         snake = new Snake();
+        snakeSpeed = STARTING_SNAKE_SPEED;
 
         // 1 - defining start directions to properly set up the snake \
         snakeDirection = random.nextInt(3) + 1;
-        for (int i = 0; i < snakeLength; i++) {
+        for (int i = 0; i < STARTING_SNAKE_LENGTH; i++) {
             // here we define position of every snake's cell \
             int cellPositionX = 0, cellPositionY = 0;
             // setting tail in the opposite direction here - to free space for head \
@@ -412,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MyLog.i("turned Down");
                 break;
             case R.id.bStartPause:
-                vibrator.vibrate(SHORT_VIBRAION);
+                vibrator.vibrate(SHORT_VIBRATION);
                 if (alreadyLaunched) { // initial value is false \
                     if (timer != null) {
                         timer.cancel();
@@ -448,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     } // end of onClick-method \\
 
     private void gameOver() {
-        vibrator.vibrate(LONG_VIBRAION);
+        vibrator.vibrate(LONG_VIBRATION);
         wasGameOver = true;
         alreadyLaunched = false;
         MyLog.i("game ended with score " + score);
@@ -483,45 +483,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // 1 - saving information about the last cell position - before it will be freed in the end \
             snakeCell = snake.getCell(snake.getLength() - 1);
-            int cellToFreeX = snakeCell.getIndexOfSymbol();
-            int cellToFreeY = snakeCell.getIndexOfRow();
+            int cellToFreeX = snakeCell.getIndexByX();
+            int cellToFreeY = snakeCell.getIndexByY();
 
             // 2 - making single change to every cell in the model of snake - except the head \
             for (int i = snake.getLength() - 1; i > 0; i--) {
 //            for (int i = 1; i < snake.getLength(); i++) {
                 snakeCell = snake.getCell(i - 1); // to get the position of every previous cell
                 // shifting 1 cell at a step \
-                newCellX = snakeCell.getIndexOfSymbol();
-                newCellY = snakeCell.getIndexOfRow();
+                newCellX = snakeCell.getIndexByX();
+                newCellY = snakeCell.getIndexByY();
                 // moving every cell of the snake's body \
                 snakeCell = snake.getCell(i); // to update current cell vith position of previous \
-                snakeCell.setIndexOfSymbol(newCellX);
-                snakeCell.setIndexOfRow(newCellY);
+                snakeCell.setIndexByX(newCellX);
+                snakeCell.setIndexByY(newCellY);
             }
 
             // 3 - finally moving snake's head to selected direction \
             snakeCell = snake.getCell(0); // for head of the snake
             switch (snakeDirection) {
                 case 0: // tail to right - head moves to left \
-                    newCellX = snakeCell.getIndexOfSymbol() + 1;
-                    newCellY = snakeCell.getIndexOfRow();
+                    newCellX = snakeCell.getIndexByX() + 1;
+                    newCellY = snakeCell.getIndexByY();
                     break;
                 case 1: // tail is set up - head moves down \
-                    newCellX = snakeCell.getIndexOfSymbol();
-                    newCellY = snakeCell.getIndexOfRow() - 1;
+                    newCellX = snakeCell.getIndexByX();
+                    newCellY = snakeCell.getIndexByY() - 1;
                     break;
                 case 2: // tail to left - head moves to right \
-                    newCellX = snakeCell.getIndexOfSymbol() - 1;
-                    newCellY = snakeCell.getIndexOfRow();
+                    newCellX = snakeCell.getIndexByX() - 1;
+                    newCellY = snakeCell.getIndexByY();
                     break;
                 case 3: // tail is set down - head moves up \
-                    newCellX = snakeCell.getIndexOfSymbol();
-                    newCellY = snakeCell.getIndexOfRow() + 1;
+                    newCellX = snakeCell.getIndexByX();
+                    newCellY = snakeCell.getIndexByY() + 1;
                     break;
             }
             // saving info to the snake's model \
-            snakeCell.setIndexOfSymbol(newCellX);
-            snakeCell.setIndexOfRow(newCellY);
+            snakeCell.setIndexByX(newCellX);
+            snakeCell.setIndexByY(newCellY);
 
             // here we have just finished to update snake's model \
             MyLog.i("move done in snake's model");
@@ -529,8 +529,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // now it's obvious to update model for field with snake's new data and display this all \
             for (int i = 0; i < snake.getLength(); i++) {
                 snakeCell = snake.getCell(i);
-                newCellX = snakeCell.getIndexOfSymbol();
-                newCellY = snakeCell.getIndexOfRow();
+                newCellX = snakeCell.getIndexByX();
+                newCellY = snakeCell.getIndexByY();
 /*
                 // setting the snake body \
                 mainCharArrayList.get(newCellY)[newCellX] = SNAKE;
@@ -574,13 +574,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // VERIFICATIONS ===========================================================================
 
         private boolean isFoodFound() {
-            return snake.getCell(0).getIndexOfRow() == foodPositionRow
-                    && snake.getCell(0).getIndexOfSymbol() == foodPositionSymbol;
+            return snake.getCell(0).getIndexByY() == foodPositionRow
+                    && snake.getCell(0).getIndexByX() == foodPositionSymbol;
         }
 
         private void eatFood() {
             // user must be happy with such a vibration :)
-            vibrator.vibrate(SHORT_VIBRAION);
+            vibrator.vibrate(SHORT_VIBRATION);
 
             int cellPositionX, cellPositionY;
             Snake.SnakeCell currentCell;
@@ -591,13 +591,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 case LENGTH_PLUS: // length +1
                     /*
                     i decided to add a new cell at the snake 's head - because we know the direction \
-                    new cell will get visible only at the net move\
+                    new cell will get visible only at the end of the move \
                     right now i 'm only updating the model - not the view \
                     */
                     cellPositionX = foodPositionSymbol + shiftAfterFood(snakeDirection, true);
                     cellPositionY = foodPositionRow + shiftAfterFood(snakeDirection, false);
                     currentCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
-//                    snake.addCell(snakeLength, currentCell);
                     snake.addCell(snake.getLength(), currentCell);
                     snakeSpeed++;
                     MyLog.i("LENGTH_PLUS taken!");
@@ -608,8 +607,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     if (snake.getLength() > 1) { // to avoid snake's dissappearing \
                         // first updating field to clear snake's tail - while it's available \
                         currentCell = snake.getCell(snake.getLength() - 1);
-                        cellPositionX = currentCell.getIndexOfSymbol();
-                        cellPositionY = currentCell.getIndexOfRow();
+                        cellPositionX = currentCell.getIndexByX();
+                        cellPositionY = currentCell.getIndexByY();
                         mainCharArrayList.get(cellPositionY)[cellPositionX] = SPACE;
                         // now it is safe to update the model \
                         snake.removeCell(snake.getLength() - 1);
@@ -654,13 +653,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         private boolean collisionHappened() {
             // we have only to check what happens to the snake's head - other cells are inactive \
-            int snakeHeadY = snake.getCell(0).getIndexOfRow();
-            int snakeHeadX = snake.getCell(0).getIndexOfSymbol();
+            int snakeHeadY = snake.getCell(0).getIndexByY();
+            int snakeHeadX = snake.getCell(0).getIndexByX();
 
             if (snake.getLength() <= 4) { // snake with less length cannot collide with itself \
                 return touchedBounds(snakeHeadY, snakeHeadX);
             } else
-                return touchedBounds(snakeHeadY, snakeHeadX) || touchedItelf(snakeHeadY, snakeHeadX);
+                return touchedBounds(snakeHeadY, snakeHeadX) || touchedItself(snakeHeadY, snakeHeadX);
         }
 
         // connected to collisionHappened-method \
@@ -671,12 +670,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         // connected to collisionHappened-method \
-        private boolean touchedItelf(int snakeHeadY, int snakeHeadX) {
+        private boolean touchedItself(int snakeHeadY, int snakeHeadX) {
             // snake can collide with itself beginning only from fifth element = fourth index \
             for (int i = 4; i < snake.getLength(); i++) {
                 Snake.SnakeCell snakeCell = snake.getCell(i);
-                if (snakeHeadY == snakeCell.getIndexOfRow() || snakeHeadX == snakeCell.getIndexOfRow())
+                if (snakeHeadY == snakeCell.getIndexByY() && snakeHeadX == snakeCell.getIndexByX()) {
+                    MyLog.i("touchedItself");
                     return true;
+                }
             }
             return false;
         }
