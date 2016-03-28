@@ -1,4 +1,4 @@
-package com.tryings.my.dev_challenge_2016.entity;
+package com.igor.shaula.snake_in_text.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import java.util.ArrayList;
 
 /**
- * Entity for the snake object
+ * Created by igor shaula - entity for the snake object \
  */
 public class Snake implements Parcelable {
 

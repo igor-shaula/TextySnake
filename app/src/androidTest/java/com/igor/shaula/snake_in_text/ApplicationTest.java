@@ -1,4 +1,4 @@
-package com.tryings.my.dev_challenge_2016;
+package com.igor.shaula.snake_in_text;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

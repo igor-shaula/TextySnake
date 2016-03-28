@@ -1,4 +1,4 @@
-package com.tryings.my.dev_challenge_2016.activity;
+package com.igor.shaula.snake_in_text.activity;
 
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -15,9 +15,10 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
-import com.tryings.my.dev_challenge_2016.R;
-import com.tryings.my.dev_challenge_2016.entity.Snake;
-import com.tryings.my.dev_challenge_2016.util.MyLog;
+import com.igor.shaula.snake_in_text.R;
+import com.igor.shaula.snake_in_text.entity.Snake;
+import com.igor.shaula.snake_in_text.util.MyLog;
+import com.igor.shaula.snake_in_text.util.MyPSF;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -25,43 +26,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * i know this class is really big and includes three subclasses - but i had no time to refactor this issue \
+ * Created by igor shaula \
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    /*
-        // keys for saving-restoring after screen orientation change \
-        private final String KEY_SNAKE = "snake";
-        private final String KEY_SNAKE_SPEED = "snakeSpeed";
-        private final String KEY_SNAKE_DIRECTION = "snakeDirection";
-        private final String KEY_SCORE = "score";
-        private final String KEY_ALREADY_LAUNCHED = "alreadyLaunched";
-        private final String KEY_WAS_GAME_OVER = "wasGameOver";
-    */
-    // basic symbols to create starting game field \
-    private final char SNAKE = '@';
-    private final char SPACE = ' ';
-    private final char BORDER = '+';
-
-    // types of food for the snake \
-    private final char LENGTH_PLUS = '$'; // +1 to length - this is the main type of food \
-    private final char LENGTH_MINUS = '-'; // -1 from length
-    private final char SPEED_UP = '#'; // +1 to speed
-    private final char SPEED_SLOW = '*'; // -1 from speed
-
-    private final int SHORT_VIBRATION = 100;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int LONG_VIBRATION = 300;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int STARTING_SNAKE_LENGTH = 3;
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int STARTING_SNAKE_SPEED = 3;
 
     // following fields are safely rebuilt after changing screen configuration \\\\\\\\\\\\\\\\\\\\\
 
     // definition of the field \
     private char foodType;
     private char[] foodTypeArray = // LENGTH_PLUS will be as often as other values in sum \
-            {LENGTH_PLUS, LENGTH_PLUS, LENGTH_PLUS, LENGTH_MINUS, SPEED_SLOW, SPEED_UP};
+            {MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS,
+                    MyPSF.LENGTH_MINUS, MyPSF.SPEED_SLOW, MyPSF.SPEED_UP};
     @SuppressWarnings("FieldCanBeLocal")
     private int updateFoodPeriod = 10 * 1000;
     private int foodPositionRow, foodPositionSymbol;
@@ -121,6 +96,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // from the very beginning we have to define available field \
         actvMainField = (AppCompatTextView) findViewById(R.id.actvMainField);
         assert actvMainField != null;
+
+/*
+        // setting up our square font \
+        Typeface typeface = Typeface.createFromAsset(getAssets(), "Arcade.ttf");
+        actvMainField.setTypeface(typeface);
+*/
         actvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -235,7 +216,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             charArray[symbolsInFieldLine] = '\n';
             // setting other elements to their default values \
             for (int j = 0; j < symbolsInFieldLine; j++) {
-                charArray[j] = SPACE;
+                charArray[j] = MyPSF.SPACE;
             }
             // now single char array is ready and has to be added to the list \
             mainCharArrayList.add(i, charArray);
@@ -265,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < fieldLinesCount; i++)
             for (int j = 0; j < symbolsInFieldLine; j++)
                 if (i == 0 || i == fieldLinesCount - 1 || j == 0 || j == symbolsInFieldLine - 1)
-                    mainCharArrayList.get(i)[j] = BORDER;
+                    mainCharArrayList.get(i)[j] = MyPSF.BORDER;
     }
 
     /**
@@ -274,11 +255,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setInitialSnake() {
 
         snake = new Snake();
-        snakeSpeed = STARTING_SNAKE_SPEED;
+        snakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
 
         // 1 - defining start directions to properly set up the snake \
         snakeDirection = random.nextInt(3) + 1;
-        for (int i = 0; i < STARTING_SNAKE_LENGTH; i++) {
+        for (int i = 0; i < MyPSF.STARTING_SNAKE_LENGTH; i++) {
             // here we define position of every snake's cell \
             int cellPositionX = 0, cellPositionY = 0;
             // setting tail in the opposite direction here - to free space for head \
@@ -309,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // updating the snake's model \
             snake.addCell(i, newCell);
             // placing the this snake cell to our field \
-            mainCharArrayList.get(cellPositionY)[cellPositionX] = SNAKE;
+            mainCharArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SNAKE;
         } // end of for-loop
         updateTextView();
     } // end of setInitialSnake-method \\
@@ -327,8 +308,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 */
         // first of all clearing old place \
         char replaceToSpace = mainCharArrayList.get(oldFoodPositionY)[oldFoodPositionX];
-        if (replaceToSpace != BORDER) // this might happen at the very start \
-            mainCharArrayList.get(oldFoodPositionY)[oldFoodPositionX] = SPACE;
+        if (replaceToSpace != MyPSF.BORDER) // this might happen at the very start \
+            mainCharArrayList.get(oldFoodPositionY)[oldFoodPositionX] = MyPSF.SPACE;
         // now everything is clear and we can set new food type and position \
         do {
             /*
@@ -341,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // -1 instead of +1 just to avoid placing food on the boards \
             MyLog.i("random foodPositionRow " + foodPositionRow);
             MyLog.i("random foodPositionSymbol " + foodPositionSymbol);
-        } while (mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] == SNAKE);
+        } while (mainCharArrayList.get(foodPositionRow)[foodPositionSymbol] == MyPSF.SNAKE);
 
         oldFoodPositionX = foodPositionSymbol;
         oldFoodPositionY = foodPositionRow;
@@ -415,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MyLog.i("turned Down");
                 break;
             case R.id.bStartPause:
-                vibrator.vibrate(SHORT_VIBRATION);
+                vibrator.vibrate(MyPSF.SHORT_VIBRATION);
                 if (alreadyLaunched) { // initial value is false \
                     if (timer != null) {
                         timer.cancel();
@@ -451,7 +432,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     } // end of onClick-method \\
 
     private void gameOver() {
-        vibrator.vibrate(LONG_VIBRATION);
+        vibrator.vibrate(MyPSF.LONG_VIBRATION);
         wasGameOver = true;
         alreadyLaunched = false;
         MyLog.i("game ended with score " + score);
@@ -543,9 +524,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // this is a crutch - the game somehow may fall after screen rotation \
                 try {
                     // setting the snake body \
-                    mainCharArrayList.get(newCellY)[newCellX] = SNAKE;
+                    mainCharArrayList.get(newCellY)[newCellX] = MyPSF.SNAKE;
                     // recovering the field after the snake's tail \
-                    mainCharArrayList.get(cellToFreeY)[cellToFreeX] = SPACE;
+                    mainCharArrayList.get(cellToFreeY)[cellToFreeX] = MyPSF.SPACE;
                 } catch (IndexOutOfBoundsException ioobe) {
                     // ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException
                     MyLog.i("exception happened: " + ioobe.getMessage());
@@ -583,7 +564,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         private void eatFood() {
             // user must be happy with such a vibration :)
-            vibrator.vibrate(SHORT_VIBRATION);
+            vibrator.vibrate(MyPSF.SHORT_VIBRATION);
 
             int cellPositionX, cellPositionY;
             Snake.SnakeCell currentCell;
@@ -591,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             switch (foodType) {
 
-                case LENGTH_PLUS: // length +1
+                case MyPSF.LENGTH_PLUS: // length +1
                     /*
                     i decided to add a new cell at the snake 's head - because we know the direction \
                     new cell will get visible only at the end of the move \
@@ -605,14 +586,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     MyLog.i("LENGTH_PLUS taken!");
                     break;
 
-                case LENGTH_MINUS: // length -1
+                case MyPSF.LENGTH_MINUS: // length -1
                     // just removing the last cell \
                     if (snake.getLength() > 1) { // to avoid snake's dissappearing \
                         // first updating field to clear snake's tail - while it's available \
                         currentCell = snake.getCell(snake.getLength() - 1);
                         cellPositionX = currentCell.getIndexByX();
                         cellPositionY = currentCell.getIndexByY();
-                        mainCharArrayList.get(cellPositionY)[cellPositionX] = SPACE;
+                        mainCharArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SPACE;
                         // now it is safe to update the model \
                         snake.removeCell(snake.getLength() - 1);
                         if (snakeSpeed > 1) snakeSpeed--;
@@ -620,12 +601,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     MyLog.i("LENGTH_MINUS taken!");
                     break;
 
-                case SPEED_UP: // speed +1
+                case MyPSF.SPEED_UP: // speed +1
                     snakeSpeed++;
                     MyLog.i("SPEED_UP taken!");
                     break;
 
-                case SPEED_SLOW: // speed -1
+                case MyPSF.SPEED_SLOW: // speed -1
                     if (snakeSpeed > 1) // to avoid falling after division by zero \
                         snakeSpeed--;
                     MyLog.i("SPEED_SLOW taken!");

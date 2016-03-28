@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.tryings.my.dev_challenge_2016">
-    <!-- package name was specially done like this - to exclude any links to author in code -->
+    package="com.igor.shaula.snake_in_text">
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/snake_logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.MainActivity">
+        <activity android:name="com.igor.shaula.snake_in_text.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
