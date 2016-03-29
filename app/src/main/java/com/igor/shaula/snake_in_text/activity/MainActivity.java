@@ -4,16 +4,16 @@ import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatButton;
-import android.support.v7.widget.AppCompatTextView;
 import android.text.format.DateFormat;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.igor.shaula.snake_in_text.R;
 import com.igor.shaula.snake_in_text.entity.Snake;
@@ -37,8 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private char[] foodTypeArray = // LENGTH_PLUS will be as often as other values in sum \
             {MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS,
                     MyPSF.LENGTH_MINUS, MyPSF.SPEED_SLOW, MyPSF.SPEED_UP};
-    @SuppressWarnings("FieldCanBeLocal")
-    private int updateFoodPeriod = 10 * 1000;
     private int foodPositionRow, foodPositionSymbol;
     private int oldFoodPositionX, oldFoodPositionY;
     private int fieldPixelWidth, fieldPixelHeight; // in pixels
@@ -48,8 +46,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ArrayList<char[]> mainCharArrayList;
 
     // active widgets \
-    private AppCompatTextView actvMainField, actvTime, actvScore;
-    private AppCompatButton acbStartStop;
+    private TextView tvMainField, tvTime, tvScore;
+    private Button bStartPause;
 
     // utils from the system \
     private Vibrator vibrator;
@@ -94,15 +92,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         */
 
         // from the very beginning we have to define available field \
-        actvMainField = (AppCompatTextView) findViewById(R.id.actvMainField);
-        assert actvMainField != null;
+        tvMainField = (TextView) findViewById(R.id.viewMainField);
+        assert tvMainField != null;
 
 /*
         // setting up our square font \
         Typeface typeface = Typeface.createFromAsset(getAssets(), "Arcade.ttf");
-        actvMainField.setTypeface(typeface);
+        tvMainField.setTypeface(typeface);
 */
-        actvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
+
+        tvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
@@ -130,12 +129,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ibDown != null)
             ibDown.setOnClickListener(this);
 
-        actvTime = (AppCompatTextView) findViewById(R.id.actvTime);
-        actvScore = (AppCompatTextView) findViewById(R.id.actvScore);
+        tvTime = (TextView) findViewById(R.id.tvTime);
+        tvScore = (TextView) findViewById(R.id.tvScore);
+        tvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
 
-        acbStartStop = (AppCompatButton) findViewById(R.id.bStartPause);
-        assert acbStartStop != null;
-        acbStartStop.setOnClickListener(this);
+        bStartPause = (Button) findViewById(R.id.bStartPause);
+        assert bStartPause != null;
+        bStartPause.setOnClickListener(this);
 
         vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
     } // end of onCreate-method \\
@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // 0 - from onGlobalLayout-method
     private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
         // getting current screen size in pixels \
-        fieldPixelWidth = actvMainField.getWidth();
+        fieldPixelWidth = tvMainField.getWidth();
         MyLog.i("fieldPixelWidth " + fieldPixelWidth);
 
         FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
@@ -184,10 +184,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // now removing the listener - it's not needed any more \
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
-            actvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+            tvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
         else
             //noinspection deprecation
-            actvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+            tvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
     } // end of detectFieldParameters-method \\
 
     // 1 - from onGlobalLayout-method
@@ -195,8 +195,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (!wasGameOver) {
             // here we get pixel width of a single symbol - initial TextView has only one symbol \
-            actvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            int measuredSymbolWidth = actvMainField.getMeasuredWidth();
+            tvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            int measuredSymbolWidth = tvMainField.getMeasuredWidth();
             MyLog.i("measuredSymbolWidth " + measuredSymbolWidth);
 
             // getting our first valuable parameter - the size of main array \
@@ -204,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             MyLog.i("symbolsInFieldLine " + symbolsInFieldLine);
         }
         // clearing the text field to properly initialize it for game \
-        actvMainField.setText(null);
+        tvMainField.setText(null);
 
         // now preparing our model and initializing text field \
         int i = 0, measuredTextHeight;
@@ -222,15 +222,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mainCharArrayList.add(i, charArray);
 //            MyLog.i("added " + new String(mainCharArrayList.get(i)));
 
-            String previousText = actvMainField.getText().toString();
+            String previousText = tvMainField.getText().toString();
             String newText = previousText + new String(mainCharArrayList.get(i));
-            actvMainField.setText(newText);
+            tvMainField.setText(newText);
 //            MyLog.i("newText \n" + newText);
 
             i++;
 
-            actvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            measuredTextHeight = actvMainField.getMeasuredHeight();
+            tvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            measuredTextHeight = tvMainField.getMeasuredHeight();
 //            MyLog.i("measuredTextHeight " + measuredTextHeight);
 
         } while (measuredTextHeight <= fieldPixelHeight);
@@ -340,7 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i = 0; i < fieldLinesCount; i++) {
             newStringToSet.append(mainCharArrayList.get(i));
         }
-        actvMainField.setText(newStringToSet);
+        tvMainField.setText(newStringToSet);
     }
 
     // MENU ========================================================================================
@@ -403,8 +403,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         timer = null;
                     }
                     int stopTextColor = ContextCompat.getColor(this, R.color.primary_light);
-                    actvMainField.setTextColor(stopTextColor);
-                    acbStartStop.setText(R.string.start);
+                    tvMainField.setTextColor(stopTextColor);
+                    bStartPause.setText(R.string.start);
                 } else {
                     if (wasGameOver) {
                         // everything is reset to later start from scratch \
@@ -416,15 +416,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         wasGameOver = false;
                     }
                     int startTextColor = ContextCompat.getColor(this, android.R.color.white);
-                    actvMainField.setTextColor(startTextColor);
-                    actvMainField.setBackgroundResource(R.color.primary_dark);
-                    acbStartStop.setText(R.string.stop);
+                    tvMainField.setTextColor(startTextColor);
+                    tvMainField.setBackgroundResource(R.color.primary_dark);
+                    bStartPause.setText(R.string.pause);
                     // launching everything \
-                    int delay = 1000 / snakeSpeed;
+                    int delay = 600 / snakeSpeed;
                     timer = new Timer();
                     timer.schedule(new SnakeMoveTimerTask(), 0, delay);
-                    timer.schedule(new FoodUpdateTimerTask(), updateFoodPeriod, updateFoodPeriod);
-                    timer.schedule(new TimeUpdateTimerTask(), 0, 1);
+                    timer.schedule(new TimeUpdateTimerTask(), 0, 1000);
+//                    timer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
+                    timer.schedule(new FoodUpdateTimerTask(),
+                            MyPSF.STARTING_UPDATE_FOOD_PERIOD,
+                            MyPSF.STARTING_UPDATE_FOOD_PERIOD);
                 }
                 alreadyLaunched = !alreadyLaunched;
                 break;
@@ -443,10 +446,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                acbStartStop.setText(R.string.start);
+                bStartPause.setText(R.string.start);
                 int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
-                actvMainField.setTextColor(endTextColor);
-                actvMainField.setBackgroundResource(R.color.primary_light);
+                tvMainField.setTextColor(endTextColor);
+                tvMainField.setBackgroundResource(R.color.primary_light);
             }
         });
     }
@@ -539,8 +542,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 public void run() {
                     updateTextView();
                     String scoreComplex = getString(R.string.score) + ": " + score;
-                    actvScore.setText(scoreComplex);
-                    MyLog.i("actvScore updated");
+                    tvScore.setText(scoreComplex);
+                    MyLog.i("tvScore updated");
                 }
             });
 
@@ -693,18 +696,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             00 added to the beginning of the string to avoid situation <=99 difference
             that means less than three digits and ArrayOutOfBoundsException as a result
 */
+/*
             String systemTimeString = String.valueOf("00" + elapsedTimeLong);
             final StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(DateFormat.format("mm:ss", elapsedTimeLong));
             stringBuilder.append(":").append(getMilliseconds(systemTimeString));
+*/
+            final String stringToSet = String.valueOf("Time: " + DateFormat.format("mm:ss", elapsedTimeLong));
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    actvTime.setText(stringBuilder);
+                    tvTime.setText(stringToSet);
+//                    tvTime.setText(stringBuilder);
                 }
             });
         }
-
+/*
         private String getMilliseconds(String systemTimeString) {
 
             int stringIndex = systemTimeString.length() - 1;
@@ -716,5 +723,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             return new String(digits);
         }
+*/
     } // end of TimeUpdateTimerTask-class \\
 }

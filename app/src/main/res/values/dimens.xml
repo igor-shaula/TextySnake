@@ -1,7 +1,8 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="directionsButtonSize">48dp</dimen>
-    <dimen name="size_8dp">8dp</dimen>
-    <dimen name="size_2dp">2dp</dimen>
+    <dimen name="size_8">8dp</dimen>
+    <dimen name="size_2">2dp</dimen>
+    <dimen name="size_16">16dp</dimen>
 
 </resources>

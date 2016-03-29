@@ -20,6 +20,10 @@ public class MyPSF {
     public static final int LONG_VIBRATION = 300;
     public static final int STARTING_SNAKE_LENGTH = 3;
     public static final int STARTING_SNAKE_SPEED = 3;
+    public static final int STARTING_UPDATE_FOOD_PERIOD = 10 * 1000;
+
+    public static final String SCORE_STARTING_SUFFIX = " 0";
+
 /*
         // keys for saving-restoring after screen orientation change \
         public static final String KEY_SNAKE = "snake";

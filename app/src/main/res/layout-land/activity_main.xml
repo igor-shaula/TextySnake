@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     tools:context=".activity.MainActivity">
 
-    <android.support.v7.widget.ContentFrameLayout
+    <FrameLayout
         android:id="@+id/flMain"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <android.support.v7.widget.AppCompatTextView
-            android:id="@+id/actvMainField"
+        <com.igor.shaula.snake_in_text.custom_view.MyTextView
+            android:id="@+id/viewMainField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/primary_dark"
@@ -23,7 +23,7 @@
             android:textStyle="bold"
             android:typeface="monospace" />
 
-    </android.support.v7.widget.ContentFrameLayout>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="300dp"
@@ -37,7 +37,7 @@
             android:layout_weight="1"
             android:gravity="center">
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/ibUp"
                 style="@style/MyImageButton"
                 android:layout_alignParentTop="true"
@@ -45,7 +45,7 @@
                 android:contentDescription="@string/descButtonUp"
                 android:src="@drawable/circled_up" />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/ivCenter"
                 style="@style/MyImageButton"
                 android:layout_below="@id/ibUp"
@@ -53,7 +53,7 @@
                 android:contentDescription="@string/descCentralImage"
                 android:src="@drawable/all_directions" />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/ibDown"
                 style="@style/MyImageButton"
                 android:layout_below="@id/ivCenter"
@@ -61,7 +61,7 @@
                 android:contentDescription="@string/descButtonDown"
                 android:src="@drawable/circled_down" />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/ibLeft"
                 style="@style/MyImageButton"
                 android:layout_below="@+id/ibUp"
@@ -70,7 +70,7 @@
                 android:contentDescription="@string/descButtonLeft"
                 android:src="@drawable/circled_left" />
 
-            <android.support.v7.widget.AppCompatImageButton
+            <ImageButton
                 android:id="@+id/ibRight"
                 style="@style/MyImageButton"
                 android:layout_below="@+id/ibUp"
@@ -88,19 +88,19 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/actvTime"
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/tvTime"
                 style="@style/MyText"
                 android:text="@string/defaultTime" />
 
-            <android.support.v7.widget.AppCompatButton
+            <com.igor.shaula.snake_in_text.custom_view.MyButton
                 android:id="@+id/bStartPause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/start" />
 
-            <android.support.v7.widget.AppCompatTextView
-                android:id="@+id/actvScore"
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/tvScore"
                 style="@style/MyText"
                 android:text="@string/score" />
 
@@ -108,4 +108,4 @@
 
     </LinearLayout>
 
-</android.support.v7.widget.LinearLayoutCompat>
+</LinearLayout>
