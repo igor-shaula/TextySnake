@@ -5,9 +5,11 @@ import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
@@ -17,7 +19,6 @@ import android.widget.TextView;
 
 import com.igor.shaula.snake_in_text.R;
 import com.igor.shaula.snake_in_text.entity.Snake;
-import com.igor.shaula.snake_in_text.listener.MyTouchListener;
 import com.igor.shaula.snake_in_text.util.MyLog;
 import com.igor.shaula.snake_in_text.util.MyPSF;
 
@@ -66,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // game parameters \
     private int score;
     private boolean mAlreadyLaunched = false, mWasGameOver = false;
+
+    private GestureDetector mGestureDetector;
 
     // LIFECYCLE ===================================================================================
 
@@ -132,10 +135,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         assert bStartPause != null;
         bStartPause.setOnClickListener(this);
 
+        // now the setting the top - gesture sensetive interface \
+//        tvMainField.setOnTouchListener(new MyTouchListener(this));
+
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        tvMainField.setOnTouchListener(new MyTouchListener(this));
-        tvMainField.setOnGenericMotionListener();
+
+        mGestureDetector = new GestureDetector(
+                this,
+                new GestureDetector.SimpleOnGestureListener() {
+
+                    @Override
+                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                        MyLog.i("onFling");
+
+//                        int detectedDirection = 0;
+                        if (velocityX > 500) {
+                            mSnakeDirection = 0;
+                            MyLog.i("mSnakeDirection = 0 / velocityX = " + velocityX);
+                            return true;
+                        }
+                        // TODO: 01.04.2016 continue here \
+                        if (velocityY > 300) {
+                            mSnakeDirection = 3;
+                            MyLog.i("mSnakeDirection = 1");
+                            return true;
+                        }
+                        if (velocityX < -500) {
+                            mSnakeDirection = 2;
+                            MyLog.i("mSnakeDirection = 2");
+                            return true;
+                        }
+                        if (velocityY < -300) {
+                            mSnakeDirection = 1;
+                            MyLog.i("mSnakeDirection = 3");
+                            return true;
+                        }
+/*
+                        if (velocityX >10) {
+//                        if (velocityY < 5) {
+                            // detecting move along X axis \
+                            int directionX = (int) Math.abs(e2.getAxisValue(MotionEvent.AXIS_X) - e1.getAxisValue(MotionEvent.AXIS_X));
+                            MyLog.i("directionX = " + directionX);
+                            if (directionX > 0) mSnakeDirection = 0;
+                            else mSnakeDirection = 2;
+                            return true;
+                        }
+                        if (velocityY >10) {
+//                        if (velocityX < 5) {
+                            // detecting move along Y axis \
+                            int directionY = (int) Math.abs(e2.getAxisValue(MotionEvent.AXIS_Y) - e1.getAxisValue(MotionEvent.AXIS_Y));
+                            MyLog.i("directionY = " + directionY);
+                            if (directionY > 0) mSnakeDirection = 3;
+                            else mSnakeDirection = 1;
+                            return true;
+                        }
+                        MyLog.i("detectedDirection = " + mSnakeDirection);
+*/
+                        return false;
+//                    return super.onFling(e1, e2, velocityX, velocityY);
+                    }
+                });
     } // end of onCreate-method \\
+
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        return mGestureDetector.onTouchEvent(motionEvent);
+    }
 
     // SAVE_RESTORE ================================================================================
 

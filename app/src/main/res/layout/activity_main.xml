@@ -10,6 +10,7 @@
     <FrameLayout
         android:id="@+id/flMain"
         android:layout_width="match_parent"
+        android:layout_gravity="center"
         android:layout_height="0dp"
         android:layout_weight="1">
 
@@ -17,6 +18,7 @@
             android:id="@+id/viewMainField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:background="@color/primary_dark"
             android:text="@string/oneSymbol"
             android:textColor="@color/primary_light"
@@ -26,6 +28,7 @@
 
     <RelativeLayout
         android:id="@+id/rlButtons"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/size_8">
@@ -77,7 +80,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_8"
         android:background="@color/primary"
         android:gravity="center"
         android:orientation="horizontal">
@@ -92,7 +94,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/main_button_states"
-            android:elevation="@dimen/size_8"
             android:padding="@dimen/size_16"
             android:text="@string/start"
             android:textAppearance="@android:style/TextAppearance.Large"
