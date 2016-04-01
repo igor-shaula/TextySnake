@@ -19,8 +19,8 @@ import android.widget.TextView;
 
 import com.igor.shaula.snake_in_text.R;
 import com.igor.shaula.snake_in_text.entity.Snake;
-import com.igor.shaula.snake_in_text.util.MyLog;
-import com.igor.shaula.snake_in_text.util.MyPSF;
+import com.igor.shaula.snake_in_text.utils.MyLog;
+import com.igor.shaula.snake_in_text.utils.MyPSF;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -34,11 +34,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // following fields are safely rebuilt after changing screen configuration \\\\\\\\\\\\\\\\\\\\\
 
-    // definition of the field \
-    private char mFoodType;
     private final char[] mFoodTypeArray = // LENGTH_PLUS will be as often as other values in sum \
             {MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS,
                     MyPSF.LENGTH_MINUS, MyPSF.SPEED_SLOW, MyPSF.SPEED_UP};
+    // definition of the field \
+    private char mFoodType;
     private int mFoodPositionRow, mFoodPositionSymbol;
     private int mOldFoodPositionX, mOldFoodPositionY;
     private int mFieldPixelWidth, mFieldPixelHeight; // in pixels
@@ -62,15 +62,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Snake mSnake;
     @SuppressWarnings("FieldCanBeLocal")
     private int mSnakeSpeed;
-    private int mSnakeDirection;
+    private MyDirections mSnakeDirection;
 
     // game parameters \
     private int score;
     private boolean mAlreadyLaunched = false, mWasGameOver = false;
 
     private GestureDetector mGestureDetector;
-
-    // LIFECYCLE ===================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,69 +138,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
-        mGestureDetector = new GestureDetector(
-                this,
-                new GestureDetector.SimpleOnGestureListener() {
-
-                    @Override
-                    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                        MyLog.i("onFling");
-
-//                        int detectedDirection = 0;
-                        if (velocityX > 500) {
-                            mSnakeDirection = 0;
-                            MyLog.i("mSnakeDirection = 0 / velocityX = " + velocityX);
-                            return true;
-                        }
-                        // TODO: 01.04.2016 continue here \
-                        if (velocityY > 300) {
-                            mSnakeDirection = 3;
-                            MyLog.i("mSnakeDirection = 1");
-                            return true;
-                        }
-                        if (velocityX < -500) {
-                            mSnakeDirection = 2;
-                            MyLog.i("mSnakeDirection = 2");
-                            return true;
-                        }
-                        if (velocityY < -300) {
-                            mSnakeDirection = 1;
-                            MyLog.i("mSnakeDirection = 3");
-                            return true;
-                        }
-/*
-                        if (velocityX >10) {
-//                        if (velocityY < 5) {
-                            // detecting move along X axis \
-                            int directionX = (int) Math.abs(e2.getAxisValue(MotionEvent.AXIS_X) - e1.getAxisValue(MotionEvent.AXIS_X));
-                            MyLog.i("directionX = " + directionX);
-                            if (directionX > 0) mSnakeDirection = 0;
-                            else mSnakeDirection = 2;
-                            return true;
-                        }
-                        if (velocityY >10) {
-//                        if (velocityX < 5) {
-                            // detecting move along Y axis \
-                            int directionY = (int) Math.abs(e2.getAxisValue(MotionEvent.AXIS_Y) - e1.getAxisValue(MotionEvent.AXIS_Y));
-                            MyLog.i("directionY = " + directionY);
-                            if (directionY > 0) mSnakeDirection = 3;
-                            else mSnakeDirection = 1;
-                            return true;
-                        }
-                        MyLog.i("detectedDirection = " + mSnakeDirection);
-*/
-                        return false;
-//                    return super.onFling(e1, e2, velocityX, velocityY);
-                    }
-                });
+        mGestureDetector = new GestureDetector(this, new MyGestureListener());
     } // end of onCreate-method \\
+
+    // LIFECYCLE ===================================================================================
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         return mGestureDetector.onTouchEvent(motionEvent);
     }
-
-    // SAVE_RESTORE ================================================================================
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -218,6 +162,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyLog.i("onSaveInstanceState worked");
     }
 
+    // SAVE_RESTORE ================================================================================
+
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
@@ -230,8 +176,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mWasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
 */
     }
-
-    // BEFORE START ================================================================================
 
     // 0 - from onGlobalLayout-method
     private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
@@ -251,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //noinspection deprecation
             tvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
     } // end of detectFieldParameters-method \\
+
+    // BEFORE START ================================================================================
 
     // 1 - from onGlobalLayout-method
     private void prepareTextField() {
@@ -319,29 +265,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSnake = new Snake();
         mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
 
-        // 1 - defining start directions to properly set up the mSnake \
-        mSnakeDirection = mRandom.nextInt(3) + 1;
+        // defining start directions to properly set up the mSnake \
+        switch (mRandom.nextInt(3) + 1) {
+            case 0:
+                mSnakeDirection = MyDirections.RIGHT;
+                break;
+            case 1:
+                mSnakeDirection = MyDirections.UP;
+                break;
+            case 2:
+                mSnakeDirection = MyDirections.LEFT;
+                break;
+            case 3:
+                mSnakeDirection = MyDirections.DOWN;
+        }
+
         for (int i = 0; i < MyPSF.STARTING_SNAKE_LENGTH; i++) {
             // here we define position of every mSnake's cell \
             int cellPositionX = 0, cellPositionY = 0;
             // setting tail in the opposite direction here - to free space for head \
             switch (mSnakeDirection) {
-                case 0: { // right
+                case RIGHT: {
                     cellPositionX = mSymbolsInFieldLine / 2 - i;
                     cellPositionY = mFieldLinesCount / 2;
                     break;
                 }
-                case 1: { // up
+                case UP: {
                     cellPositionX = mSymbolsInFieldLine / 2;
                     cellPositionY = mFieldLinesCount / 2 + i;
                     break;
                 }
-                case 2: { // left
+                case LEFT: {
                     cellPositionX = mSymbolsInFieldLine / 2 + i;
                     cellPositionY = mFieldLinesCount / 2;
                     break;
                 }
-                case 3: { // down
+                case DOWN: {
                     cellPositionX = mSymbolsInFieldLine / 2;
                     cellPositionY = mFieldLinesCount / 2 - i;
                     break;
@@ -405,14 +364,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMainField.setText(newStringToSet);
     }
 
-    // MENU ========================================================================================
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         return true;
     }
+
+    // MENU ========================================================================================
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -436,25 +395,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-    // LISTENER ====================================================================================
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.ibRight:
-                mSnakeDirection = 0;
+                mSnakeDirection = MyDirections.RIGHT;
                 MyLog.i("turned Right");
                 break;
             case R.id.ibUp:
-                mSnakeDirection = 1;
+                mSnakeDirection = MyDirections.UP;
                 MyLog.i("turned Up");
                 break;
             case R.id.ibLeft:
-                mSnakeDirection = 2;
+                mSnakeDirection = MyDirections.LEFT;
                 MyLog.i("turned Left");
                 break;
             case R.id.ibDown:
-                mSnakeDirection = 3;
+                mSnakeDirection = MyDirections.DOWN;
                 MyLog.i("turned Down");
                 break;
             case R.id.bStartPause:
@@ -496,6 +453,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     } // end of onClick-method \\
 
+    // LISTENER ====================================================================================
+
     private void gameOver() {
         mVibrator.vibrate(MyPSF.LONG_VIBRATION);
         mWasGameOver = true;
@@ -518,10 +477,64 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // MOVEMENT ====================================================================================
 
+    public enum MyDirections {RIGHT, UP, LEFT, DOWN}
+
+    public class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            MyLog.i("onFling");
+
+            if (isRight(velocityX, velocityY)) {
+                mSnakeDirection = MyDirections.RIGHT;
+                return true;
+            }
+            if (isUp(velocityX, velocityY)) {
+                mSnakeDirection = MyDirections.UP;
+                return true;
+            }
+            if (isLeft(velocityX, velocityY)) {
+                mSnakeDirection = MyDirections.LEFT;
+                return true;
+            }
+            if (isDown(velocityX, velocityY)) {
+                mSnakeDirection = MyDirections.DOWN;
+                return true;
+            }
+            return false;
+        }
+
+        @SuppressWarnings("UnusedParameters")
+        private boolean isRight(float velocityX, float velocityY) {
+            return velocityX > 500;
+//            return velocityX > 500 && (-100 < velocityY && velocityY < 100);
+        }
+
+        @SuppressWarnings("UnusedParameters")
+        private boolean isUp(float velocityX, float velocityY) {
+            return velocityY < -300;
+//            return velocityY < -300 && (-100 < velocityX && velocityX < 100);
+        }
+
+        @SuppressWarnings("UnusedParameters")
+        private boolean isLeft(float velocityX, float velocityY) {
+            return velocityX < -500;
+//            return velocityX < -500 && (-100 < velocityY && velocityY < 100);
+        }
+
+        @SuppressWarnings("UnusedParameters")
+        private boolean isDown(float velocityX, float velocityY) {
+            return velocityY > 300;
+//            return velocityY > 300 && (-100 < velocityX && velocityX < 100);
+        }
+    }
+
+    // TIMER CLASSES ===============================================================================
+
     /**
      * special class defined for repeating operations and usage of Timer \
      */
-    public class SnakeMoveTimerTask extends TimerTask {
+    private class SnakeMoveTimerTask extends TimerTask {
 
         // this method handles movement of the mSnake \
         @Override
@@ -551,19 +564,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // 3 - finally moving mSnake's head to selected direction \
             snakeCell = mSnake.getCell(0); // for head of the mSnake
             switch (mSnakeDirection) {
-                case 0: // tail to right - head moves to left \
+                case RIGHT: // tail to right - head moves to left \
                     newCellX = snakeCell.getIndexByX() + 1;
                     newCellY = snakeCell.getIndexByY();
                     break;
-                case 1: // tail is set up - head moves down \
+                case UP: // tail is set up - head moves down \
                     newCellX = snakeCell.getIndexByX();
                     newCellY = snakeCell.getIndexByY() - 1;
                     break;
-                case 2: // tail to left - head moves to right \
+                case LEFT: // tail to left - head moves to right \
                     newCellX = snakeCell.getIndexByX() - 1;
                     newCellY = snakeCell.getIndexByY();
                     break;
-                case 3: // tail is set down - head moves up \
+                case DOWN: // tail is set down - head moves up \
                     newCellX = snakeCell.getIndexByX();
                     newCellY = snakeCell.getIndexByY() + 1;
                     break;
@@ -679,21 +692,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        private int shiftAfterFood(int direction, boolean isForX) {
+        private int shiftAfterFood(MyDirections direction, boolean isForX) {
             if (isForX)
                 switch (direction) {
-                    case 0: // to right - for X
+                    case RIGHT: // to right - for X
                         return 1;
-                    case 2: // to left - for X
+                    case LEFT: // to left - for X
                         return -1;
                     default: // up and dowm - 1, 3 cases don't affect X
                         return 0;
                 }
             else
                 switch (direction) {
-                    case 1: // up - for Y
+                    case UP: // up - for Y
                         return 1;
-                    case 3: // down - for Y
+                    case DOWN: // down - for Y
                         return -1;
                     default: // to right and left - 0, 2 cases don't affect Y
                         return 0;
@@ -732,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     } // end of SnakeMoveTimerTask-class \\
 
-    public class FoodUpdateTimerTask extends TimerTask {
+    private class FoodUpdateTimerTask extends TimerTask {
 
         @Override
         public void run() {
@@ -747,9 +760,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public class TimeUpdateTimerTask extends TimerTask {
+    private class TimeUpdateTimerTask extends TimerTask {
         // code here is called every milisecond - it has to be really fast \
-        long initialSystemTime = System.currentTimeMillis();
+        private long initialSystemTime = System.currentTimeMillis();
 
         @Override
         public void run() {

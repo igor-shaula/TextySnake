@@ -1,4 +1,4 @@
-package com.igor.shaula.snake_in_text.util;
+package com.igor.shaula.snake_in_text.utils;
 
 /**
  * Created by igor shaula

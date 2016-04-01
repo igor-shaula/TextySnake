@@ -10,8 +10,8 @@
     <FrameLayout
         android:id="@+id/flMain"
         android:layout_width="match_parent"
-        android:layout_gravity="center"
         android:layout_height="0dp"
+        android:layout_gravity="center"
         android:layout_weight="1">
 
         <com.igor.shaula.snake_in_text.custom_view.MyTextView
@@ -20,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@color/primary_dark"
+            android:gravity="center_vertical"
             android:text="@string/oneSymbol"
             android:textColor="@color/primary_light"
             android:typeface="monospace" />
@@ -28,10 +29,10 @@
 
     <RelativeLayout
         android:id="@+id/rlButtons"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_8">
+        android:layout_marginTop="@dimen/size_8"
+        android:visibility="gone">
 
         <ImageButton
             android:id="@+id/ibUp"

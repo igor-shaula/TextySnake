@@ -17,7 +17,6 @@ public class MyFontCache {
     private static final String FONT_NAME = "Anonymous_Pro.ttf";
 
     public static Typeface getTypeface(Context context) {
-//    public static Typeface getTypeface(String FONT_NAME, Context context) {
 
         Typeface typeface = fontCache.get(FONT_NAME);
 
