@@ -24,6 +24,10 @@ public class MyPSF {
 
     public static final String SCORE_STARTING_SUFFIX = " 0";
 
+    public static final String S_P_NAME = "Texty Snake Shared Preferences";
+    public static final String KEY_SCORE = "Best Score";
+    public static final String KEY_TIME = "Best Time";
+
 /*
         // keys for saving-restoring after screen orientation change \
         public static final String KEY_SNAKE = "snake";

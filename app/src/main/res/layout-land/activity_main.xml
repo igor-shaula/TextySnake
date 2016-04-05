@@ -89,8 +89,8 @@
             android:orientation="horizontal">
 
             <com.igor.shaula.snake_in_text.custom_view.MyTextView
-                android:id="@+id/tvTime"
-                style="@style/MyText"
+                android:id="@+id/mtvTime"
+                style="@style/MyText.Weight_1"
                 android:text="@string/defaultTime" />
 
             <com.igor.shaula.snake_in_text.custom_view.MyButton
@@ -100,8 +100,8 @@
                 android:text="@string/start" />
 
             <com.igor.shaula.snake_in_text.custom_view.MyTextView
-                android:id="@+id/tvScore"
-                style="@style/MyText"
+                android:id="@+id/mtvScore"
+                style="@style/MyText.Weight_1"
                 android:text="@string/score" />
 
         </android.support.v7.widget.LinearLayoutCompat>

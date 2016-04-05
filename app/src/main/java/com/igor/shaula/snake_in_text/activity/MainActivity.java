@@ -1,8 +1,11 @@
 package com.igor.shaula.snake_in_text.activity;
 
+import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
 import android.view.GestureDetector;
@@ -18,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.igor.shaula.snake_in_text.R;
+import com.igor.shaula.snake_in_text.custom_view.MyTextView;
 import com.igor.shaula.snake_in_text.entity.Snake;
 import com.igor.shaula.snake_in_text.utils.MyLog;
 import com.igor.shaula.snake_in_text.utils.MyPSF;
@@ -65,10 +69,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private MyDirections mSnakeDirection;
 
     // game parameters \
-    private int score;
     private boolean mAlreadyLaunched = false, mWasGameOver = false;
+    private int mCurrentScore, mBestScore;
+    private long mCurrentTime, mBestTime;
 
     private GestureDetector mGestureDetector;
+
+    // LIFECYCLE ===================================================================================
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mSnake = savedInstanceState.getParcelable(KEY_SNAKE);
             mSnakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
             mSnakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
-            score = savedInstanceState.getInt(KEY_SCORE);
+            mCurrentScore = savedInstanceState.getInt(KEY_SCORE);
             mAlreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
             mWasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
         } else {}
@@ -125,28 +132,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (ibDown != null)
             ibDown.setOnClickListener(this);
 
-        tvTime = (TextView) findViewById(R.id.tvTime);
-        tvScore = (TextView) findViewById(R.id.tvScore);
+        tvTime = (TextView) findViewById(R.id.mtvTime);
+        tvScore = (TextView) findViewById(R.id.mtvScore);
         tvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
 
         bStartPause = (Button) findViewById(R.id.bStartPause);
         assert bStartPause != null;
         bStartPause.setOnClickListener(this);
 
-        // now the setting the top - gesture sensetive interface \
-//        tvMainField.setOnTouchListener(new MyTouchListener(this));
-
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
+        // now the setting the top - gesture sensetive interface \
         mGestureDetector = new GestureDetector(this, new MyGestureListener());
-    } // end of onCreate-method \\
+//        tvMainField.setOnTouchListener(new MyTouchListener(this));
 
-    // LIFECYCLE ===================================================================================
+        SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
+        mBestScore = sharedPreferences.getInt(MyPSF.KEY_SCORE, 0);
+        mBestTime = sharedPreferences.getLong(MyPSF.KEY_TIME, 0);
+    } // end of onCreate-method \\
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         return mGestureDetector.onTouchEvent(motionEvent);
     }
+
+    // SAVE_RESTORE ================================================================================
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -155,14 +165,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         outState.putParcelable(KEY_SNAKE, mSnake);
         outState.putInt(KEY_SNAKE_DIRECTION, mSnakeDirection);
         outState.putInt(KEY_SNAKE_SPEED, mSnakeSpeed);
-        outState.putInt(KEY_SCORE, score);
+        outState.putInt(KEY_SCORE, mCurrentScore);
         outState.putBoolean(KEY_ALREADY_LAUNCHED, mAlreadyLaunched);
         outState.putBoolean(KEY_WAS_GAME_OVER, mWasGameOver);
 */
         MyLog.i("onSaveInstanceState worked");
     }
-
-    // SAVE_RESTORE ================================================================================
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
@@ -171,10 +179,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mSnake = savedInstanceState.getParcelable(KEY_SNAKE);
         mSnakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
         mSnakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
-        score = savedInstanceState.getInt(KEY_SCORE);
+        mCurrentScore = savedInstanceState.getInt(KEY_SCORE);
         mAlreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
         mWasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
 */
+        MyLog.i("onRestoreInstanceState worked");
     }
 
     // 0 - from onGlobalLayout-method
@@ -364,6 +373,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMainField.setText(newStringToSet);
     }
 
+    // MENU ========================================================================================
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -371,13 +382,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    // MENU ========================================================================================
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         int newSnakeSpeed = 0;
         switch (item.getItemId()) {
+            case R.id.viewScores:
+                showScores();
             case R.id.speed_5:
                 newSnakeSpeed++;
             case R.id.speed_4:
@@ -394,6 +405,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyLog.i("newSnakeSpeed = " + newSnakeSpeed);
         return super.onOptionsItemSelected(item);
     }
+
+    // UTILS =======================================================================================
+
+    private boolean showScores() {
+
+        // preparing view for the dialog \
+        @SuppressLint("InflateParams")
+        View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
+
+        // setting all elements for this view \
+        MyTextView mtvCurrentScore = (MyTextView) dialogView.findViewById(R.id.mtvCurrentScore);
+        MyTextView mtvCurrentTime = (MyTextView) dialogView.findViewById(R.id.mtvCurrentTime);
+        MyTextView mtvBestScore = (MyTextView) dialogView.findViewById(R.id.mtvBestScore);
+        MyTextView mtvBestTime = (MyTextView) dialogView.findViewById(R.id.mtvBestTime);
+        mtvCurrentScore.setText(mCurrentScore);
+        mtvCurrentTime.setText(DateFormat.format("mm:ss", mCurrentTime));
+        mtvBestScore.setText(mBestScore);
+        mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
+
+        // preparing builder for the dialog \
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+
+        // building and showing the dialog itself \
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        return true;
+    }
+
+    // LISTENER ====================================================================================
 
     @Override
     public void onClick(View v) {
@@ -431,7 +473,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setFieldBorders();
                         setInitialSnake();
                         setInitialFood();
-                        score = 0;
+                        mCurrentScore = 0;
                         mWasGameOver = false;
                     }
                     int startTextColor = ContextCompat.getColor(this, android.R.color.white);
@@ -453,16 +495,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     } // end of onClick-method \\
 
-    // LISTENER ====================================================================================
-
     private void gameOver() {
         mVibrator.vibrate(MyPSF.LONG_VIBRATION);
         mWasGameOver = true;
         mAlreadyLaunched = false;
-        MyLog.i("game ended with score " + score);
+        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
         mTimer.cancel();
         mTimer.purge();
         mTimer = null;
+
+        // checking if current result is the best \
+        if (mCurrentScore > mBestScore) {
+            mBestScore = mCurrentScore;
+            saveNewBestResults();
+        }
+
+//        int rawCurrentTime = Integer.decode(String.valueOf(tvTime.getText()));
+//        int currentTime = 60 * (rawCurrentTime / 100) + rawCurrentTime % 60;
+        if (mCurrentTime > mBestTime) {
+            mBestTime = mCurrentTime;
+            saveNewBestResults();
+        }
+
         // resetting the start-stop button to its primary state \
         runOnUiThread(new Runnable() {
             @Override
@@ -473,6 +527,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 tvMainField.setBackgroundResource(R.color.primary_light);
             }
         });
+    }
+
+    private void saveNewBestResults() {
+        getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE)
+                .edit()
+                .clear()
+                .putInt(MyPSF.KEY_SCORE, mBestScore)
+                .putLong(MyPSF.KEY_TIME, mBestTime)
+                .commit();
     }
 
     // MOVEMENT ====================================================================================
@@ -616,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     updateTextView();
-                    String scoreComplex = getString(R.string.score) + " " + score;
+                    String scoreComplex = getString(R.string.score) + " " + mCurrentScore;
                     tvScore.setText(scoreComplex);
                     MyLog.i("tvScore updated");
                 }
@@ -624,7 +687,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             // exit conditions check is the last thing to do \
             if (collisionHappened()) gameOver(); // this is the only way out from loop \
-            else score++;
+            else mCurrentScore++;
 
             // now handling eating of food and bonuses - it's taken by the head only \
             if (isFoodFound()) {
@@ -766,7 +829,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void run() {
-            long elapsedTimeLong = System.currentTimeMillis() - initialSystemTime;
+            mCurrentTime = System.currentTimeMillis() - initialSystemTime;
 /*
             00 added to the beginning of the string to avoid situation <=99 difference
             that means less than three digits and ArrayOutOfBoundsException as a result
@@ -777,7 +840,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             stringBuilder.append(DateFormat.format("mm:ss", elapsedTimeLong));
             stringBuilder.append(":").append(getMilliseconds(systemTimeString));
 */
-            final String stringToSet = String.valueOf("Time " + DateFormat.format("mm:ss", elapsedTimeLong));
+            final String stringToSet = String.valueOf("Time " + DateFormat.format("mm:ss", mCurrentTime));
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

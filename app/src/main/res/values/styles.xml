@@ -9,11 +9,20 @@
     <style name="MyText">
         <item name="android:singleLine">true</item>
         <item name="android:gravity">center</item>
-        <item name="android:layout_weight">1</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="MyText.Weight_1">
+        <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">0dp</item>
+    </style>
+
+    <style name="MyText.Scores">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_margin">@dimen/size_16</item>
     </style>
 
     <style name="MyImageButton">

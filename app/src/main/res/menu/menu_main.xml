@@ -6,8 +6,14 @@
     tools:context=".activity.MainActivity">
 
     <item
-        android:id="@+id/setComplexity"
+        android:id="@+id/viewScores"
         android:orderInCategory="100"
+        android:title="@string/viewScores"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/setComplexity"
+        android:orderInCategory="101"
         android:title="@string/setSpeed"
         app:showAsAction="ifRoom">
 
