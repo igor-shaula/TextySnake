@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@color/primary_dark"
+    android:orientation="vertical"
+    android:padding="@dimen/size_16">
+
+    <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        style="@style/MyText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/setSpeedOfSnake" />
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/size_8">
+
+        <com.igor.shaula.snake_in_text.custom_view.MyRadioButton
+            android:id="@+id/mrb1"
+            style="@style/MyRadioButton"
+            android:text="@string/speedVerySlow" />
+
+        <com.igor.shaula.snake_in_text.custom_view.MyRadioButton
+            android:id="@+id/mrb2"
+            style="@style/MyRadioButton"
+            android:text="@string/speedSlow" />
+
+        <com.igor.shaula.snake_in_text.custom_view.MyRadioButton
+            android:id="@+id/mrb3"
+            style="@style/MyRadioButton"
+            android:text="@string/speedNormal" />
+
+        <com.igor.shaula.snake_in_text.custom_view.MyRadioButton
+            android:id="@+id/mrb4"
+            style="@style/MyRadioButton"
+            android:text="@string/speedFast" />
+
+        <com.igor.shaula.snake_in_text.custom_view.MyRadioButton
+            android:id="@+id/mrb5"
+            style="@style/MyRadioButton"
+            android:text="@string/speedVeryFast"
+            android:textColorHighlight="@color/accent" />
+
+    </RadioGroup>
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/size_2"
+        android:background="@color/primary_light" />
+
+    <com.igor.shaula.snake_in_text.custom_view.MyButton
+        android:id="@+id/mbClearBestResults"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/size_16"
+        android:background="@drawable/main_button_states"
+        android:padding="@dimen/size_16"
+        android:text="@string/clearBestResults"
+        android:textAppearance="@android:style/TextAppearance.Large"
+        android:textColor="@android:color/white" />
+
+</LinearLayout>

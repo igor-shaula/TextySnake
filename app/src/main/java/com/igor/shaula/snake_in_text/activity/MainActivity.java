@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.igor.shaula.snake_in_text.R;
@@ -32,9 +31,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by igor shaula \
+ * Created by igor shaula - main class holding others to avoid too many code lines \
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     // following fields are safely rebuilt after changing screen configuration \\\\\\\\\\\\\\\\\\\\\
 
@@ -118,27 +117,50 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 });
 
-        ImageButton ibRight = (ImageButton) findViewById(R.id.ibRight);
-        ImageButton ibUp = (ImageButton) findViewById(R.id.ibUp);
-        ImageButton ibLeft = (ImageButton) findViewById(R.id.ibLeft);
-        ImageButton ibDown = (ImageButton) findViewById(R.id.ibDown);
-
-        if (ibRight != null)
-            ibRight.setOnClickListener(this);
-        if (ibUp != null)
-            ibUp.setOnClickListener(this);
-        if (ibLeft != null)
-            ibLeft.setOnClickListener(this);
-        if (ibDown != null)
-            ibDown.setOnClickListener(this);
-
         tvTime = (TextView) findViewById(R.id.mtvTime);
         tvScore = (TextView) findViewById(R.id.mtvScore);
         tvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
 
         bStartPause = (Button) findViewById(R.id.bStartPause);
-        assert bStartPause != null;
-        bStartPause.setOnClickListener(this);
+        bStartPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
+                if (mAlreadyLaunched) { // initial value is false \
+                    if (mTimer != null) {
+                        mTimer.cancel();
+                        mTimer = null;
+                    }
+                    int stopTextColor = ContextCompat.getColor(getApplicationContext(), R.color.primary_light);
+                    tvMainField.setTextColor(stopTextColor);
+                    bStartPause.setText(R.string.start);
+                } else {
+                    if (mWasGameOver) {
+                        // everything is reset to later start from scratch \
+                        prepareTextField();
+                        setFieldBorders();
+                        setInitialSnake();
+                        setInitialFood();
+                        mCurrentScore = 0;
+                        mWasGameOver = false;
+                    }
+                    int startTextColor = ContextCompat.getColor(getApplicationContext(), android.R.color.white);
+                    tvMainField.setTextColor(startTextColor);
+                    tvMainField.setBackgroundResource(R.color.primary_dark);
+                    bStartPause.setText(R.string.pause);
+                    // launching everything \
+                    int delay = 600 / mSnakeSpeed;
+                    mTimer = new Timer();
+                    mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
+                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1000);
+//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
+                    mTimer.schedule(new FoodUpdateTimerTask(),
+                            MyPSF.STARTING_UPDATE_FOOD_PERIOD,
+                            MyPSF.STARTING_UPDATE_FOOD_PERIOD);
+                }
+                mAlreadyLaunched = !mAlreadyLaunched;
+            }
+        });
 
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
@@ -186,6 +208,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyLog.i("onRestoreInstanceState worked");
     }
 
+    // BEFORE START ================================================================================
+
     // 0 - from onGlobalLayout-method
     private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
         // getting current screen size in pixels \
@@ -204,8 +228,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             //noinspection deprecation
             tvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
     } // end of detectFieldParameters-method \\
-
-    // BEFORE START ================================================================================
 
     // 1 - from onGlobalLayout-method
     private void prepareTextField() {
@@ -256,9 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyLog.i("mFieldLinesCount " + mFieldLinesCount);
     } // end of prepareTextField-method \\
 
-    /**
-     * 2 - from onGlobalLayout-method
-     */
+    // 2 - from onGlobalLayout-method
     private void setFieldBorders() {
         for (int i = 0; i < mFieldLinesCount; i++)
             for (int j = 0; j < mSymbolsInFieldLine; j++)
@@ -266,9 +286,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mCharsArrayList.get(i)[j] = MyPSF.BORDER;
     }
 
-    /**
-     * 3 - from onGlobalLayout-method
-     */
+    // 3 - from onGlobalLayout-method
     private void setInitialSnake() {
 
         mSnake = new Snake();
@@ -331,6 +349,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateTextView();
     } // end of setInitialFood-method \\
 
+    // MENU ========================================================================================
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int newSnakeSpeed = 0;
+        switch (item.getItemId()) {
+            case R.id.showScores:
+                showScores();
+                break;
+            case R.id.showPreferences:
+                showPreferences();
+                break;
+                /*
+            case R.id.speed_5:
+                newSnakeSpeed++;
+            case R.id.speed_4:
+                newSnakeSpeed++;
+            case R.id.speed_3:
+                newSnakeSpeed++;
+            case R.id.speed_2:
+                newSnakeSpeed++;
+            case R.id.speed_1:
+                newSnakeSpeed++;
+                */
+        }
+        if (newSnakeSpeed != 0)
+            mSnakeSpeed = newSnakeSpeed;
+        MyLog.i("newSnakeSpeed = " + newSnakeSpeed);
+        return super.onOptionsItemSelected(item);
+    }
+
+    // UTILS =======================================================================================
+
     private void updateFood() {
 /*
         this method gets called after the mSnake is initialized -so we have to check collisions \
@@ -373,40 +432,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMainField.setText(newStringToSet);
     }
 
-    // MENU ========================================================================================
+    private void gameOver() {
+        mVibrator.vibrate(MyPSF.LONG_VIBRATION);
+        mWasGameOver = true;
+        mAlreadyLaunched = false;
+        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
+        mTimer.cancel();
+        mTimer.purge();
+        mTimer = null;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        int newSnakeSpeed = 0;
-        switch (item.getItemId()) {
-            case R.id.viewScores:
-                showScores();
-            case R.id.speed_5:
-                newSnakeSpeed++;
-            case R.id.speed_4:
-                newSnakeSpeed++;
-            case R.id.speed_3:
-                newSnakeSpeed++;
-            case R.id.speed_2:
-                newSnakeSpeed++;
-            case R.id.speed_1:
-                newSnakeSpeed++;
+        // checking if current result is the best \
+        if (mCurrentScore > mBestScore || mCurrentTime > mBestTime) {
+            if (mCurrentScore > mBestScore)
+                mBestScore = mCurrentScore;
+            if (mCurrentTime > mBestTime)
+                mBestTime = mCurrentTime;
+            saveNewBestResults();
         }
-        if (newSnakeSpeed != 0)
-            mSnakeSpeed = newSnakeSpeed;
-        MyLog.i("newSnakeSpeed = " + newSnakeSpeed);
-        return super.onOptionsItemSelected(item);
+
+        // resetting the start-stop button to its primary state \
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                bStartPause.setText(R.string.start);
+                int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
+                tvMainField.setTextColor(endTextColor);
+                tvMainField.setBackgroundResource(R.color.primary_light);
+                showScores();
+            }
+        });
     }
 
-    // UTILS =======================================================================================
+    private void saveNewBestResults() {
+        getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE)
+                .edit()
+                .clear()
+                .putInt(MyPSF.KEY_SCORE, mBestScore)
+                .putLong(MyPSF.KEY_TIME, mBestTime)
+                .commit();
+    }
 
     private boolean showScores() {
 
@@ -419,9 +483,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         MyTextView mtvCurrentTime = (MyTextView) dialogView.findViewById(R.id.mtvCurrentTime);
         MyTextView mtvBestScore = (MyTextView) dialogView.findViewById(R.id.mtvBestScore);
         MyTextView mtvBestTime = (MyTextView) dialogView.findViewById(R.id.mtvBestTime);
-        mtvCurrentScore.setText(mCurrentScore);
+        mtvCurrentScore.setText(String.valueOf(mCurrentScore));
         mtvCurrentTime.setText(DateFormat.format("mm:ss", mCurrentTime));
-        mtvBestScore.setText(mBestScore);
+        mtvBestScore.setText(String.valueOf(mBestScore));
         mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
 
         // preparing builder for the dialog \
@@ -435,107 +499,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return true;
     }
 
-    // LISTENER ====================================================================================
+    private void showPreferences() {
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.ibRight:
-                mSnakeDirection = MyDirections.RIGHT;
-                MyLog.i("turned Right");
-                break;
-            case R.id.ibUp:
-                mSnakeDirection = MyDirections.UP;
-                MyLog.i("turned Up");
-                break;
-            case R.id.ibLeft:
-                mSnakeDirection = MyDirections.LEFT;
-                MyLog.i("turned Left");
-                break;
-            case R.id.ibDown:
-                mSnakeDirection = MyDirections.DOWN;
-                MyLog.i("turned Down");
-                break;
-            case R.id.bStartPause:
-                mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
-                if (mAlreadyLaunched) { // initial value is false \
-                    if (mTimer != null) {
-                        mTimer.cancel();
-                        mTimer = null;
-                    }
-                    int stopTextColor = ContextCompat.getColor(this, R.color.primary_light);
-                    tvMainField.setTextColor(stopTextColor);
-                    bStartPause.setText(R.string.start);
-                } else {
-                    if (mWasGameOver) {
-                        // everything is reset to later start from scratch \
-                        prepareTextField();
-                        setFieldBorders();
-                        setInitialSnake();
-                        setInitialFood();
-                        mCurrentScore = 0;
-                        mWasGameOver = false;
-                    }
-                    int startTextColor = ContextCompat.getColor(this, android.R.color.white);
-                    tvMainField.setTextColor(startTextColor);
-                    tvMainField.setBackgroundResource(R.color.primary_dark);
-                    bStartPause.setText(R.string.pause);
-                    // launching everything \
-                    int delay = 600 / mSnakeSpeed;
-                    mTimer = new Timer();
-                    mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
-                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1000);
-//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
-                    mTimer.schedule(new FoodUpdateTimerTask(),
-                            MyPSF.STARTING_UPDATE_FOOD_PERIOD,
-                            MyPSF.STARTING_UPDATE_FOOD_PERIOD);
-                }
-                mAlreadyLaunched = !mAlreadyLaunched;
-                break;
-        }
-    } // end of onClick-method \\
+        // preparing view for the dialog \
+        @SuppressLint("InflateParams")
+        View dialogView = getLayoutInflater().inflate(R.layout.preferences, null);
 
-    private void gameOver() {
-        mVibrator.vibrate(MyPSF.LONG_VIBRATION);
-        mWasGameOver = true;
-        mAlreadyLaunched = false;
-        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
-        mTimer.cancel();
-        mTimer.purge();
-        mTimer = null;
+        // setting all elements for this view \
 
-        // checking if current result is the best \
-        if (mCurrentScore > mBestScore) {
-            mBestScore = mCurrentScore;
-            saveNewBestResults();
-        }
 
-//        int rawCurrentTime = Integer.decode(String.valueOf(tvTime.getText()));
-//        int currentTime = 60 * (rawCurrentTime / 100) + rawCurrentTime % 60;
-        if (mCurrentTime > mBestTime) {
-            mBestTime = mCurrentTime;
-            saveNewBestResults();
-        }
+        // preparing builder for the dialog \
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
 
-        // resetting the start-stop button to its primary state \
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                bStartPause.setText(R.string.start);
-                int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
-                tvMainField.setTextColor(endTextColor);
-                tvMainField.setBackgroundResource(R.color.primary_light);
-            }
-        });
-    }
-
-    private void saveNewBestResults() {
-        getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE)
-                .edit()
-                .clear()
-                .putInt(MyPSF.KEY_SCORE, mBestScore)
-                .putLong(MyPSF.KEY_TIME, mBestTime)
-                .commit();
+        // building and showing the dialog itself \
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     // MOVEMENT ====================================================================================
@@ -594,9 +573,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // TIMER CLASSES ===============================================================================
 
-    /**
-     * special class defined for repeating operations and usage of Timer \
-     */
+    // special class defined for repeating operations and usage of Timer \
     private class SnakeMoveTimerTask extends TimerTask {
 
         // this method handles movement of the mSnake \

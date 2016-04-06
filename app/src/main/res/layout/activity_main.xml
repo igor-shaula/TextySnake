@@ -22,61 +22,63 @@
             android:background="@color/primary_dark"
             android:gravity="center_vertical"
             android:text="@string/oneSymbol"
-            android:textColor="@color/primary_light"
-            android:typeface="monospace" />
+            android:textColor="@color/primary_light" />
+        <!--android:typeface="monospace" />-->
 
     </FrameLayout>
 
-    <RelativeLayout
-        android:id="@+id/rlButtons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/size_8"
-        android:visibility="gone">
+    <!--
+        <RelativeLayout
+            android:id="@+id/rlButtons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/size_8"
+            android:visibility="gone">
 
-        <ImageButton
-            android:id="@+id/ibUp"
-            style="@style/MyImageButton"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:contentDescription="@string/descButtonUp"
-            android:src="@drawable/circled_up" />
+            <ImageButton
+                android:id="@+id/ibUp"
+                style="@style/MyImageButton"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@string/descButtonUp"
+                android:src="@drawable/circled_up" />
 
-        <ImageButton
-            android:id="@+id/ivCenter"
-            style="@style/MyImageButton"
-            android:layout_below="@id/ibUp"
-            android:layout_centerInParent="true"
-            android:contentDescription="@string/descCentralImage"
-            android:src="@drawable/all_directions" />
+            <ImageButton
+                android:id="@+id/ivCenter"
+                style="@style/MyImageButton"
+                android:layout_below="@id/ibUp"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/descCentralImage"
+                android:src="@drawable/all_directions" />
 
-        <ImageButton
-            android:id="@+id/ibDown"
-            style="@style/MyImageButton"
-            android:layout_below="@id/ivCenter"
-            android:layout_centerHorizontal="true"
-            android:contentDescription="@string/descButtonDown"
-            android:src="@drawable/circled_down" />
+            <ImageButton
+                android:id="@+id/ibDown"
+                style="@style/MyImageButton"
+                android:layout_below="@id/ivCenter"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@string/descButtonDown"
+                android:src="@drawable/circled_down" />
 
-        <ImageButton
-            android:id="@+id/ibLeft"
-            style="@style/MyImageButton"
-            android:layout_centerVertical="true"
-            android:layout_toLeftOf="@id/ivCenter"
-            android:layout_toStartOf="@id/ivCenter"
-            android:contentDescription="@string/descButtonLeft"
-            android:src="@drawable/circled_left" />
+            <ImageButton
+                android:id="@+id/ibLeft"
+                style="@style/MyImageButton"
+                android:layout_centerVertical="true"
+                android:layout_toLeftOf="@id/ivCenter"
+                android:layout_toStartOf="@id/ivCenter"
+                android:contentDescription="@string/descButtonLeft"
+                android:src="@drawable/circled_left" />
 
-        <ImageButton
-            android:id="@+id/ibRight"
-            style="@style/MyImageButton"
-            android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/ivCenter"
-            android:layout_toRightOf="@id/ivCenter"
-            android:contentDescription="@string/descButtonRight"
-            android:src="@drawable/circled_right" />
+            <ImageButton
+                android:id="@+id/ibRight"
+                style="@style/MyImageButton"
+                android:layout_centerVertical="true"
+                android:layout_toEndOf="@id/ivCenter"
+                android:layout_toRightOf="@id/ivCenter"
+                android:contentDescription="@string/descButtonRight"
+                android:src="@drawable/circled_right" />
 
-    </RelativeLayout>
+        </RelativeLayout>
+    -->
 
     <LinearLayout
         android:layout_width="match_parent"

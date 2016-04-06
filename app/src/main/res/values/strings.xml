@@ -14,14 +14,18 @@
     <string name="descButtonLeft">button left</string>
     <string name="descButtonRight">button right</string>
 
+    <string name="speedKey">speed key</string>
     <string name="setSpeed">Set speed</string>
-    <string name="speedVerySlow">very slow</string>
-    <string name="speedSlow">slow</string>
-    <string name="speedNormal">normal</string>
-    <string name="speedFast">fast</string>
-    <string name="speedVeryFast">very fast</string>
+    <string name="speedVerySlow">1 - very slow</string>
+    <string name="speedSlow">2 - slow</string>
+    <string name="speedNormal">3 - normal</string>
+    <string name="speedFast">4 - fast</string>
+    <string name="speedVeryFast">5 - very fast</string>
+
     <string name="viewScores">View Scores</string>
     <string name="yourResult">Your result</string>
     <string name="bestResult">Best result</string>
+    <string name="setSpeedOfSnake">How fast is the snake</string>
+    <string name="clearBestResults">Clear best results</string>
 
 </resources>

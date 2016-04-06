@@ -6,51 +6,53 @@
     tools:context=".activity.MainActivity">
 
     <item
-        android:id="@+id/viewScores"
+        android:id="@+id/showScores"
         android:orderInCategory="100"
         android:title="@string/viewScores"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/setComplexity"
+        android:id="@+id/showPreferences"
         android:orderInCategory="101"
         android:title="@string/setSpeed"
-        app:showAsAction="ifRoom">
+        app:showAsAction="ifRoom" />
 
-        <menu>
+    <!--
+            <menu>
 
-            <item
-                android:id="@+id/speed_1"
-                android:orderInCategory="101"
-                android:title="@string/speedVerySlow"
-                app:showAsAction="never" />
+                <item
+                    android:id="@+id/speed_1"
+                    android:orderInCategory="101"
+                    android:title="@string/speedVerySlow"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/speed_2"
-                android:orderInCategory="102"
-                android:title="@string/speedSlow"
-                app:showAsAction="never" />
+                <item
+                    android:id="@+id/speed_2"
+                    android:orderInCategory="102"
+                    android:title="@string/speedSlow"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/speed_3"
-                android:orderInCategory="103"
-                android:title="@string/speedNormal"
-                app:showAsAction="never" />
+                <item
+                    android:id="@+id/speed_3"
+                    android:orderInCategory="103"
+                    android:title="@string/speedNormal"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/speed_4"
-                android:orderInCategory="104"
-                android:title="@string/speedFast"
-                app:showAsAction="never" />
+                <item
+                    android:id="@+id/speed_4"
+                    android:orderInCategory="104"
+                    android:title="@string/speedFast"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/speed_5"
-                android:orderInCategory="105"
-                android:title="@string/speedVeryFast"
-                app:showAsAction="never" />
+                <item
+                    android:id="@+id/speed_5"
+                    android:orderInCategory="105"
+                    android:title="@string/speedVeryFast"
+                    app:showAsAction="never" />
 
-        </menu>
+            </menu>
 
-    </item>
+        </item>
+    -->
 
 </menu>
