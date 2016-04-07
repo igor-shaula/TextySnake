@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context=".activity.MainActivity"
+    android:baselineAligned="false">
+
+    <FrameLayout
+        android:id="@+id/flMain"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <com.igor.shaula.snake_in_text.custom_view.MyTextView
+            android:id="@+id/viewMainField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary_dark"
+            android:text="@string/oneSymbol"
+            android:textColor="@color/primary_light"
+            android:textIsSelectable="false"
+            android:textStyle="bold"
+            android:typeface="monospace" />
+
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/rlButtons"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/ibUp"
+                style="@style/MyImageButton"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@string/descButtonUp"
+                android:src="@drawable/circled_up" />
+
+            <ImageButton
+                android:id="@+id/ivCenter"
+                style="@style/MyImageButton"
+                android:layout_below="@id/ibUp"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/descCentralImage"
+                android:src="@drawable/all_directions" />
+
+            <ImageButton
+                android:id="@+id/ibDown"
+                style="@style/MyImageButton"
+                android:layout_below="@id/ivCenter"
+                android:layout_centerHorizontal="true"
+                android:contentDescription="@string/descButtonDown"
+                android:src="@drawable/circled_down" />
+
+            <ImageButton
+                android:id="@+id/ibLeft"
+                style="@style/MyImageButton"
+                android:layout_below="@+id/ibUp"
+                android:layout_toLeftOf="@+id/ivCenter"
+                android:layout_toStartOf="@+id/ivCenter"
+                android:contentDescription="@string/descButtonLeft"
+                android:src="@drawable/circled_left" />
+
+            <ImageButton
+                android:id="@+id/ibRight"
+                style="@style/MyImageButton"
+                android:layout_below="@+id/ibUp"
+                android:layout_toEndOf="@+id/ivCenter"
+                android:layout_toRightOf="@+id/ivCenter"
+                android:contentDescription="@string/descButtonRight"
+                android:src="@drawable/circled_right" />
+
+        </RelativeLayout>
+
+        <android.support.v7.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/primary"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvTime"
+                style="@style/MyText.Weight"
+                android:text="@string/defaultTime" />
+
+            <com.igor.shaula.snake_in_text.custom_view.MyButton
+                android:id="@+id/bStartPause"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start" />
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvScore"
+                style="@style/MyText.Weight"
+                android:text="@string/score" />
+
+        </android.support.v7.widget.LinearLayoutCompat>
+
+    </LinearLayout>
+
+</LinearLayout>

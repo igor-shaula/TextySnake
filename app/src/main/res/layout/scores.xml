@@ -5,56 +5,96 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:background="@color/primary_dark"
-    android:orientation="horizontal"
+    android:orientation="vertical"
     android:padding="@dimen/size_16">
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
-            style="@style/MyText.Scores"
-            android:text="@string/yourResult" />
-
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
-            android:id="@+id/mtvCurrentScore"
-            style="@style/MyText.Scores"
-            android:text="@string/app_name" />
-
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
-            android:id="@+id/mtvCurrentTime"
-            style="@style/MyText.Scores"
-            android:text="@string/app_name" />
-
-    </LinearLayout>
+    <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        style="@style/MyText.Scores"
+        android:layout_margin="@dimen/size_0"
+        android:text="@string/results" />
 
     <View
-        android:layout_width="@dimen/size_2"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/size_2"
+        android:layout_marginTop="@dimen/size_16"
         android:background="@color/primary_light" />
 
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
-            style="@style/MyText.Scores"
-            android:text="@string/bestResult" />
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
-            android:id="@+id/mtvBestScore"
-            style="@style/MyText.Scores"
-            android:text="@string/app_name" />
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                style="@style/MyText.Scores"
+                android:text="@string/your" />
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
-            android:id="@+id/mtvBestTime"
-            style="@style/MyText.Scores"
-            android:text="@string/app_name" />
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvCurrentScore"
+                style="@style/MyText.Scores"
+                android:text="@string/app_name" />
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvCurrentTime"
+                style="@style/MyText.Scores"
+                android:text="@string/app_name" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="@dimen/size_2"
+            android:layout_height="match_parent"
+            android:background="@color/primary_light" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                style="@style/MyText.Scores"
+                android:text="@string/best" />
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvBestScore"
+                style="@style/MyText.Scores"
+                android:text="@string/app_name" />
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvBestTime"
+                style="@style/MyText.Scores"
+                android:text="@string/app_name" />
+
+        </LinearLayout>
 
     </LinearLayout>
+
+    <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        android:id="@+id/mtvClearBestResults"
+        style="@style/MyText.Scores"
+        android:layout_margin="@dimen/size_0"
+        android:background="@drawable/main_button_states"
+        android:padding="@dimen/size_16"
+        android:text="@string/clearBestResults" />
+
+    <!--
+        <com.igor.shaula.snake_in_text.custom_view.MyButton
+            android:id="@+id/mbClearBestResults"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/size_16"
+            android:background="@drawable/main_button_states"
+            android:padding="@dimen/size_16"
+            android:text="@string/clearBestResults"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textColor="@android:color/white" />
+    -->
 
 </LinearLayout>

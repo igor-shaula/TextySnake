@@ -4,6 +4,8 @@
     <string name="start">Start</string>
     <string name="pause">Pause</string>
     <string name="score">Score</string>
+    <string name="time">Time</string>
+    <string name="defaultScore">Score 0</string>
     <string name="defaultTime">Time 00:00</string>
     <!--<string name="defaultTime">00:00:000</string>-->
     <string name="oneSymbol">O</string>
@@ -23,9 +25,10 @@
     <string name="speedVeryFast">5 - very fast</string>
 
     <string name="viewScores">View Scores</string>
-    <string name="yourResult">Your result</string>
-    <string name="bestResult">Best result</string>
+    <string name="your">Your</string>
+    <string name="best">Best</string>
     <string name="setSpeedOfSnake">How fast is the snake</string>
     <string name="clearBestResults">Clear best results</string>
+    <string name="results">Results</string>
 
 </resources>
