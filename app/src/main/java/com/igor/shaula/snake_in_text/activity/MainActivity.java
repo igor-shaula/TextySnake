@@ -524,9 +524,43 @@ public class MainActivity extends AppCompatActivity {
     public class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
         @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            MyLog.i("onDoubleTap");
+            return super.onDoubleTap(e);
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(MotionEvent e) {
+            MyLog.i("onDoubleTapEvent");
+            return super.onDoubleTapEvent(e);
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            MyLog.i("onLongPress");
+            super.onLongPress(e);
+        }
+
+        @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             MyLog.i("onFling");
 
+            float sensitvity = 50;
+
+            if ((e1.getX() - e2.getX()) > sensitvity) {
+                MyLog.i("left");
+            } else if ((e2.getX() - e1.getX()) > sensitvity) {
+                MyLog.i("right");
+            }
+
+            if ((e1.getY() - e2.getY()) > sensitvity) {
+                MyLog.i("up");
+            } else if ((e2.getY() - e1.getY()) > sensitvity) {
+                MyLog.i("down");
+            }
+            return super.onFling(e1, e2, velocityX, velocityY);
+
+/*
             if (isRight(velocityX, velocityY)) {
                 mSnakeDirection = MyDirections.RIGHT;
                 return true;
@@ -568,6 +602,8 @@ public class MainActivity extends AppCompatActivity {
         private boolean isDown(float velocityX, float velocityY) {
             return velocityY > 300;
 //            return velocityY > 300 && (-100 < velocityX && velocityX < 100);
+        }
+        */
         }
     }
 
