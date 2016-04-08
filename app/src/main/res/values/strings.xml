@@ -30,5 +30,7 @@
     <string name="setSpeedOfSnake">How fast is the snake</string>
     <string name="clearBestResults">Clear best results</string>
     <string name="results">Results</string>
+    <string name="no">NO!</string>
+    <string name="yes">YES</string>
 
 </resources>

@@ -81,20 +81,47 @@
         android:layout_margin="@dimen/size_0"
         android:background="@drawable/main_button_states"
         android:padding="@dimen/size_16"
-        android:text="@string/clearBestResults" />
+        android:text="@string/clearBestResults"
+        android:visibility="visible" />
 
-    <!--
-        <com.igor.shaula.snake_in_text.custom_view.MyButton
-            android:id="@+id/mbClearBestResults"
+    <LinearLayout
+        android:id="@+id/llTwoButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="visible">
+
+        <View
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/size_2"
+            android:background="@color/primary_light" />
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/size_16"
-            android:background="@drawable/main_button_states"
-            android:padding="@dimen/size_16"
-            android:text="@string/clearBestResults"
-            android:textAppearance="@android:style/TextAppearance.Large"
-            android:textColor="@android:color/white" />
-    -->
+            android:orientation="horizontal">
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvNo"
+                style="@style/MyText.Weight"
+                android:background="@drawable/main_button_states"
+                android:padding="@dimen/size_16"
+                android:text="@string/no" />
+
+            <View
+                android:layout_width="@dimen/size_2"
+                android:layout_height="match_parent"
+                android:background="@color/primary_light" />
+
+            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+                android:id="@+id/mtvYes"
+                style="@style/MyText.Weight"
+                android:background="@drawable/main_button_states"
+                android:padding="@dimen/size_16"
+                android:text="@string/yes" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

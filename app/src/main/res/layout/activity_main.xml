@@ -33,26 +33,6 @@
             android:gravity="start"
             android:text="@string/score" />
 
-        <!--
-                <com.igor.shaula.snake_in_text.custom_view.MyButton
-                    android:id="@+id/bStartPause"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/main_button_states"
-                    android:padding="@dimen/size_16"
-                    android:text="@string/start"
-                    android:textAppearance="@android:style/TextAppearance.Large"
-                    android:textColor="@android:color/white" />
-        -->
-
-<!--
-        <View
-            android:layout_width="@dimen/size_2"
-            android:layout_height="wrap_content"
-            android:background="@color/primary_light"
-            android:padding="@dimen/size_16" />
--->
-
         <com.igor.shaula.snake_in_text.custom_view.MyTextView
             android:id="@+id/mtvTime"
             style="@style/MyText.Weight"

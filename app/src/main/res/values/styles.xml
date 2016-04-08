@@ -47,9 +47,11 @@
     <style name="MyRadioButton" parent="MyText">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center_vertical</item>
-        <!--<item name="android:padding">@dimen/size_16</item>-->
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_marginBottom">@dimen/size_8</item>
+        <item name="android:button">@android:color/transparent</item>
+        <item name="android:padding">@dimen/size_8</item>
+        <item name="android:background">@drawable/my_radio_button_states</item>
     </style>
 
 </resources>
