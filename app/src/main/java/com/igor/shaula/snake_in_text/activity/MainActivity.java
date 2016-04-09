@@ -109,26 +109,13 @@ public class MainActivity extends AppCompatActivity {
                         // moving everything to separate methods \
                         ViewTreeObserver.OnGlobalLayoutListener listener = this;
                         detectFieldParameters(listener); // 0
-                        prepareTextField(); // 1
-                        setFieldBorders(); // 2
-                        setInitialSnake(); // 3
-                        setInitialFood(); // 4
+                        prepareGame();
                     }
                 });
 
         mtvTime = (MyTextView) findViewById(R.id.mtvTime);
         mtvScore = (MyTextView) findViewById(R.id.mtvScore);
         mtvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
-
-/*
-        bStartPause = (Button) findViewById(R.id.bStartPause);
-        bStartPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startPause();
-            }
-        });
-*/
 
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
@@ -177,6 +164,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // BEFORE START ================================================================================
+
+    private void prepareGame() {
+        prepareTextField(); // 1
+        setFieldBorders(); // 2
+        setInitialSnake(); // 3
+        setInitialFood(); // 4
+    }
 
     // 0 - from onGlobalLayout-method
     private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
@@ -378,39 +372,6 @@ public class MainActivity extends AppCompatActivity {
         mtvMainField.setText(newStringToSet);
     }
 
-    private void gameOver() {
-        mVibrator.vibrate(MyPSF.LONG_VIBRATION);
-        mWasGameOver = true;
-        mAlreadyLaunched = false;
-        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer.purge();
-            mTimer = null;
-        }
-
-        // checking if current result is the best \
-        if (mCurrentScore > mBestScore || mCurrentTime > mBestTime) {
-            if (mCurrentScore > mBestScore)
-                mBestScore = mCurrentScore;
-            if (mCurrentTime > mBestTime)
-                mBestTime = mCurrentTime;
-            saveNewBestResults();
-        }
-
-        // resetting the start-stop button to its primary state \
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-//                bStartPause.setText(R.string.start);
-                int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
-                mtvMainField.setTextColor(endTextColor);
-                mtvMainField.setBackgroundResource(R.color.primary_light);
-                showScoresDialog();
-            }
-        });
-    }
-
     private void saveNewBestResults() {
         getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE)
                 .edit()
@@ -425,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
         pauseGame();
 
         // preparing view for the dialog \
-        @SuppressLint("InflateParams") final
+        @SuppressLint("InflateParams")
         View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
 
         // setting all elements for this view \
@@ -439,35 +400,36 @@ public class MainActivity extends AppCompatActivity {
         mtvBestScore.setText(String.valueOf(mBestScore));
         mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
 
-        final MyTextView myTextView = (MyTextView) dialogView.findViewById(R.id.mtvClearBestResults);
-        final LinearLayout llTwoButtons = (LinearLayout) dialogView.findViewById(R.id.llTwoButtons);
+        final MyTextView mtvClearBestResults = (MyTextView) dialogView.findViewById(R.id.mtvClearBestResults);
+        final LinearLayout llHidden = (LinearLayout) dialogView.findViewById(R.id.llHidden);
+        final boolean[] longButtonClickedOnce = {false};
 
         // preparing special listener for two hidden buttons \
         final View.OnClickListener hiddenViewClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (v.getId() == R.id.mtvNo) {
-                    llTwoButtons.setVisibility(View.GONE);
-//                            myTextView.setVisibility(View.VISIBLE);
-                } else if (v.getId() == R.id.mtvYes) {
+                if (v.getId() == R.id.mtvYes) { // other button just hides this view again \
                     mBestScore = 0;
                     mBestTime = 0;
                     mtvBestScore.setText(String.valueOf(mBestScore));
                     mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
                     saveNewBestResults();
                 }
+                llHidden.setVisibility(View.GONE); // click at NO-button is done by this line \
+                longButtonClickedOnce[0] = false;
             }
         };
 
-        myTextView.setOnClickListener(new View.OnClickListener() {
+        mtvClearBestResults.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                myTextView.setVisibility(View.GONE);
-                llTwoButtons.setVisibility(View.VISIBLE);
-                llTwoButtons.setOnClickListener(hiddenViewClickListener);
+                llHidden.setVisibility(View.VISIBLE);
+                llHidden.findViewById(R.id.mtvNo).setOnClickListener(hiddenViewClickListener);
+                llHidden.findViewById(R.id.mtvYes).setOnClickListener(hiddenViewClickListener);
+                if (longButtonClickedOnce[0]) llHidden.setVisibility(View.GONE);
+                longButtonClickedOnce[0] = !longButtonClickedOnce[0];
             }
         });
-
 
         // preparing builder for the dialog \
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -498,13 +460,13 @@ public class MainActivity extends AppCompatActivity {
 
         // setting all elements for this view \
         RadioGroup rgSpeed = (RadioGroup) dialogView.findViewById(R.id.rgSpeed);
-//        try {
-        rgSpeed.check(mSnakeSpeed - 1);
 
-//        ((RadioButton) dialogView.findViewById(rgSpeed.getCheckedRadioButtonId())).setChecked(true);
-        // TODO: 09.04.2016 this check() doesn't work as intended \
-
-//        } catch (){}
+        int[] radioButtons = {R.id.mrb1, R.id.mrb2, R.id.mrb3, R.id.mrb4, R.id.mrb5};
+        try {
+            rgSpeed.check(radioButtons[mSnakeSpeed - 1]);
+        } catch (ArrayIndexOutOfBoundsException aioobe) {
+            MyLog.i("ArrayIndexOutOfBoundsException: mSnakeSpeed = " + mSnakeSpeed);
+        }
         rgSpeed.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -547,10 +509,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (mWasGameOver) {
             // everything is reset to later start from scratch \
-            prepareTextField();
-            setFieldBorders();
-            setInitialSnake();
-            setInitialFood();
+            prepareGame();
             mCurrentScore = 0;
             mWasGameOver = false;
         }
@@ -568,6 +527,38 @@ public class MainActivity extends AppCompatActivity {
                 MyPSF.STARTING_UPDATE_FOOD_PERIOD);
     }
 
+    private void endGame() {
+        mVibrator.vibrate(MyPSF.LONG_VIBRATION);
+        mWasGameOver = true;
+        mAlreadyLaunched = false;
+        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer.purge();
+            mTimer = null;
+        }
+
+        // checking if current result is the best \
+        if (mCurrentScore > mBestScore || mCurrentTime > mBestTime) {
+            if (mCurrentScore > mBestScore)
+                mBestScore = mCurrentScore;
+            if (mCurrentTime > mBestTime)
+                mBestTime = mCurrentTime;
+            saveNewBestResults();
+        }
+
+        // resetting the start-stop button to its primary state \
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
+                mtvMainField.setTextColor(endTextColor);
+                mtvMainField.setBackgroundResource(R.color.primary_light);
+//                showScoresDialog();
+            }
+        });
+    }
+
 // MOVEMENT ====================================================================================
 
     public enum MyDirections {RIGHT, UP, LEFT, DOWN}
@@ -576,8 +567,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            MyLog.i("onDoubleTap");
-//            startPause();
+            MyLog.i("onDoubleTap - start / pause");
             if (mAlreadyLaunched) pauseGame();
             else startGame();
             return super.onDoubleTap(e);
@@ -585,7 +575,18 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLongPress(MotionEvent e) {
-            MyLog.i("onLongPress");
+            MyLog.i("onLongPress - full restart from zero");
+
+            mVibrator.vibrate(MyPSF.LONG_VIBRATION);
+            mWasGameOver = true;
+            mAlreadyLaunched = false;
+            MyLog.i("game ended with mCurrentScore " + mCurrentScore);
+            if (mTimer != null) {
+                mTimer.cancel();
+                mTimer.purge();
+                mTimer = null;
+            }
+            startGame();
             super.onLongPress(e);
         }
 
@@ -652,7 +653,7 @@ public class MainActivity extends AppCompatActivity {
             return velocityY > 300;
 //            return velocityY > 300 && (-100 < velocityX && velocityX < 100);
         }
-        */
+*/
         }
     }
 
@@ -748,7 +749,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             // exit conditions check is the last thing to do \
-            if (collisionHappened()) gameOver(); // this is the only way out from loop \
+            if (collisionHappened()) endGame(); // this is the only way out from loop \
             else mCurrentScore++;
 
             // now handling eating of food and bonuses - it's taken by the head only \
@@ -787,6 +788,7 @@ public class MainActivity extends AppCompatActivity {
                     mSnake.addCell(mSnake.getLength(), currentCell);
                     mSnakeSpeed++;
                     MyLog.i("LENGTH_PLUS taken!");
+                    mCurrentScore += 100;
                     break;
 
                 case MyPSF.LENGTH_MINUS: // length -1
@@ -802,17 +804,20 @@ public class MainActivity extends AppCompatActivity {
                         if (mSnakeSpeed > 1) mSnakeSpeed--;
                     }
                     MyLog.i("LENGTH_MINUS taken!");
+//                    mCurrentScore += 100;
                     break;
 
                 case MyPSF.SPEED_UP: // speed +1
                     mSnakeSpeed++;
                     MyLog.i("SPEED_UP taken!");
+//                    mCurrentScore += 50;
                     break;
 
                 case MyPSF.SPEED_SLOW: // speed -1
                     if (mSnakeSpeed > 1) // to avoid falling after division by zero \
                         mSnakeSpeed--;
                     MyLog.i("SPEED_SLOW taken!");
+//                    mCurrentScore += 50;
                     break;
             }
         }

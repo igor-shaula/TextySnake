@@ -85,11 +85,11 @@
         android:visibility="visible" />
 
     <LinearLayout
-        android:id="@+id/llTwoButtons"
+        android:id="@+id/llHidden"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <View
             android:layout_width="wrap_content"
