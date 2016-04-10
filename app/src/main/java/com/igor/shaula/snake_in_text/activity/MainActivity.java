@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private MyDirections mSnakeDirection;
 
     // game parameters \
-    private boolean mAlreadyLaunched = false, mWasGameOver = false, mFirstTimeLaunch = true;
+    private boolean mFirstLaunch = false, mGameEnded = false, mGamePausedSwitch = false;
     private int mCurrentScore, mBestScore;
     private long mCurrentTime, mBestTime;
 
@@ -89,8 +89,8 @@ public class MainActivity extends AppCompatActivity {
             mSnakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
             mSnakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
             mCurrentScore = savedInstanceState.getInt(KEY_SCORE);
-            mAlreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
-            mWasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
+            mGamePausedSwitch = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
+            mGameEnded = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
         } else {}
 */
         /*
@@ -130,8 +130,8 @@ public class MainActivity extends AppCompatActivity {
         outState.putInt(KEY_SNAKE_DIRECTION, mSnakeDirection);
         outState.putInt(KEY_SNAKE_SPEED, mSnakeSpeed);
         outState.putInt(KEY_SCORE, mCurrentScore);
-        outState.putBoolean(KEY_ALREADY_LAUNCHED, mAlreadyLaunched);
-        outState.putBoolean(KEY_WAS_GAME_OVER, mWasGameOver);
+        outState.putBoolean(KEY_ALREADY_LAUNCHED, mGamePausedSwitch);
+        outState.putBoolean(KEY_WAS_GAME_OVER, mGameEnded);
 */
         MyLog.i("onSaveInstanceState worked");
     }
@@ -144,13 +144,30 @@ public class MainActivity extends AppCompatActivity {
         mSnakeDirection = savedInstanceState.getInt(KEY_SNAKE_DIRECTION);
         mSnakeSpeed = savedInstanceState.getInt(KEY_SNAKE_SPEED);
         mCurrentScore = savedInstanceState.getInt(KEY_SCORE);
-        mAlreadyLaunched = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
-        mWasGameOver = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
+        mGamePausedSwitch = savedInstanceState.getBoolean(KEY_ALREADY_LAUNCHED);
+        mGameEnded = savedInstanceState.getBoolean(KEY_WAS_GAME_OVER);
 */
         MyLog.i("onRestoreInstanceState worked");
     }
 
-    // BEFORE START ================================================================================
+    // MENU ========================================================================================
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.viewScores) showScoresDialog();
+        else if (item.getItemId() == R.id.setPreferences) showSetSpeedDialog();
+        return super.onOptionsItemSelected(item);
+    }
+
+    // MAIN SEQUENCE ===============================================================================
 
     // 0 - from onGlobalLayout-method
     private void initializeGame() {
@@ -182,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
                             mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
 
                         prepareGameIn4Steps();
+                        actionStartGame();
                     }
                 });
         MyLog.i("initializeGame ended");
@@ -197,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     // 1 - from onGlobalLayout-method
     private void step_1_prepareTextField() {
 
-        if (!mWasGameOver) {
+        if (!mFirstLaunch) {
             // here we get pixel width of a single symbol - initial TextView has only one symbol \
             mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
             int measuredSymbolWidth = mtvMainField.getMeasuredWidth();
@@ -206,6 +224,9 @@ public class MainActivity extends AppCompatActivity {
             // getting our first valuable parameter - the size of main array \
             mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
             MyLog.i("mSymbolsInFieldLine " + mSymbolsInFieldLine);
+
+            // only here i can switch this flag out \
+            mFirstLaunch = true;
         }
         // clearing the text field to properly initialize it for game \
         mtvMainField.setText(null);
@@ -314,23 +335,6 @@ public class MainActivity extends AppCompatActivity {
         util_updateTextView();
     } // end of step_4_setInitialFood-method \\
 
-    // MENU ========================================================================================
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == R.id.viewScores) showScoresDialog();
-        else if (item.getItemId() == R.id.setPreferences) showSetSpeedDialog();
-        return super.onOptionsItemSelected(item);
-    }
-
     // UTILS =======================================================================================
 
     private void util_updateFood() {
@@ -386,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean showScoresDialog() {
 
-        pauseGame();
+        actionPauseGame();
 
         // preparing view for the dialog \
         @SuppressLint("InflateParams")
@@ -447,7 +451,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean showSetSpeedDialog() {
 
-        pauseGame();
+        actionPauseGame();
 
         // preparing view for the dialog \
         @SuppressLint("InflateParams")
@@ -498,9 +502,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // just stopping the snake's movement \
-    private void pauseGame() {
+    private void actionPauseGame() {
 
-        mAlreadyLaunched = false;
+        mGamePausedSwitch = true;
 
         if (mTimer != null) {
             mTimer.cancel();
@@ -509,17 +513,11 @@ public class MainActivity extends AppCompatActivity {
         mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.primary_light));
     }
 
-    // the only method where mAlreadyLaunched = true \
-    private void startGame() {
+    // the only method where mGamePausedSwitch = true \
+    private void actionStartGame() {
 
-        if (!mAlreadyLaunched || mWasGameOver) {
-            // everything is reset to later start from scratch \
-            prepareGameIn4Steps();
-            mCurrentScore = 0;
-            mWasGameOver = false;
-        }
-
-        mAlreadyLaunched = true;
+        mGamePausedSwitch = false;
+        mGameEnded = false;
 
         int startTextColor = ContextCompat.getColor(getApplicationContext(), android.R.color.white);
         mtvMainField.setTextColor(startTextColor);
@@ -529,7 +527,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             delay = 500 / mSnakeSpeed;
         } catch (ArithmeticException ae) {
-            delay = 500 / MyPSF.STARTING_SNAKE_SPEED;
+            MyLog.i("ArithmeticException with delay = 500 / 0: mSnakeSpeed = 0");
+            actionEndGame();
+            return;
         }
         mTimer = new Timer();
         mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
@@ -540,11 +540,11 @@ public class MainActivity extends AppCompatActivity {
                 MyPSF.STARTING_UPDATE_FOOD_PERIOD);
     }
 
-    // the only method where mWasGameOver = true \
-    private void endGame() {
+    // the only method where mGameEnded = true \
+    private void actionEndGame() {
 
-        mWasGameOver = true;
-        mAlreadyLaunched = false;
+        mGameEnded = true;
+        mGamePausedSwitch = true;
 
         // stopping all timers \
         if (mTimer != null) {
@@ -569,7 +569,6 @@ public class MainActivity extends AppCompatActivity {
                 int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
                 mtvMainField.setTextColor(endTextColor);
                 mtvMainField.setBackgroundResource(R.color.primary_light);
-//                showScoresDialog();
             }
         });
         MyLog.i("game ended with mCurrentScore " + mCurrentScore);
@@ -584,32 +583,51 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             MyLog.i("onDoubleTap - start / pause");
-            MyLog.i("mAlreadyLaunched = " + mAlreadyLaunched);
-            MyLog.i("mWasGameOver = " + mWasGameOver);
+            MyLog.i("mFirstLaunch = " + mFirstLaunch);
+            MyLog.i("mGamePausedSwitch = " + mGamePausedSwitch);
+            MyLog.i("mGameEnded = " + mGameEnded);
 
-            // now everything starts here \
-            if (mFirstTimeLaunch) {
-                initializeGame();
-                mFirstTimeLaunch = false;
-                MyLog.i("first time launch worked out");
+            // 1 - fresh new start \
+            if (!mFirstLaunch) {
+                executeFirstLaunch();
                 return true; // only for the first launch \
             }
-            // here we assume that this is not the first launch \
-            if (mAlreadyLaunched) pauseGame();
-            else startGame();
+
+            // 2 - start a new one after game over \
+            if (mGameEnded) prepareGameIn4Steps();
+
+            // 3 - to pause the game \
+            if (!mGamePausedSwitch) actionPauseGame();
+            else actionStartGame();
 
             return super.onDoubleTap(e);
+        }
+
+        private void executeFirstLaunch() {
+            MyLog.i("executeFirstLaunch worked");
+
+            // big amount of code is hidden underneath this line \
+            initializeGame();
+
+            mGamePausedSwitch = true; // because in fact it is \
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
             MyLog.i("onLongPress - full restart from zero");
-
-            endGame();
+            MyLog.i("mFirstLaunch = " + mFirstLaunch);
+            MyLog.i("mGamePausedSwitch = " + mGamePausedSwitch);
+            MyLog.i("mGameEnded = " + mGameEnded);
 
             mVibrator.vibrate(MyPSF.LONG_VIBRATION);
 
-            startGame();
+            actionEndGame();
+            mCurrentScore = 0;
+
+            // everything is reset to later start from scratch \
+            if (!mFirstLaunch) executeFirstLaunch();
+            else prepareGameIn4Steps();
+            actionStartGame();
 
             super.onLongPress(e);
         }
@@ -618,18 +636,18 @@ public class MainActivity extends AppCompatActivity {
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
 //            MyLog.i("onFling");
 
-            float sensitvity = 50;
+            float sensitivity = 50;
 
-            if ((e1.getX() - e2.getX()) > sensitvity) {
+            if ((e1.getX() - e2.getX()) > sensitivity) {
                 MyLog.i("left");
                 mSnakeDirection = MyDirections.LEFT;
-            } else if ((e2.getX() - e1.getX()) > sensitvity) {
+            } else if ((e2.getX() - e1.getX()) > sensitivity) {
                 MyLog.i("right");
                 mSnakeDirection = MyDirections.RIGHT;
-            } else if ((e1.getY() - e2.getY()) > sensitvity) {
+            } else if ((e1.getY() - e2.getY()) > sensitivity) {
                 MyLog.i("up");
                 mSnakeDirection = MyDirections.UP;
-            } else if ((e2.getY() - e1.getY()) > sensitvity) {
+            } else if ((e2.getY() - e1.getY()) > sensitivity) {
                 MyLog.i("down");
                 mSnakeDirection = MyDirections.DOWN;
             }
@@ -692,30 +710,17 @@ public class MainActivity extends AppCompatActivity {
             snakeCell.setIndexByY(newCellY);
 /*
             // here we have just finished to update mSnake's model \
-            MyLog.i("move done in mSnake's model");
 */
             // now it's obvious to update model for field with mSnake's new data and display this all \
             for (int i = 0; i < mSnake.getLength(); i++) {
                 snakeCell = mSnake.getCell(i);
                 newCellX = snakeCell.getIndexByX();
                 newCellY = snakeCell.getIndexByY();
-/*
+
                 // setting the mSnake body \
-                mCharsArrayList.get(newCellY)[newCellX] = SNAKE;
+                mCharsArrayList.get(newCellY)[newCellX] = MyPSF.SNAKE;
                 // recovering the field after the mSnake's tail \
-                mCharsArrayList.get(cellToFreeY)[cellToFreeX] = SPACE;
-*/
-                // this is a crutch - the game somehow may fall after screen rotation \
-                try {
-                    // setting the mSnake body \
-                    mCharsArrayList.get(newCellY)[newCellX] = MyPSF.SNAKE;
-                    // recovering the field after the mSnake's tail \
-                    mCharsArrayList.get(cellToFreeY)[cellToFreeX] = MyPSF.SPACE;
-                } catch (IndexOutOfBoundsException ioobe) {
-                    // ArrayIndexOutOfBoundsException extends IndexOutOfBoundsException
-                    MyLog.i("exception happened: " + ioobe.getMessage());
-                    return;
-                }
+                mCharsArrayList.get(cellToFreeY)[cellToFreeX] = MyPSF.SPACE;
             }
             // updating the field with new mSnake's position \
             runOnUiThread(new Runnable() {
@@ -728,7 +733,7 @@ public class MainActivity extends AppCompatActivity {
             });
 
             // exit conditions check is the last thing to do \
-            if (collisionHappened()) endGame(); // this is the only way out from loop \
+            if (collisionHappened()) actionEndGame(); // this is the only way out from loop \
             else mCurrentScore++;
 
             // now handling eating of food and bonuses - it's taken by the head only \
@@ -780,20 +785,20 @@ public class MainActivity extends AppCompatActivity {
                         if (mSnakeSpeed > 1) mSnakeSpeed--;
                     }
                     MyLog.i("LENGTH_MINUS taken!");
-//                    mCurrentScore += 100;
+                    mCurrentScore -= 100;
                     break;
 
                 case MyPSF.SPEED_UP: // speed +1
                     mSnakeSpeed++;
                     MyLog.i("SPEED_UP taken!");
-//                    mCurrentScore += 50;
+                    mCurrentScore += 50;
                     break;
 
                 case MyPSF.SPEED_SLOW: // speed -1
                     if (mSnakeSpeed > 1) // to avoid falling after division by zero \
                         mSnakeSpeed--;
                     MyLog.i("SPEED_SLOW taken!");
-//                    mCurrentScore += 50;
+                    mCurrentScore -= 50;
                     break;
             }
         }
