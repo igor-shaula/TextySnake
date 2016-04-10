@@ -12,9 +12,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
+        android:background="@color/primary_light"
         android:layout_weight="1">
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"
             style="@style/MyText.Main" />
 
@@ -27,13 +28,13 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/mtvScore"
             style="@style/MyText.Weight"
             android:gravity="start"
             android:text="@string/score" />
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/mtvTime"
             style="@style/MyText.Weight"
             android:gravity="end"

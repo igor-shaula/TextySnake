@@ -33,4 +33,30 @@
     <string name="no">NO!</string>
     <string name="yes">YES</string>
 
+    <string name="userGuide">
+        \n
+        Hi, dear player,
+        \n
+        the snake is waiting for you ;)
+        \n\n
+        @@@
+        \n\n
+        This field is responsive to gestures
+        \n\n
+        @@@@@@
+        \n\n
+        1 - Double tap to start/pause game
+        \n\n
+        2 - Swipe right/left/up/dowm
+        \n
+        to set new direction for the snake
+        \n\n
+        3 - Long click to restart game
+        \n\n
+        @@@@@@@@@
+        \n\n
+        Have fun and gain high scores :)
+        \n
+    </string>
+
 </resources>

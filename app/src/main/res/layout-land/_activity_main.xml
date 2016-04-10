@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:layout_weight="1">
 
-        <com.igor.shaula.snake_in_text.custom_view.MyTextView
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,18 +90,18 @@
             android:gravity="center"
             android:orientation="horizontal">
 
-            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+            <com.igor.shaula.snake_in_text.custom_views.MyTextView
                 android:id="@+id/mtvTime"
                 style="@style/MyText.Weight"
                 android:text="@string/defaultTime" />
 
-            <com.igor.shaula.snake_in_text.custom_view.MyButton
+            <com.igor.shaula.snake_in_text.custom_views.MyButton
                 android:id="@+id/bStartPause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/start" />
 
-            <com.igor.shaula.snake_in_text.custom_view.MyTextView
+            <com.igor.shaula.snake_in_text.custom_views.MyTextView
                 android:id="@+id/mtvScore"
                 style="@style/MyText.Weight"
                 android:text="@string/score" />

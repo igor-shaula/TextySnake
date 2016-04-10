@@ -8,7 +8,7 @@
     android:baselineAligned="false"
     tools:context=".activity.MainActivity">
 
-    <com.igor.shaula.snake_in_text.custom_view.MyTextView
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/viewMainField"
         style="@style/MyText.Main" />
 

@@ -1,26 +1,25 @@
-package com.igor.shaula.snake_in_text.custom_view;
+package com.igor.shaula.snake_in_text.custom_views;
 
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import android.widget.Button;
 
 /**
  * Created by igor shaula - to set custom font and maintain game field in this way \
  */
-public class MyTextView extends TextView {
-
-    public MyTextView(Context context) {
+public class MyButton extends Button {
+    public MyButton(Context context) {
         super(context);
         applyMyFont(context);
     }
 
-    public MyTextView(Context context, AttributeSet attrs) {
+    public MyButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         applyMyFont(context);
     }
 
-    public MyTextView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MyButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         applyMyFont(context);
     }
@@ -28,10 +27,5 @@ public class MyTextView extends TextView {
     private void applyMyFont(Context context) {
         Typeface typeface = MyFontCache.getTypeface(context);
         setTypeface(typeface);
-//        setTypeface(typeface, R.style.MyText_Main);
-        setKeepScreenOn(true);
-        setScrollContainer(false);
-        setSingleLine(false);
-        setTextIsSelectable(false);
     }
 }

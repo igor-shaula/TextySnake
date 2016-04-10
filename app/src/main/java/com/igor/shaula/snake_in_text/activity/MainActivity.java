@@ -20,7 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
 import com.igor.shaula.snake_in_text.R;
-import com.igor.shaula.snake_in_text.custom_view.MyTextView;
+import com.igor.shaula.snake_in_text.custom_views.MyTextView;
 import com.igor.shaula.snake_in_text.entity.Snake;
 import com.igor.shaula.snake_in_text.utils.MyLog;
 import com.igor.shaula.snake_in_text.utils.MyPSF;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private MyDirections mSnakeDirection;
 
     // game parameters \
-    private boolean mAlreadyLaunched = false, mWasGameOver = false;
+    private boolean mAlreadyLaunched = false, mWasGameOver = false, mFirstTimeLaunch = true;
     private int mCurrentScore, mBestScore;
     private long mCurrentTime, mBestTime;
 
@@ -100,19 +100,6 @@ public class MainActivity extends AppCompatActivity {
 
         // from the very beginning we have to define available field \
         mtvMainField = (MyTextView) findViewById(R.id.viewMainField);
-        assert mtvMainField != null;
-
-        mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
-                new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        // moving everything to separate methods \
-                        ViewTreeObserver.OnGlobalLayoutListener listener = this;
-                        detectFieldParameters(listener); // 0
-                        prepareGame();
-                    }
-                });
-
         mtvTime = (MyTextView) findViewById(R.id.mtvTime);
         mtvScore = (MyTextView) findViewById(R.id.mtvScore);
         mtvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
@@ -165,34 +152,50 @@ public class MainActivity extends AppCompatActivity {
 
     // BEFORE START ================================================================================
 
-    private void prepareGame() {
-        prepareTextField(); // 1
-        setFieldBorders(); // 2
-        setInitialSnake(); // 3
-        setInitialFood(); // 4
+    // 0 - from onGlobalLayout-method
+    private void initializeGame() {
+        MyLog.i("initializeGame started");
+
+        // first of all i have to change text to a single symbol \
+        mtvMainField.setText(R.string.oneSymbol);
+
+        mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+
+                        // getting current screen size in pixels \
+                        mFieldPixelWidth = mtvMainField.getWidth();
+                        MyLog.i("mFieldPixelWidth " + mFieldPixelWidth);
+
+                        FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
+                        assert flMain != null;
+                        mFieldPixelHeight = flMain.getHeight();
+                        MyLog.i("mFieldPixelHeight " + mFieldPixelHeight);
+
+                        ViewTreeObserver.OnGlobalLayoutListener listener = this;
+                        // now removing the listener - it's not needed any more \
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
+                            mtvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+                        else
+                            //noinspection deprecation
+                            mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+
+                        prepareGameIn4Steps();
+                    }
+                });
+        MyLog.i("initializeGame ended");
+    } // end of initializeGame-method \\
+
+    private void prepareGameIn4Steps() {
+        step_1_prepareTextField(); // 1
+        step_2_setFieldBorders(); // 2
+        step_3_setInitialSnake(); // 3
+        step_4_setInitialFood(); // 4
     }
 
-    // 0 - from onGlobalLayout-method
-    private void detectFieldParameters(ViewTreeObserver.OnGlobalLayoutListener listener) {
-        // getting current screen size in pixels \
-        mFieldPixelWidth = mtvMainField.getWidth();
-        MyLog.i("mFieldPixelWidth " + mFieldPixelWidth);
-
-        FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
-        assert flMain != null;
-        mFieldPixelHeight = flMain.getHeight();
-        MyLog.i("mFieldPixelHeight " + mFieldPixelHeight);
-
-        // now removing the listener - it's not needed any more \
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
-            mtvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
-        else
-            //noinspection deprecation
-            mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
-    } // end of detectFieldParameters-method \\
-
     // 1 - from onGlobalLayout-method
-    private void prepareTextField() {
+    private void step_1_prepareTextField() {
 
         if (!mWasGameOver) {
             // here we get pixel width of a single symbol - initial TextView has only one symbol \
@@ -238,10 +241,10 @@ public class MainActivity extends AppCompatActivity {
 
         mFieldLinesCount = i;
         MyLog.i("mFieldLinesCount " + mFieldLinesCount);
-    } // end of prepareTextField-method \\
+    } // end of step_1_prepareTextField-method \\
 
     // 2 - from onGlobalLayout-method
-    private void setFieldBorders() {
+    private void step_2_setFieldBorders() {
         for (int i = 0; i < mFieldLinesCount; i++)
             for (int j = 0; j < mSymbolsInFieldLine; j++)
                 if (i == 0 || i == mFieldLinesCount - 1 || j == 0 || j == mSymbolsInFieldLine - 1)
@@ -249,7 +252,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 3 - from onGlobalLayout-method
-    private void setInitialSnake() {
+    private void step_3_setInitialSnake() {
 
         mSnake = new Snake();
         mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
@@ -302,14 +305,14 @@ public class MainActivity extends AppCompatActivity {
             // placing the this mSnake cell to our field \
             mCharsArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SNAKE;
         } // end of for-loop
-        updateTextView();
-    } // end of setInitialSnake-method \\
+        util_updateTextView();
+    } // end of step_3_setInitialSnake-method \\
 
     // 4 - from onGlobalLayout-method
-    private void setInitialFood() {
-        updateFood();
-        updateTextView();
-    } // end of setInitialFood-method \\
+    private void step_4_setInitialFood() {
+        util_updateFood();
+        util_updateTextView();
+    } // end of step_4_setInitialFood-method \\
 
     // MENU ========================================================================================
 
@@ -330,7 +333,7 @@ public class MainActivity extends AppCompatActivity {
 
     // UTILS =======================================================================================
 
-    private void updateFood() {
+    private void util_updateFood() {
 /*
         this method gets called after the mSnake is initialized -so we have to check collisions \
         i decided to do all in one cycle because of low probability of collisions \
@@ -363,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
 //        mCharsArrayList.get(mFoodPositionRow - 1)[mFoodPositionSymbol - 1] = FOOD;
     }
 
-    private void updateTextView() {
+    private void util_updateTextView() {
 
         StringBuilder newStringToSet = new StringBuilder();
         for (int i = 0; i < mFieldLinesCount; i++) {
@@ -372,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
         mtvMainField.setText(newStringToSet);
     }
 
-    private void saveNewBestResults() {
+    private void util_saveNewBestResults() {
         getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE)
                 .edit()
                 .clear()
@@ -413,7 +416,7 @@ public class MainActivity extends AppCompatActivity {
                     mBestTime = 0;
                     mtvBestScore.setText(String.valueOf(mBestScore));
                     mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
-                    saveNewBestResults();
+                    util_saveNewBestResults();
                 }
                 llHidden.setVisibility(View.GONE); // click at NO-button is done by this line \
                 longButtonClickedOnce[0] = false;
@@ -442,7 +445,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void showSetSpeedDialog() {
+    private boolean showSetSpeedDialog() {
 
         pauseGame();
 
@@ -490,10 +493,13 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             }
         });
+
+        return true;
     }
 
+    // just stopping the snake's movement \
     private void pauseGame() {
-        mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
+
         mAlreadyLaunched = false;
 
         if (mTimer != null) {
@@ -503,21 +509,28 @@ public class MainActivity extends AppCompatActivity {
         mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.primary_light));
     }
 
+    // the only method where mAlreadyLaunched = true \
     private void startGame() {
-        mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
-        mAlreadyLaunched = true;
 
-        if (mWasGameOver) {
+        if (!mAlreadyLaunched || mWasGameOver) {
             // everything is reset to later start from scratch \
-            prepareGame();
+            prepareGameIn4Steps();
             mCurrentScore = 0;
             mWasGameOver = false;
         }
+
+        mAlreadyLaunched = true;
+
         int startTextColor = ContextCompat.getColor(getApplicationContext(), android.R.color.white);
         mtvMainField.setTextColor(startTextColor);
         mtvMainField.setBackgroundResource(R.color.primary_dark);
         // launching everything \
-        int delay = 500 / mSnakeSpeed;
+        int delay; // amount of time for game to wait = realization of speed \
+        try {
+            delay = 500 / mSnakeSpeed;
+        } catch (ArithmeticException ae) {
+            delay = 500 / MyPSF.STARTING_SNAKE_SPEED;
+        }
         mTimer = new Timer();
         mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
         mTimer.schedule(new TimeUpdateTimerTask(), 0, 1000);
@@ -527,11 +540,13 @@ public class MainActivity extends AppCompatActivity {
                 MyPSF.STARTING_UPDATE_FOOD_PERIOD);
     }
 
+    // the only method where mWasGameOver = true \
     private void endGame() {
-        mVibrator.vibrate(MyPSF.LONG_VIBRATION);
+
         mWasGameOver = true;
         mAlreadyLaunched = false;
-        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
+
+        // stopping all timers \
         if (mTimer != null) {
             mTimer.cancel();
             mTimer.purge();
@@ -544,7 +559,7 @@ public class MainActivity extends AppCompatActivity {
                 mBestScore = mCurrentScore;
             if (mCurrentTime > mBestTime)
                 mBestTime = mCurrentTime;
-            saveNewBestResults();
+            util_saveNewBestResults();
         }
 
         // resetting the start-stop button to its primary state \
@@ -557,6 +572,7 @@ public class MainActivity extends AppCompatActivity {
 //                showScoresDialog();
             }
         });
+        MyLog.i("game ended with mCurrentScore " + mCurrentScore);
     }
 
 // MOVEMENT ====================================================================================
@@ -568,8 +584,20 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             MyLog.i("onDoubleTap - start / pause");
+            MyLog.i("mAlreadyLaunched = " + mAlreadyLaunched);
+            MyLog.i("mWasGameOver = " + mWasGameOver);
+
+            // now everything starts here \
+            if (mFirstTimeLaunch) {
+                initializeGame();
+                mFirstTimeLaunch = false;
+                MyLog.i("first time launch worked out");
+                return true; // only for the first launch \
+            }
+            // here we assume that this is not the first launch \
             if (mAlreadyLaunched) pauseGame();
             else startGame();
+
             return super.onDoubleTap(e);
         }
 
@@ -577,22 +605,18 @@ public class MainActivity extends AppCompatActivity {
         public void onLongPress(MotionEvent e) {
             MyLog.i("onLongPress - full restart from zero");
 
+            endGame();
+
             mVibrator.vibrate(MyPSF.LONG_VIBRATION);
-            mWasGameOver = true;
-            mAlreadyLaunched = false;
-            MyLog.i("game ended with mCurrentScore " + mCurrentScore);
-            if (mTimer != null) {
-                mTimer.cancel();
-                mTimer.purge();
-                mTimer = null;
-            }
+
             startGame();
+
             super.onLongPress(e);
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            MyLog.i("onFling");
+//            MyLog.i("onFling");
 
             float sensitvity = 50;
 
@@ -610,50 +634,6 @@ public class MainActivity extends AppCompatActivity {
                 mSnakeDirection = MyDirections.DOWN;
             }
             return super.onFling(e1, e2, velocityX, velocityY);
-/*
-            if (isRight(velocityX, velocityY)) {
-                mSnakeDirection = MyDirections.RIGHT;
-                return true;
-            }
-            if (isUp(velocityX, velocityY)) {
-                mSnakeDirection = MyDirections.UP;
-                return true;
-            }
-            if (isLeft(velocityX, velocityY)) {
-                mSnakeDirection = MyDirections.LEFT;
-                return true;
-            }
-            if (isDown(velocityX, velocityY)) {
-                mSnakeDirection = MyDirections.DOWN;
-                return true;
-            }
-            return false;
-        }
-
-        @SuppressWarnings("UnusedParameters")
-        private boolean isRight(float velocityX, float velocityY) {
-            return velocityX > 500;
-//            return velocityX > 500 && (-100 < velocityY && velocityY < 100);
-        }
-
-        @SuppressWarnings("UnusedParameters")
-        private boolean isUp(float velocityX, float velocityY) {
-            return velocityY < -300;
-//            return velocityY < -300 && (-100 < velocityX && velocityX < 100);
-        }
-
-        @SuppressWarnings("UnusedParameters")
-        private boolean isLeft(float velocityX, float velocityY) {
-            return velocityX < -500;
-//            return velocityX < -500 && (-100 < velocityY && velocityY < 100);
-        }
-
-        @SuppressWarnings("UnusedParameters")
-        private boolean isDown(float velocityX, float velocityY) {
-            return velocityY > 300;
-//            return velocityY > 300 && (-100 < velocityX && velocityX < 100);
-        }
-*/
         }
     }
 
@@ -710,10 +690,10 @@ public class MainActivity extends AppCompatActivity {
             // saving info to the mSnake's model \
             snakeCell.setIndexByX(newCellX);
             snakeCell.setIndexByY(newCellY);
-
+/*
             // here we have just finished to update mSnake's model \
             MyLog.i("move done in mSnake's model");
-
+*/
             // now it's obvious to update model for field with mSnake's new data and display this all \
             for (int i = 0; i < mSnake.getLength(); i++) {
                 snakeCell = mSnake.getCell(i);
@@ -741,10 +721,9 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateTextView();
+                    util_updateTextView();
                     String scoreComplex = getString(R.string.score) + " " + mCurrentScore;
                     mtvScore.setText(scoreComplex);
-                    MyLog.i("mtvScore updated");
                 }
             });
 
@@ -753,10 +732,7 @@ public class MainActivity extends AppCompatActivity {
             else mCurrentScore++;
 
             // now handling eating of food and bonuses - it's taken by the head only \
-            if (isFoodFound()) {
-                eatFood();
-                MyLog.i("food eaten");
-            }
+            if (isFoodFound()) eatFood();
         } // end of run-method \\
 
         // VERIFICATIONS ===========================================================================
@@ -879,11 +855,11 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void run() {
-            updateFood();
+            util_updateFood();
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateTextView();
+                    util_updateTextView();
                 }
             });
             MyLog.i("mFoodType updated");

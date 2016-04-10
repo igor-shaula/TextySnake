@@ -1,4 +1,4 @@
-package com.igor.shaula.snake_in_text.custom_view;
+package com.igor.shaula.snake_in_text.custom_views;
 
 import android.content.Context;
 import android.graphics.Typeface;
