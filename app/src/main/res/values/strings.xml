@@ -1,12 +1,12 @@
 <resources>
 
-    <string name="app_name">TextySnake</string>
+    <string name="app_name">Texty Snake</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
-    <string name="score">Score</string>
-    <string name="time">Time</string>
-    <string name="defaultScore">Score 0</string>
-    <string name="defaultTime">Time 00:00</string>
+    <string name="score">Score\n</string>
+    <string name="time">Time\n</string>
+    <string name="defaultScore">Score\n0</string>
+    <string name="defaultTime">Time\n00:00</string>
     <!--<string name="defaultTime">00:00:000</string>-->
     <string name="oneSymbol">O</string>
 
@@ -17,7 +17,8 @@
     <string name="descButtonRight">button right</string>
 
     <string name="speedKey">speed key</string>
-    <string name="setSpeed">Set speed</string>
+    <string name="setSpeed1">Set Speed</string>
+    <string name="setSpeed2">Set\nSpeed</string>
     <string name="speedVerySlow">1 - very slow</string>
     <string name="speedSlow">2 - slow</string>
     <string name="speedNormal">3 - normal</string>
@@ -27,7 +28,7 @@
     <string name="viewScores">View Scores</string>
     <string name="your">Your</string>
     <string name="best">Best</string>
-    <string name="setSpeedOfSnake">How fast is the snake</string>
+    <string name="howFastIsTheSnake">How fast is the snake</string>
     <string name="clearBestResults">Clear best results</string>
     <string name="results">Results</string>
     <string name="no">NO!</string>

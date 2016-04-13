@@ -6,15 +6,15 @@
     tools:context=".activity.MainActivity">
 
     <item
-        android:id="@+id/viewScores"
+        android:id="@+id/mtvShowScores"
         android:orderInCategory="100"
         android:title="@string/viewScores"
         app:showAsAction="ifRoom" />
 
     <item
-        android:id="@+id/setPreferences"
+        android:id="@+id/mtvSetSpeed"
         android:orderInCategory="101"
-        android:title="@string/setSpeed"
+        android:title="@string/setSpeed1"
         app:showAsAction="ifRoom" />
 
 </menu>

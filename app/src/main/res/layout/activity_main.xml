@@ -38,16 +38,19 @@
         android:orientation="horizontal">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/mtvScore"
-            style="@style/MyText.Weight"
-            android:gravity="start"
-            android:text="@string/defaultScore" />
+            android:id="@+id/mtvViewScores"
+            style="@style/MyText.Weight.Land.Active"
+            android:text="@string/viewScores" />
+
+        <View
+            android:layout_width="@dimen/size_2"
+            android:layout_height="match_parent"
+            android:background="@color/primary_dark" />
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/mtvTime"
-            style="@style/MyText.Weight"
-            android:gravity="end"
-            android:text="@string/defaultTime" />
+            android:id="@+id/mtvSetSpeed"
+            style="@style/MyText.Weight.Land.Active"
+            android:text="@string/setSpeed1" />
 
     </LinearLayout>
 

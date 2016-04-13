@@ -8,21 +8,16 @@
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         style="@style/MyText.Weight.Land"
-        android:gravity="start"
         android:text="@string/app_name" />
 
-    <!--
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/mtvScore"
-            style="@style/MyText.Weight"
-            android:gravity="start"
-            android:text="@string/defaultScore" />
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvScore"
+        style="@style/MyText.Weight.Land"
+        android:text="@string/defaultScore" />
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/mtvTime"
-            style="@style/MyText.Weight"
-            android:gravity="end"
-            android:text="@string/defaultTime" />
-    -->
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvTime"
+        style="@style/MyText.Weight.Land"
+        android:text="@string/defaultTime" />
 
 </LinearLayout>

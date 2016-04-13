@@ -2,6 +2,7 @@ package com.igor.shaula.snake_in_text.activity;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -11,9 +12,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
 import android.view.GestureDetector;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -52,8 +50,7 @@ public class MainActivity extends AppCompatActivity {
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
-    // active widgets \
-    private MyTextView mtvMainField, mtvTime, mtvScore;
+    private MyTextView mtvMainField, mtvScore, mtvTime;
 
     // utils from the system \
     private Vibrator mVibrator;
@@ -93,6 +90,39 @@ public class MainActivity extends AppCompatActivity {
 
         setSupportActionBar(myToolbar);
 
+        MyTextView mtvShowScores = null;
+
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+            mtvShowScores = (MyTextView) findViewById(R.id.mtvViewScores);
+        else if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            mtvShowScores = (MyTextView) findViewById(R.id.mtvShowScores);
+
+        assert mtvShowScores != null;
+        mtvShowScores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showScoresDialog();
+            }
+        });
+
+//        mtvScore = (MyTextView) findViewById(R.id.mtvViewScores);
+        mtvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
+
+        if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+            mtvShowScores = (MyTextView) findViewById(R.id.mtvViewScores);
+        else if (getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)
+            mtvShowScores = (MyTextView) findViewById(R.id.mtvShowScores);
+//        mtvTime = (MyTextView) findViewById(R.id.mtvSetSpeed);
+
+        MyTextView mtvSetSpeed = (MyTextView) findViewById(R.id.mtvSetSpeed);
+        assert mtvSetSpeed != null;
+        mtvSetSpeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showSetSpeedDialog();
+            }
+        });
+
 /*
         //noinspection StatementWithEmptyBody
         if (savedInstanceState != null) {
@@ -114,9 +144,6 @@ public class MainActivity extends AppCompatActivity {
 
         // from the very beginning we have to define available field \
         mtvMainField = (MyTextView) findViewById(R.id.viewMainField);
-        mtvTime = (MyTextView) findViewById(R.id.mtvTime);
-        mtvScore = (MyTextView) findViewById(R.id.mtvScore);
-        mtvScore.setText(String.valueOf(getString(R.string.score) + MyPSF.SCORE_STARTING_SUFFIX));
 
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
@@ -164,12 +191,13 @@ public class MainActivity extends AppCompatActivity {
         MyLog.i("onRestoreInstanceState worked");
     }
 
+/*
     // MENU ========================================================================================
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu._menu_main, menu);
         return true;
     }
 
@@ -180,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         else if (item.getItemId() == R.id.setPreferences) showSetSpeedDialog();
         return super.onOptionsItemSelected(item);
     }
+*/
 
     // MAIN SEQUENCE ===============================================================================
 
@@ -473,7 +502,7 @@ public class MainActivity extends AppCompatActivity {
 
         // preparing view for the dialog \
         @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.preferences, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.speed, null);
 
         // preparing builder for the dialog \
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

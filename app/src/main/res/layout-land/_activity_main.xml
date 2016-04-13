@@ -91,7 +91,7 @@
             android:orientation="horizontal">
 
             <com.igor.shaula.snake_in_text.custom_views.MyTextView
-                android:id="@+id/mtvTime"
+                android:id="@+id/mtvSetSpeed"
                 style="@style/MyText.Weight"
                 android:text="@string/defaultTime" />
 
@@ -102,7 +102,7 @@
                 android:text="@string/start" />
 
             <com.igor.shaula.snake_in_text.custom_views.MyTextView
-                android:id="@+id/mtvScore"
+                android:id="@+id/mtvViewScores"
                 style="@style/MyText.Weight"
                 android:text="@string/score" />
 

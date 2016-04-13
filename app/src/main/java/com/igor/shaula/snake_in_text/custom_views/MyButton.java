@@ -1,3 +1,4 @@
+/*
 package com.igor.shaula.snake_in_text.custom_views;
 
 import android.content.Context;
@@ -5,9 +6,11 @@ import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.Button;
 
+*/
 /**
  * Created by igor shaula - to set custom font and maintain game field in this way \
- */
+ *//*
+
 public class MyButton extends Button {
     public MyButton(Context context) {
         super(context);
@@ -28,4 +31,4 @@ public class MyButton extends Button {
         Typeface typeface = MyFontCache.getTypeface(context);
         setTypeface(typeface);
     }
-}
+}*/

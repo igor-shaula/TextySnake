@@ -8,20 +8,7 @@
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         style="@style/MyText.Weight.Land"
-        android:gravity="start"
         android:text="@string/app_name" />
-
-    <!--
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/viewScores"
-            style="@style/MyText.Weight.Land"
-            android:text="@string/viewScores" />
-
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/setPreferences"
-            style="@style/MyText.Weight.Land"
-            android:text="@string/setSpeed" />
-    -->
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvScore"
@@ -32,5 +19,20 @@
         android:id="@+id/mtvTime"
         style="@style/MyText.Weight.Land"
         android:text="@string/defaultTime" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvShowScores"
+        style="@style/MyText.Weight.Land.Active"
+        android:text="@string/viewScores" />
+
+    <View
+        android:layout_width="@dimen/size_0"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_margin="@dimen/size_2" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvSetSpeed"
+        style="@style/MyText.Weight.Land.Active"
+        android:text="@string/setSpeed2" />
 
 </LinearLayout>

@@ -16,6 +16,6 @@
         android:entries="@array/speedNames"
         android:entryValues="@array/speedValues"
         android:key="@string/speedKey"
-        android:title="@string/setSpeed" />
+        android:title="@string/setSpeed1" />
 
 </PreferenceScreen>
