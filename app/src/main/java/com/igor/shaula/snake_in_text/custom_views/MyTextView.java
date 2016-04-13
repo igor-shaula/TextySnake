@@ -34,4 +34,9 @@ public class MyTextView extends TextView {
         setSingleLine(false);
         setTextIsSelectable(false);
     }
+
+    public void setSquareSymbols() {
+        // fixing the total height of the line in our main field \
+        setLineSpacing(0.0f, 0.6f);
+    }
 }

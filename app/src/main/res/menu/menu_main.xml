@@ -17,42 +17,4 @@
         android:title="@string/setSpeed"
         app:showAsAction="ifRoom" />
 
-    <!--
-            <menu>
-
-                <item
-                    android:id="@+id/speed_1"
-                    android:orderInCategory="101"
-                    android:title="@string/speedVerySlow"
-                    app:showAsAction="never" />
-
-                <item
-                    android:id="@+id/speed_2"
-                    android:orderInCategory="102"
-                    android:title="@string/speedSlow"
-                    app:showAsAction="never" />
-
-                <item
-                    android:id="@+id/speed_3"
-                    android:orderInCategory="103"
-                    android:title="@string/speedNormal"
-                    app:showAsAction="never" />
-
-                <item
-                    android:id="@+id/speed_4"
-                    android:orderInCategory="104"
-                    android:title="@string/speedFast"
-                    app:showAsAction="never" />
-
-                <item
-                    android:id="@+id/speed_5"
-                    android:orderInCategory="105"
-                    android:title="@string/speedVeryFast"
-                    app:showAsAction="never" />
-
-            </menu>
-
-        </item>
-    -->
-
 </menu>

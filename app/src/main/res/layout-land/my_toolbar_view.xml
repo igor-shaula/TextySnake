@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/primary"
+    android:orientation="horizontal">
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        style="@style/MyText.Weight.Land"
+        android:gravity="start"
+        android:text="@string/app_name" />
+
+    <!--
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            android:id="@+id/viewScores"
+            style="@style/MyText.Weight.Land"
+            android:text="@string/viewScores" />
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            android:id="@+id/setPreferences"
+            style="@style/MyText.Weight.Land"
+            android:text="@string/setSpeed" />
+    -->
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvScore"
+        style="@style/MyText.Weight.Land"
+        android:text="@string/defaultScore" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvTime"
+        style="@style/MyText.Weight.Land"
+        android:text="@string/defaultTime" />
+
+</LinearLayout>

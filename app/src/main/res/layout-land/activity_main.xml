@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/flMain"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:baselineAligned="false"
-    tools:context=".activity.MainActivity">
+    android:orientation="vertical">
 
-    <com.igor.shaula.snake_in_text.custom_views.MyTextView
-        android:id="@+id/viewMainField"
-        style="@style/MyText.Main" />
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/myToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-</FrameLayout>
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/flMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:baselineAligned="false"
+        tools:context=".activity.MainActivity">
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            android:id="@+id/viewMainField"
+            style="@style/MyText.Main" />
+
+    </FrameLayout>
+
+</LinearLayout>

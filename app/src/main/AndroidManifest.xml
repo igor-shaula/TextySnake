@@ -11,6 +11,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name="com.igor.shaula.snake_in_text.activity.MainActivity">
+            <!--android:screenOrientation="portrait">-->
+            <!--temporary crutch for only portrait mode-->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
