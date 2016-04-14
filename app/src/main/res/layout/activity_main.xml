@@ -16,19 +16,17 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <FrameLayout
-        android:id="@+id/flMain"
+    <ScrollView
+        android:id="@+id/svMain"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_gravity="center"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:background="@color/primary_light">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"
             style="@style/MyText.Main" />
 
-    </FrameLayout>
+    </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -38,7 +36,7 @@
         android:orientation="horizontal">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/mtvViewScores"
+            android:id="@+id/mtvShowScores_P"
             style="@style/MyText.Weight.Land.Active"
             android:text="@string/viewScores" />
 
@@ -48,7 +46,7 @@
             android:background="@color/primary_dark" />
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
-            android:id="@+id/mtvSetSpeed"
+            android:id="@+id/mtvSetSpeed_P"
             style="@style/MyText.Weight.Land.Active"
             android:text="@string/setSpeed1" />
 

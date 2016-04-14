@@ -22,8 +22,6 @@ public class MyPSF {
     public static final int STARTING_SNAKE_SPEED = 3;
     public static final int STARTING_UPDATE_FOOD_PERIOD = 10 * 1000;
 
-    public static final String SCORE_STARTING_SUFFIX = " 0";
-
     public static final String S_P_NAME = "Texty Snake Shared Preferences";
     public static final String KEY_SCORE = "Best Score";
     public static final String KEY_TIME = "Best Time";

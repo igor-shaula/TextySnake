@@ -13,19 +13,26 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+    <!--
+        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:baselineAligned="false"
+            tools:context=".activity.MainActivity">
+            -->
 
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/flMain"
+    <ScrollView
+        android:id="@+id/svMain"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:baselineAligned="false"
-        tools:context=".activity.MainActivity">
+        android:layout_height="match_parent">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"
             style="@style/MyText.Main" />
 
-    </FrameLayout>
+    </ScrollView>
+
+    <!--</FrameLayout>-->
 
 </LinearLayout>

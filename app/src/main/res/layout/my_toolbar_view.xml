@@ -7,13 +7,14 @@
     android:orientation="horizontal">
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
-        style="@style/MyText.Weight.Land"
-        android:text="@string/app_name" />
-
-    <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvScore"
         style="@style/MyText.Weight.Land"
         android:text="@string/defaultScore" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        style="@style/MyText.Weight.Land"
+        android:background="@color/primary_dark"
+        android:text="@string/app_name" />
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvTime"
