@@ -13,26 +13,27 @@
         android:background="?attr/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-    <!--
-        <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:baselineAligned="false"
-            tools:context=".activity.MainActivity">
-            -->
 
     <ScrollView
-        android:id="@+id/svMain"
+        android:id="@+id/svHidden"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/primary_dark">
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView style="@style/MyText.Main.Guide" />
+
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/flMain"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary_light">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"
             style="@style/MyText.Main" />
 
-    </ScrollView>
-
-    <!--</FrameLayout>-->
+    </FrameLayout>
 
 </LinearLayout>

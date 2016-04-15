@@ -17,7 +17,17 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
     <ScrollView
-        android:id="@+id/svMain"
+        android:id="@+id/svHidden"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/primary_dark">
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView style="@style/MyText.Main.Guide" />
+
+    </ScrollView>
+
+    <FrameLayout
+        android:id="@+id/flMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/primary_light">
@@ -26,7 +36,7 @@
             android:id="@+id/viewMainField"
             style="@style/MyText.Main" />
 
-    </ScrollView>
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

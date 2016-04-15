@@ -43,10 +43,16 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
-        <item name="android:text">@string/userGuide</item>
+        <item name="android:text">@string/oneSymbol</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@color/primary_dark</item>
+    </style>
+
+    <style name="MyText.Main.Guide">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:text">@string/userGuide</item>
     </style>
 
     <style name="MyImageButton">

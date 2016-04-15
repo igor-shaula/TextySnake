@@ -14,6 +14,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.ScrollView;
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
+    private ScrollView svHidden = (ScrollView) findViewById(R.id.svHidden);
     private MyTextView mtvMainField, mtvScore, mtvTime;
 
     // utils from the system \
@@ -68,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
 
     private GestureDetector mGestureDetector;
 
-    private int screenOrientation;
-
     // LIFECYCLE ===================================================================================
 
     @SuppressLint("InflateParams")
@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // game depends on screen orientation changes \
-        screenOrientation = getResources().getConfiguration().orientation;
+        int screenOrientation = getResources().getConfiguration().orientation;
 
         // setting action bar \
         Toolbar myToolbar = (Toolbar) findViewById(R.id.myToolbar);
@@ -122,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 showSetSpeedDialog();
             }
         });
+
+        svHidden.setOnTouchListener(this);
 
         // initializing other informative views \
         mtvScore = (MyTextView) findViewById(R.id.mtvScore);
@@ -187,8 +189,10 @@ public class MainActivity extends AppCompatActivity {
     private void initializeGame() {
         MyLog.i("initializeGame started");
 
-        // first of all i have to change text to a single symbol \
-        mtvMainField.setText(R.string.oneSymbol);
+        assert svHidden != null;
+        svHidden.setVisibility(View.GONE);
+
+        final FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
 
         mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -199,11 +203,8 @@ public class MainActivity extends AppCompatActivity {
                         mFieldPixelWidth = mtvMainField.getWidth();
                         MyLog.i("mFieldPixelWidth " + mFieldPixelWidth);
 
-                        ScrollView svMain = (ScrollView) findViewById(R.id.svMain);
-
-                        assert svMain != null;
-                        svMain.setScrollContainer(false);
-                        mFieldPixelHeight = svMain.getHeight();
+                        assert flMain != null;
+                        mFieldPixelHeight = flMain.getHeight();
                         MyLog.i("mFieldPixelHeight " + mFieldPixelHeight);
 
                         ViewTreeObserver.OnGlobalLayoutListener listener = this;
