@@ -19,11 +19,16 @@
     <string name="speedKey">speed key</string>
     <string name="setSpeed1">Set Speed</string>
     <string name="setSpeed2">Set\nSpeed</string>
-    <string name="speedVerySlow">1 - very slow</string>
-    <string name="speedSlow">2 - slow</string>
-    <string name="speedNormal">3 - normal</string>
-    <string name="speedFast">4 - fast</string>
-    <string name="speedVeryFast">5 - very fast</string>
+
+    <string name="speedTooSlow">SLOWEST (1)</string>
+    <string name="speedVerySlow">very slow (2)</string>
+    <string name="speedSlow">SLOW (3)</string>
+    <string name="speedAbitSlow">a bit slow (4)</string>
+    <string name="speedNormal">NORMAL (5)</string>
+    <string name="speedAbitFast">a bit fast (6)</string>
+    <string name="speedFast">FAST (7)</string>
+    <string name="speedVeryFast">very fast (8)</string>
+    <string name="speedTooFast">FASTEST (9)</string>
 
     <string name="viewScores">View Scores</string>
     <string name="your">Your</string>
@@ -42,18 +47,19 @@
         \n\n
         @@@
         \n\n
-        1 - Double tap to start/pause game
+        1 - Long click to start/restart
         \n\n
         2 - Swipe right/left/up/down here
         \n
         to set new direction for the snake
         \n\n
-        3 - Long click to restart game
+        3 - Double tap to pause/continue
         \n\n
         @@@@@@
         \n\n
         Have fun and gain high scores :)
         \n
     </string>
+    <string name="i_ve_got_it_start_the_game">I\'ve got it, start the game!</string>
 
 </resources>

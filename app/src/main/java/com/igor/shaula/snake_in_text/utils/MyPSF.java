@@ -17,9 +17,9 @@ public class MyPSF {
     public static final char SPEED_SLOW = '*'; // -1 from speed
 
     public static final int SHORT_VIBRATION = 100;
-    public static final int LONG_VIBRATION = 300;
+//    public static final int LONG_VIBRATION = 300;
     public static final int STARTING_SNAKE_LENGTH = 3;
-    public static final int STARTING_SNAKE_SPEED = 3;
+    public static final int STARTING_SNAKE_SPEED = 4;
     public static final int STARTING_UPDATE_FOOD_PERIOD = 10 * 1000;
 
     public static final String S_P_NAME = "Texty Snake Shared Preferences";

@@ -16,25 +16,23 @@
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <ScrollView
-        android:id="@+id/svHidden"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/primary_dark">
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        style="@style/MyText.Main.Guide"
+        android:id="@+id/mtvUserGuide"
+        android:scrollbars="vertical" />
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView style="@style/MyText.Main.Guide" />
-
-    </ScrollView>
-
+    <!--this ViewGroup is needed to measure its dimensions in code-->
     <FrameLayout
         android:id="@+id/flMain"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:visibility="gone"
         android:background="@color/primary_light">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"
-            style="@style/MyText.Main" />
+            style="@style/MyText.Main.Field" />
 
     </FrameLayout>
 

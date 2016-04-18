@@ -5,6 +5,11 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!--all below this line in this style-tag doesn't work-->
+        <item name="contentInsetStart">0dp</item>
+        <item name="contentInsetEnd">0dp</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
     </style>
 
     <style name="MyText">
@@ -50,9 +55,16 @@
     </style>
 
     <style name="MyText.Main.Guide">
-        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:text">@string/userGuide</item>
+    </style>
+
+    <style name="MyText.Main.Field">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:text">@string/oneSymbol</item>
     </style>
 
     <style name="MyImageButton">
@@ -64,7 +76,6 @@
 
     <style name="MyRadioButton" parent="MyText">
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center_vertical</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_marginBottom">@dimen/size_8</item>
         <item name="android:button">@android:color/transparent</item>

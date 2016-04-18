@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateFormat;
+import android.text.method.ScrollingMovementMethod;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,7 +18,6 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
-import android.widget.ScrollView;
 
 import com.igor.shaula.snake_in_text.R;
 import com.igor.shaula.snake_in_text.custom_views.MyTextView;
@@ -49,8 +49,7 @@ public class MainActivity extends AppCompatActivity {
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
-    private ScrollView svHidden = (ScrollView) findViewById(R.id.svHidden);
-    private MyTextView mtvMainField, mtvScore, mtvTime;
+    private MyTextView mtvUserGuide, mtvMainField, mtvScore, mtvTime;
 
     // utils from the system \
     private Vibrator mVibrator;
@@ -59,12 +58,11 @@ public class MainActivity extends AppCompatActivity {
 
     // definition of the snake model \
     private Snake mSnake;
-    @SuppressWarnings("FieldCanBeLocal")
-    private int mSnakeSpeed;
+    private int mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
     private MyDirections mSnakeDirection;
 
     // game parameters \
-    private boolean mIsFirstLaunch = true, mGameEnded = false, mGamePausedSwitch = false;
+    private boolean mGameEnded = false, mGamePausedSwitch = false;
     private int mCurrentScore, mBestScore;
     private long mCurrentTime, mBestTime;
 
@@ -91,7 +89,10 @@ public class MainActivity extends AppCompatActivity {
             myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
 
         assert myToolbar != null;
-        myToolbar.addView(myToolbarView, Toolbar.LayoutParams.MATCH_PARENT, Toolbar.LayoutParams.MATCH_PARENT);
+        myToolbar.setPadding(0,0,0,0);
+        myToolbar.setTitle("");
+        myToolbar.addView(myToolbarView);
+
         setSupportActionBar(myToolbar);
 
         // setting show-scores-button and set-speed-button \
@@ -102,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
             mtvSetSpeed = (MyTextView) findViewById(R.id.mtvSetSpeed_P);
         } else if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
             mtvShowScores = (MyTextView) findViewById(R.id.mtvShowScores_L);
-//            mtvShowScores = (MyTextView) myToolbarView.findViewById(R.id.mtvShowScores_L);
             mtvSetSpeed = (MyTextView) findViewById(R.id.mtvSetSpeed_L);
-//            mtvSetSpeed = (MyTextView) myToolbarView.findViewById(R.id.mtvSetSpeed_L);
         }
 
         assert mtvShowScores != null;
@@ -123,7 +122,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        svHidden.setOnTouchListener(this);
+        mtvUserGuide = (MyTextView) findViewById(R.id.mtvUserGuide);
+        mtvUserGuide.setMovementMethod(new ScrollingMovementMethod());
+        mtvUserGuide.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                initializeGame();
+                return false;
+            }
+        });
 
         // initializing other informative views \
         mtvScore = (MyTextView) findViewById(R.id.mtvScore);
@@ -163,25 +170,6 @@ public class MainActivity extends AppCompatActivity {
         MyLog.i("onRestoreInstanceState worked");
     }
 
-/*
-    // MENU ========================================================================================
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu._menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        if (item.getItemId() == R.id.viewScores) showScoresDialog();
-        else if (item.getItemId() == R.id.setPreferences) showSetSpeedDialog();
-        return super.onOptionsItemSelected(item);
-    }
-*/
-
     // MAIN SEQUENCE ===============================================================================
 
     // 0 - from onGlobalLayout-method
@@ -189,10 +177,13 @@ public class MainActivity extends AppCompatActivity {
     private void initializeGame() {
         MyLog.i("initializeGame started");
 
-        assert svHidden != null;
-        svHidden.setVisibility(View.GONE);
+        // hiding the readme - now it's useless \
+        mtvUserGuide.setVisibility(View.GONE);
 
+        // revealing the main field to get it ready for playing \
         final FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
+        assert flMain != null;
+        flMain.setVisibility(View.VISIBLE);
 
         mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -203,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
                         mFieldPixelWidth = mtvMainField.getWidth();
                         MyLog.i("mFieldPixelWidth " + mFieldPixelWidth);
 
-                        assert flMain != null;
                         mFieldPixelHeight = flMain.getHeight();
                         MyLog.i("mFieldPixelHeight " + mFieldPixelHeight);
 
@@ -214,6 +204,15 @@ public class MainActivity extends AppCompatActivity {
                         else
                             //noinspection deprecation
                             mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+
+                        // here we get pixel width of a single symbol - initial TextView has only one symbol \
+                        mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                        int measuredSymbolWidth = mtvMainField.getMeasuredWidth();
+                        MyLog.i("measuredSymbolWidth " + measuredSymbolWidth);
+
+                        // getting our first valuable parameter - the size of main array \
+                        mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
+                        MyLog.i("mSymbolsInFieldLine " + mSymbolsInFieldLine);
 
                         prepareGameIn4Steps();
                         actionStartGame();
@@ -233,21 +232,6 @@ public class MainActivity extends AppCompatActivity {
     // 1 - from onGlobalLayout-method
     private void step_1_prepareTextField() {
 
-        if (mIsFirstLaunch) {
-
-
-            // here we get pixel width of a single symbol - initial TextView has only one symbol \
-            mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            int measuredSymbolWidth = mtvMainField.getMeasuredWidth();
-            MyLog.i("measuredSymbolWidth " + measuredSymbolWidth);
-
-            // getting our first valuable parameter - the size of main array \
-            mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
-            MyLog.i("mSymbolsInFieldLine " + mSymbolsInFieldLine);
-
-            // only here i can switch this flag out \
-            mIsFirstLaunch = false;
-        }
         // clearing the text field to properly initialize it for game \
         mtvMainField.setText(null);
 
@@ -300,7 +284,6 @@ public class MainActivity extends AppCompatActivity {
     private void step_3_setInitialSnake() {
 
         mSnake = new Snake();
-        mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
 
         // defining start directions to properly set up the mSnake \
         switch (mRandom.nextInt(3) + 1) {
@@ -492,7 +475,17 @@ public class MainActivity extends AppCompatActivity {
         // setting all elements for this view \
         RadioGroup rgSpeed = (RadioGroup) dialogView.findViewById(R.id.rgSpeed);
 
-        int[] radioButtons = {R.id.mrb1, R.id.mrb2, R.id.mrb3, R.id.mrb4, R.id.mrb5};
+        int[] radioButtons = {
+                R.id.mrb1,
+                R.id.mrb2,
+                R.id.mrb3,
+                R.id.mrb4,
+                R.id.mrb5,
+                R.id.mrb6,
+                R.id.mrb7,
+                R.id.mrb8,
+                R.id.mrb9
+        };
         try {
             rgSpeed.check(radioButtons[mSnakeSpeed - 1]);
         } catch (ArrayIndexOutOfBoundsException aioobe) {
@@ -502,8 +495,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 int newSnakeSpeed = 0;
-                // pretty nice incrementation \
+                // pretty nice incrementation - without breaks! \
                 switch (checkedId) {
+                    case R.id.mrb9:
+                        newSnakeSpeed++;
+                    case R.id.mrb8:
+                        newSnakeSpeed++;
+                    case R.id.mrb7:
+                        newSnakeSpeed++;
+                    case R.id.mrb6:
+                        newSnakeSpeed++;
                     case R.id.mrb5:
                         newSnakeSpeed++;
                     case R.id.mrb4:
@@ -601,57 +602,38 @@ public class MainActivity extends AppCompatActivity {
 
     public class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-        private float sensitivityForXY = 100;
-        private float velocityLimitPlus = 1000;
-        private float velocityLimitMinus = -1000;
-
         @Override
         public boolean onDoubleTap(MotionEvent e) {
             MyLog.i("onDoubleTap - start / pause");
-            MyLog.i("mIsFirstLaunch = " + mIsFirstLaunch);
             MyLog.i("mGamePausedSwitch = " + mGamePausedSwitch);
             MyLog.i("mGameEnded = " + mGameEnded);
 
-            // 1 - fresh new start \
-            if (mIsFirstLaunch) {
-                executeFirstLaunch();
-                return true; // only for the first launch \
-            }
-
-            // 2 - start a new one after game over \
+            // 1 - prepare new field after game over \
             if (mGameEnded) prepareGameIn4Steps();
 
-            // 3 - to pause the game \
-            if (!mGamePausedSwitch) actionPauseGame();
+            // 2 - pause or continue game \
+            if (!mGamePausedSwitch)
+                actionPauseGame();
             else actionStartGame();
 
             return super.onDoubleTap(e);
         }
 
-        private void executeFirstLaunch() {
-            MyLog.i("executeFirstLaunch worked");
-
-            // big amount of code is hidden underneath this line \
-            initializeGame();
-
-            mGamePausedSwitch = true; // because in fact it is \
-        }
-
         @Override
         public void onLongPress(MotionEvent e) {
             MyLog.i("onLongPress - full restart from zero");
-            MyLog.i("mIsFirstLaunch = " + mIsFirstLaunch);
             MyLog.i("mGamePausedSwitch = " + mGamePausedSwitch);
             MyLog.i("mGameEnded = " + mGameEnded);
 
-            mVibrator.vibrate(MyPSF.LONG_VIBRATION);
+            mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
 
             actionEndGame();
             mCurrentScore = 0;
 
-            // everything is reset to later start from scratch \
-            if (mIsFirstLaunch) executeFirstLaunch();
-            else prepareGameIn4Steps();
+            // 1 - preparing the field for the new game \
+            prepareGameIn4Steps();
+
+            // 2 - restarting the game \
             actionStartGame();
 
             super.onLongPress(e);
@@ -659,51 +641,69 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-//            MyLog.i("onFling");
+//            MyLog.i("e1.getX() = " + e1.getX() + " & e2.getX() = " + e2.getX());
+//            MyLog.i("e1.getY() = " + e1.getY() + " & e2.getY() = " + e2.getY());
+//            MyLog.i("velocityX = " + velocityX + " & velocityY = " + velocityY + "\n");
 
-            if (isLeftMove(e1, e2, velocityX, velocityY)) {
-                MyLog.i("left");
-                MyLog.i("velocityX = " + velocityX + " : velocityY = " + velocityY);
+            if (Math.abs(e2.getX() - e1.getX()) > Math.abs(e2.getY() - e1.getY()))
+                if (isLeftMove(velocityX, velocityY)) {
+                    MyLog.i("turned left");
+                    mSnakeDirection = MyDirections.LEFT;
+                } else {
+                    MyLog.i("turned right");
+                    mSnakeDirection = MyDirections.RIGHT;
+                }
+            else { // moving along Y-axis was more noticeable than along X-axis \
+                if (isUpMove(velocityX, velocityY)) {
+                    MyLog.i("turned up");
+                    mSnakeDirection = MyDirections.UP;
+                } else {
+                    MyLog.i("turned down");
+                    mSnakeDirection = MyDirections.DOWN;
+                }
+            }
+/*
+            if (isLeftMove(absDeltaX, absDeltaY, velocityX, velocityY)) {
+                MyLog.i("turned left");
                 mSnakeDirection = MyDirections.LEFT;
-            } else if (isRightMove(e1, e2, velocityX, velocityY)) {
-                MyLog.i("right");
-                MyLog.i("velocityX = " + velocityX + " : velocityY = " + velocityY);
+            } else if (isRightMove(absDeltaX, absDeltaY, velocityX, velocityY)) {
+                MyLog.i("turned right");
                 mSnakeDirection = MyDirections.RIGHT;
-            } else if (isUpMove(e1, e2, velocityX, velocityY)) {
-                MyLog.i("up");
-                MyLog.i("velocityX = " + velocityX + " : velocityY = " + velocityY);
+            } else if (isUpMove(absDeltaX, absDeltaY, velocityX, velocityY)) {
+                MyLog.i("turned up");
                 mSnakeDirection = MyDirections.UP;
-            } else if (isDownMove(e1, e2, velocityX, velocityY)) {
-                MyLog.i("down");
-                MyLog.i("velocityX = " + velocityX + " : velocityY = " + velocityY);
+            } else if (isDownMove(absDeltaX, absDeltaY, velocityX, velocityY)) {
+                MyLog.i("turned down");
                 mSnakeDirection = MyDirections.DOWN;
             }
+*/
             return super.onFling(e1, e2, velocityX, velocityY);
         }
 
-        private boolean isLeftMove(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return (e1.getX() - e2.getX()) > sensitivityForXY
-                    && velocityX <= velocityLimitMinus
-                    && velocityLimitMinus < velocityY && velocityY < velocityLimitPlus;
+        private boolean isLeftMove(float velocityX, float velocityY) {
+            return velocityX < 0 // determining the LEFT direction of the swipe \
+//                    && absDeltaX > absDeltaY // assuring that this swipe was more along X-axis than along Y \
+                    && Math.abs(velocityX) > Math.abs(velocityY); // checking if we're right completely \
         }
 
-        private boolean isRightMove(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return (e2.getX() - e1.getX()) > sensitivityForXY
-                    && velocityX >= velocityLimitPlus
-                    && velocityLimitMinus < velocityY && velocityY < velocityLimitPlus;
+        private boolean isUpMove(float velocityX, float velocityY) {
+            return velocityY < 0 // determining the UP direction of the swipe \
+//                    && absDeltaX < absDeltaY // assuring that this swipe was more along Y-axis than along X \
+                    && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
+        }
+/*
+        private boolean isRightMove(float velocityX, float velocityY) {
+            return velocityX > 0 // determining the RIGHT direction of the swipe \
+//                    && absDeltaX > absDeltaY // assuring that this swipe was more along X-axis than along Y \
+                    && Math.abs(velocityX) > Math.abs(velocityY); // checking if we're right completely \
         }
 
-        private boolean isUpMove(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return (e1.getY() - e2.getY()) > sensitivityForXY
-                    && velocityY <= velocityLimitMinus
-                    && velocityLimitMinus < velocityX && velocityX < velocityLimitPlus;
+        private boolean isDownMove(float velocityX, float velocityY) {
+            return velocityY > 0 // determining the DOWN direction of the swipe \
+//                    && absDeltaX < absDeltaY // assuring that this swipe was more along Y-axis than along X \
+                    && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
         }
-
-        private boolean isDownMove(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            return (e2.getY() - e1.getY()) > sensitivityForXY
-                    && velocityY >= velocityLimitPlus
-                    && velocityLimitMinus < velocityX && velocityX < velocityLimitPlus;
-        }
+*/
     } // end of MyGestureListener-class \\
 
 // TIMER CLASSES ===================================================================================
@@ -840,9 +840,11 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case MyPSF.SPEED_UP: // speed +1
-                    mSnakeSpeed++;
+                    if (mSnakeSpeed < 9) {
+                        mSnakeSpeed++;
+                        mCurrentScore += 50;
+                    } else mCurrentScore += 150;
                     MyLog.i("SPEED_UP taken!");
-                    mCurrentScore += 50;
                     break;
 
                 case MyPSF.SPEED_SLOW: // speed -1
