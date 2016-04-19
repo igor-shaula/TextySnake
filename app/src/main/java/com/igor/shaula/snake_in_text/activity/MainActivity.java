@@ -14,6 +14,7 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -81,19 +82,17 @@ public class MainActivity extends AppCompatActivity {
 
         // setting action bar \
         Toolbar myToolbar = (Toolbar) findViewById(R.id.myToolbar);
+        setSupportActionBar(myToolbar);
 
-        View myToolbarView = null;
-        if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
-        } else if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE)
-            myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
+        View myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
+
+        Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
         assert myToolbar != null;
-        myToolbar.setPadding(0,0,0,0);
-        myToolbar.setTitle("");
-        myToolbar.addView(myToolbarView);
-
-        setSupportActionBar(myToolbar);
+//        myToolbar.setPadding(0,0,0,0);
+//        myToolbar.setTitle("");
+        myToolbar.addView(myToolbarView, layoutParams);
 
         // setting show-scores-button and set-speed-button \
         MyTextView mtvShowScores = null, mtvSetSpeed = null;
