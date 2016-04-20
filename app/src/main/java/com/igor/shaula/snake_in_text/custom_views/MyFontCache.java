@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 /**
  * Created from https://futurestud.io/blog/custom-fonts-on-android-extending-textview
- * <p/>
+ *
  * This caches the fonts while minimizing the number of accesses to the assets.
  */
 public class MyFontCache {

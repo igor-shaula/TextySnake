@@ -84,14 +84,14 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.myToolbar);
         setSupportActionBar(myToolbar);
 
+        assert myToolbar != null;
+        myToolbar.setContentInsetsAbsolute(0, 0);
+
         View myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
 
         Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-        assert myToolbar != null;
-//        myToolbar.setPadding(0,0,0,0);
-//        myToolbar.setTitle("");
         myToolbar.addView(myToolbarView, layoutParams);
 
         // setting show-scores-button and set-speed-button \
@@ -355,12 +355,13 @@ public class MainActivity extends AppCompatActivity {
         // now everything is clear and we can set new food type and position \
         do {
             /*
-            range for mRandom: +1 -2 = -1
-            increased by one to include the whole range of values \
-            decreased by two to exclude visible field borders \
+            range for mRandom:
+            decreased by 2 to exclude visible field borders \
+            again decreased by 2 to exclude near-border dangerous positions \
+            increased by 1 to include the whole range of values because of method specifics \
             */
-            mFoodPositionRow = mRandom.nextInt(mFieldLinesCount - 2) + 1;
-            mFoodPositionSymbol = mRandom.nextInt(mSymbolsInFieldLine - 2) + 1;
+            mFoodPositionRow = mRandom.nextInt(mFieldLinesCount - 2 - 2) + 1;
+            mFoodPositionSymbol = mRandom.nextInt(mSymbolsInFieldLine - 2 - 2) + 1;
             // -1 instead of +1 just to avoid placing food on the boards \
             MyLog.i("mRandom mFoodPositionRow " + mFoodPositionRow);
             MyLog.i("mRandom mFoodPositionSymbol " + mFoodPositionSymbol);

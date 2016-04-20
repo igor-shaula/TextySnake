@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/primary"
-    android:orientation="horizontal">
+    style="@style/MyVG_MatchWrapHoriz"
+    android:background="@color/primary">
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvShowScores_L"
         style="@style/MyText.Weight.Land.Active"
-        android:text="@string/viewScores" />
+        android:text="@string/viewScores2" />
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvScore"
@@ -19,7 +17,7 @@
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         style="@style/MyText.Weight.Land"
         android:background="@color/primary_dark"
-        android:text="@string/app_name" />
+        android:text="@string/appName" />
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvTime"

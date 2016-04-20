@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MyVG_MatchMatchVert"
+    tools:context=".activity.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/myToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        style="@style/MyToolbar"
+        android:layout_height="wrap_content" />
 
     <com.igor.shaula.snake_in_text.custom_views.MyTextView
         android:id="@+id/mtvUserGuide"
@@ -22,11 +18,7 @@
     <!--this ViewGroup is needed to measure its dimensions in code-->
     <FrameLayout
         android:id="@+id/flMain"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:visibility="gone"
-        android:background="@color/primary_light">
+        style="@style/MyFrameLayout">
 
         <com.igor.shaula.snake_in_text.custom_views.MyTextView
             android:id="@+id/viewMainField"

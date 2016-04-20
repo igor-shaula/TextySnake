@@ -1,22 +1,25 @@
 <resources>
 
     <!-- Base application theme. -->
-    <!--<style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">-->
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <!--all below this line in this style-tag doesn't work-->
-        <item name="contentInsetStart">0dp</item>
-        <item name="contentInsetEnd">0dp</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActionBar">false</item>
     </style>
+
+    <!--styles for every text field-->
 
     <style name="MyText">
         <item name="android:singleLine">true</item>
         <item name="android:gravity">center</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Large</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
         <item name="android:textColor">@android:color/white</item>
+    </style>
+
+    <style name="MyText.Dialog">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_margin">@dimen/size_16</item>
     </style>
 
     <style name="MyText.Weight">
@@ -27,7 +30,6 @@
     </style>
 
     <style name="MyText.Weight.Land">
-        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:padding">@dimen/size_8</item>
         <item name="android:gravity">center</item>
@@ -37,19 +39,12 @@
         <item name="android:background">@color/accent</item>
     </style>
 
-    <style name="MyText.Scores">
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_margin">@dimen/size_16</item>
-    </style>
-
     <style name="MyText.Main">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:gravity">center</item>
         <item name="android:text">@string/oneSymbol</item>
-        <item name="android:textAppearance">@android:style/TextAppearance.Medium</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@color/primary_dark</item>
     </style>
@@ -67,13 +62,6 @@
         <item name="android:text">@string/oneSymbol</item>
     </style>
 
-    <style name="MyImageButton">
-        <item name="android:layout_height">@dimen/directionsButtonSize</item>
-        <item name="android:layout_width">@dimen/directionsButtonSize</item>
-        <item name="android:scaleType">fitCenter</item>
-        <item name="android:background">@android:color/transparent</item>
-    </style>
-
     <style name="MyRadioButton" parent="MyText">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
@@ -81,6 +69,54 @@
         <item name="android:button">@android:color/transparent</item>
         <item name="android:padding">@dimen/size_8</item>
         <item name="android:background">@drawable/my_radio_button_states</item>
+    </style>
+
+    <!--horizontal dividers-->
+
+    <style name="MyHorizLine">
+        <item name="android:layout_marginTop">@dimen/size_16</item>
+        <item name="android:layout_height">@dimen/size_2</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:background">@color/primary_light</item>
+    </style>
+
+    <!--ViewGroups-->
+
+    <style name="MyToolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:background">@color/primary</item>
+    </style>
+
+    <style name="MyFrameLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@color/primary_light</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="MyVG_MatchMatchVert">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:orientation">vertical</item>
+    </style>
+
+    <style name="MyVG_MatchWrapHoriz">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="MyVG_WrapWrapCenter">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center</item>
+    </style>
+
+    <style name="MyVG_WrapWrapCenter.WeightVertical">
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:orientation">vertical</item>
     </style>
 
 </resources>
