@@ -3,7 +3,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/MyVG_WrapWrapCenter">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         style="@style/MyVG_WrapWrapCenter"
         android:layout_gravity="start"
         android:background="@color/primary_dark"
