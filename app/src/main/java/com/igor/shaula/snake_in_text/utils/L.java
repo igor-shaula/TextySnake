@@ -5,9 +5,13 @@ import android.util.Log;
 /**
  * Created by igor shaula - just a useful wrapper for system Log \
  */
-public class MyLog {
+public class L {
 
     private static final String TAG = "LOG";
+
+    public static void l(String message) {
+        System.out.println(message);
+    }
 
     public static void v(String message) {
         Log.v(TAG, message);
