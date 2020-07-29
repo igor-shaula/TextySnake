@@ -3,12 +3,13 @@ package com.igor.shaula.snake_in_text.custom_views;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.widget.TextView;
+
+import androidx.appcompat.widget.AppCompatTextView;
 
 /**
  * Created by igor shaula - to set custom font and maintain game field in this way \
  */
-public class MyTextView extends TextView {
+public class MyTextView extends AppCompatTextView {
 
     public MyTextView(Context context) {
         super(context);

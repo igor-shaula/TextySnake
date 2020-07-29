@@ -16,6 +16,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         int screenOrientation = getResources().getConfiguration().orientation;
 
         // setting action bar \
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.myToolbar);
+        Toolbar myToolbar = findViewById(R.id.myToolbar);
         setSupportActionBar(myToolbar);
 
         assert myToolbar != null;
@@ -99,11 +100,11 @@ public class MainActivity extends AppCompatActivity {
         MyTextView mtvShowScores = null, mtvSetSpeed = null;
 
         if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            mtvShowScores = (MyTextView) findViewById(R.id.mtvShowScores_P);
-            mtvSetSpeed = (MyTextView) findViewById(R.id.mtvSetSpeed_P);
+            mtvShowScores = findViewById(R.id.mtvShowScores_P);
+            mtvSetSpeed = findViewById(R.id.mtvSetSpeed_P);
         } else if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mtvShowScores = (MyTextView) findViewById(R.id.mtvShowScores_L);
-            mtvSetSpeed = (MyTextView) findViewById(R.id.mtvSetSpeed_L);
+            mtvShowScores = findViewById(R.id.mtvShowScores_L);
+            mtvSetSpeed = findViewById(R.id.mtvSetSpeed_L);
         }
 
         assert mtvShowScores != null;
@@ -122,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mtvUserGuide = (MyTextView) findViewById(R.id.mtvUserGuide);
+        mtvUserGuide = findViewById(R.id.mtvUserGuide);
         mtvUserGuide.setMovementMethod(new ScrollingMovementMethod());
         mtvUserGuide.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -133,11 +134,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // initializing other informative views \
-        mtvScore = (MyTextView) findViewById(R.id.mtvScore);
-        mtvTime = (MyTextView) findViewById(R.id.mtvTime);
+        mtvScore = findViewById(R.id.mtvScore);
+        mtvTime = findViewById(R.id.mtvTime);
 
         // defining main game field \
-        mtvMainField = (MyTextView) findViewById(R.id.viewMainField);
+        mtvMainField = findViewById(R.id.viewMainField);
 
         // vibrator will be used when eating food or something else happens \
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -160,13 +161,13 @@ public class MainActivity extends AppCompatActivity {
     // SAVE_RESTORE ================================================================================
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         L.i("onSaveInstanceState worked");
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         L.i("onRestoreInstanceState worked");
     }
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         mtvUserGuide.setVisibility(View.GONE);
 
         // revealing the main field to get it ready for playing \
-        final FrameLayout flMain = (FrameLayout) findViewById(R.id.flMain);
+        final FrameLayout flMain = findViewById(R.id.flMain);
         assert flMain != null;
         flMain.setVisibility(View.VISIBLE);
 
@@ -203,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
                             mtvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
                         else
-                            //noinspection deprecation
                             mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
 
                         // here we get pixel width of a single symbol - initial TextView has only one symbol \
@@ -374,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFoodType = mFoodTypeArray[mRandom.nextInt(mFoodTypeArray.length)];
 
-        // substracting 1 because we know that these are indexes - counted from zero \
+        // subtracting 1 because we know that these are indexes - counted from zero \
         mCharsArrayList.get(mFoodPositionRow)[mFoodPositionSymbol] = mFoodType;
 //        mCharsArrayList.get(mFoodPositionRow - 1)[mFoodPositionSymbol - 1] = FOOD;
     }
@@ -394,10 +394,10 @@ public class MainActivity extends AppCompatActivity {
                 .clear()
                 .putInt(MyPSF.KEY_SCORE, mBestScore)
                 .putLong(MyPSF.KEY_TIME, mBestTime)
-                .commit();
+                .apply();
     }
 
-    private boolean showScoresDialog() {
+    private void showScoresDialog() {
 
         actionPauseGame();
 
@@ -406,18 +406,18 @@ public class MainActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
 
         // setting all elements for this view \
-        MyTextView mtvCurrentScore = (MyTextView) dialogView.findViewById(R.id.mtvCurrentScore);
-        MyTextView mtvCurrentTime = (MyTextView) dialogView.findViewById(R.id.mtvCurrentTime);
-        final MyTextView mtvBestScore = (MyTextView) dialogView.findViewById(R.id.mtvBestScore);
-        final MyTextView mtvBestTime = (MyTextView) dialogView.findViewById(R.id.mtvBestTime);
+        MyTextView mtvCurrentScore = dialogView.findViewById(R.id.mtvCurrentScore);
+        MyTextView mtvCurrentTime = dialogView.findViewById(R.id.mtvCurrentTime);
+        final MyTextView mtvBestScore = dialogView.findViewById(R.id.mtvBestScore);
+        final MyTextView mtvBestTime = dialogView.findViewById(R.id.mtvBestTime);
 
         mtvCurrentScore.setText(String.valueOf(mCurrentScore));
         mtvCurrentTime.setText(DateFormat.format("mm:ss", mCurrentTime));
         mtvBestScore.setText(String.valueOf(mBestScore));
         mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
 
-        final MyTextView mtvClearBestResults = (MyTextView) dialogView.findViewById(R.id.mtvClearBestResults);
-        final LinearLayout llHidden = (LinearLayout) dialogView.findViewById(R.id.llHidden);
+        final MyTextView mtvClearBestResults = dialogView.findViewById(R.id.mtvClearBestResults);
+        final LinearLayout llHidden = dialogView.findViewById(R.id.llHidden);
         final boolean[] longButtonClickedOnce = {false};
 
         // preparing special listener for two hidden buttons \
@@ -455,10 +455,9 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
-        return true;
     } // end of showScoresDialog-method \\
 
-    private boolean showSetSpeedDialog() {
+    private void showSetSpeedDialog() {
 
         actionPauseGame();
 
@@ -475,7 +474,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
 
         // setting all elements for this view \
-        RadioGroup rgSpeed = (RadioGroup) dialogView.findViewById(R.id.rgSpeed);
+        RadioGroup rgSpeed = dialogView.findViewById(R.id.rgSpeed);
 
         int[] radioButtons = {
                 R.id.mrb1,
@@ -525,7 +524,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        return true;
     } // end of showSetSpeedDialog-method \\
 
     private void actionPauseGame() {
@@ -730,7 +728,7 @@ public class MainActivity extends AppCompatActivity {
                 newCellX = snakeCell.getIndexByX();
                 newCellY = snakeCell.getIndexByY();
                 // moving every cell of the mSnake's body \
-                snakeCell = mSnake.getCell(i); // to update current cell vith position of previous \
+                snakeCell = mSnake.getCell(i); // to update current cell with position of previous \
                 snakeCell.setIndexByX(newCellX);
                 snakeCell.setIndexByY(newCellY);
             }
@@ -824,7 +822,7 @@ public class MainActivity extends AppCompatActivity {
 
                 case MyPSF.LENGTH_MINUS: // length -1
                     // just removing the last cell \
-                    if (mSnake.getLength() > 1) { // to avoid mSnake's dissappearing \
+                    if (mSnake.getLength() > 1) { // to avoid mSnake's disappearing \
                         // first updating field to clear mSnake's tail - while it's available \
                         currentCell = mSnake.getCell(mSnake.getLength() - 1);
                         cellPositionX = currentCell.getIndexByX();
@@ -862,7 +860,7 @@ public class MainActivity extends AppCompatActivity {
                         return 1;
                     case LEFT: // to left - for X
                         return -1;
-                    default: // up and dowm - 1, 3 cases don't affect X
+                    default: // up and down - 1, 3 cases don't affect X
                         return 0;
                 }
             else
@@ -924,7 +922,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private class TimeUpdateTimerTask extends TimerTask {
-        // code here is called every milisecond - it has to be really fast \
+        // code here is called every millisecond - it has to be really fast \
         private long initialSystemTime = System.currentTimeMillis();
 
         @Override

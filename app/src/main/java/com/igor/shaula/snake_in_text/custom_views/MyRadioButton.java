@@ -3,12 +3,13 @@ package com.igor.shaula.snake_in_text.custom_views;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.widget.RadioButton;
+
+import androidx.appcompat.widget.AppCompatRadioButton;
 
 /**
  * Created by igor shaula - to set custom font and maintain game field in this way \
  */
-public class MyRadioButton extends RadioButton {
+public class MyRadioButton extends AppCompatRadioButton {
     public MyRadioButton(Context context) {
         super(context);
         applyMyFont(context);
