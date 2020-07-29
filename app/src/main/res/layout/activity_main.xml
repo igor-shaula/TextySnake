@@ -10,7 +10,7 @@
         style="@style/MyToolbar"
         android:layout_height="?attr/actionBarSize" />
 
-    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+    <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
         android:id="@+id/mtvUserGuide"
         style="@style/MyText.Main.Guide"
         android:scrollbars="vertical" />
@@ -20,7 +20,7 @@
         android:id="@+id/flMain"
         style="@style/MyFrameLayout">
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
             android:id="@+id/viewMainField"
             style="@style/MyText.Main.Field" />
 
@@ -33,7 +33,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
             android:id="@+id/mtvShowScores_P"
             style="@style/MyText.Weight.Land.Active"
             android:text="@string/viewScores1" />
@@ -43,7 +43,7 @@
             android:layout_height="match_parent"
             android:background="@color/primary_dark" />
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
             android:id="@+id/mtvSetSpeed_P"
             style="@style/MyText.Weight.Land.Active"
             android:text="@string/setSpeed1" />

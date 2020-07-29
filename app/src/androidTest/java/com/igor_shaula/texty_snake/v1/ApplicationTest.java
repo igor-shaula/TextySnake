@@ -1,4 +1,4 @@
-package com.igor.shaula.snake_in_text;
+package com.igor_shaula.texty_snake.v1;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

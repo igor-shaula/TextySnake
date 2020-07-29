@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.igor.shaula.snake_in_text">
+    package="com.igor_shaula.texty_snake.v1">
 
     <uses-permission android:name="android.permission.VIBRATE" />
 
@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.igor.shaula.snake_in_text.activity.MainActivity">
+        <activity android:name="com.igor_shaula.texty_snake.v1.activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

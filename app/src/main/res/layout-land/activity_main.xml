@@ -10,7 +10,7 @@
         style="@style/MyToolbar"
         android:layout_height="wrap_content" />
 
-    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+    <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
         android:id="@+id/mtvUserGuide"
         style="@style/MyText.Main.Guide"
         android:scrollbars="vertical" />
@@ -20,7 +20,7 @@
         android:id="@+id/flMain"
         style="@style/MyFrameLayout">
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
             android:id="@+id/viewMainField"
             style="@style/MyText.Main.Field" />
 

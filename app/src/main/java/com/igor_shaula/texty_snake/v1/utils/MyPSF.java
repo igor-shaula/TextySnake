@@ -1,7 +1,7 @@
-package com.igor.shaula.snake_in_text.utils;
+package com.igor_shaula.texty_snake.v1.utils;
 
 /**
- * Created by igor shaula
+ * Created by igor_shaula texty_snake
  */
 public class MyPSF {
 

@@ -1,9 +1,9 @@
-package com.igor.shaula.snake_in_text.utils;
+package com.igor_shaula.texty_snake.v1.utils;
 
 import android.util.Log;
 
 /**
- * Created by igor shaula - just a useful wrapper for system Log \
+ * Created by igor_shaula texty_snake - just a useful wrapper for system Log \
  */
 public class L {
 

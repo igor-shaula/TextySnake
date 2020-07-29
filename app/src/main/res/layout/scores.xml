@@ -10,7 +10,7 @@
         android:orientation="vertical"
         android:padding="@dimen/size_16">
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
             style="@style/MyText.Dialog"
             android:layout_margin="@dimen/size_0"
             android:text="@string/results" />
@@ -24,16 +24,16 @@
 
             <LinearLayout style="@style/MyVG_WrapWrapCenter.WeightVertical">
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     style="@style/MyText.Dialog"
                     android:text="@string/your" />
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     android:id="@+id/mtvCurrentScore"
                     style="@style/MyText.Dialog"
                     android:text="@string/appName" />
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     android:id="@+id/mtvCurrentTime"
                     style="@style/MyText.Dialog"
                     android:text="@string/appName" />
@@ -47,16 +47,16 @@
 
             <LinearLayout style="@style/MyVG_WrapWrapCenter.WeightVertical">
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     style="@style/MyText.Dialog"
                     android:text="@string/best" />
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     android:id="@+id/mtvBestScore"
                     style="@style/MyText.Dialog"
                     android:text="@string/appName" />
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     android:id="@+id/mtvBestTime"
                     style="@style/MyText.Dialog"
                     android:text="@string/appName" />
@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
             android:id="@+id/mtvClearBestResults"
             style="@style/MyText.Dialog"
             android:layout_margin="@dimen/size_0"
@@ -90,7 +90,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     android:id="@+id/mtvNo"
                     style="@style/MyText.Weight"
                     android:background="@drawable/main_button_states"
@@ -102,7 +102,7 @@
                     android:layout_height="match_parent"
                     android:background="@color/primary_light" />
 
-                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
                     android:id="@+id/mtvYes"
                     style="@style/MyText.Weight"
                     android:background="@drawable/main_button_states"

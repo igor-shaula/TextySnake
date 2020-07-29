@@ -1,4 +1,4 @@
-package com.igor.shaula.snake_in_text.activity;
+package com.igor_shaula.texty_snake.v1.activity;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -22,11 +22,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
-import com.igor.shaula.snake_in_text.R;
-import com.igor.shaula.snake_in_text.custom_views.MyTextView;
-import com.igor.shaula.snake_in_text.entity.Snake;
-import com.igor.shaula.snake_in_text.utils.L;
-import com.igor.shaula.snake_in_text.utils.MyPSF;
+import com.igor_shaula.texty_snake.v1.R;
+import com.igor_shaula.texty_snake.v1.custom_views.MyTextView;
+import com.igor_shaula.texty_snake.v1.entity.Snake;
+import com.igor_shaula.texty_snake.v1.utils.L;
+import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -34,7 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Created by igor shaula - main class holding others to avoid too many code lines \
+ * Created by igor_shaula texty_snake - main class holding others to avoid too many code lines \
  */
 public class MainActivity extends AppCompatActivity {
 
