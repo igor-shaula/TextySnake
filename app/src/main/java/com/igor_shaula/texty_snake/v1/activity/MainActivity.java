@@ -10,16 +10,13 @@ import android.text.method.ScrollingMovementMethod;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 
 import com.igor_shaula.texty_snake.v1.R;
@@ -89,11 +86,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(viewBinding.myToolbar);
 
         viewBinding.myToolbar.setContentInsetsAbsolute(0, 0);
-
-        final View myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
-        final Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        viewBinding.myToolbar.addView(myToolbarView, layoutParams);
 
         // setting show-scores-button and set-speed-button \
         MyTextView mtvShowScores = null, mtvSetSpeed = null;
@@ -179,9 +171,7 @@ public class MainActivity extends AppCompatActivity {
         viewBinding.mtvUserGuide.setVisibility(View.GONE);
 
         // revealing the main field to get it ready for playing \
-        final FrameLayout flMain = findViewById(R.id.flMain);
-        assert flMain != null;
-        flMain.setVisibility(View.VISIBLE);
+        viewBinding.flMain.setVisibility(View.VISIBLE);
 
         viewBinding.mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -192,7 +182,7 @@ public class MainActivity extends AppCompatActivity {
                         mFieldPixelWidth = viewBinding.mtvMainField.getWidth();
                         L.i("mFieldPixelWidth " + mFieldPixelWidth);
 
-                        mFieldPixelHeight = flMain.getHeight();
+                        mFieldPixelHeight = viewBinding.flMain.getHeight();
                         L.i("mFieldPixelHeight " + mFieldPixelHeight);
 
                         ViewTreeObserver.OnGlobalLayoutListener listener = this;
