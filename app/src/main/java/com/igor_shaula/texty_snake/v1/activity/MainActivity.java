@@ -2,7 +2,6 @@ package com.igor_shaula.texty_snake.v1.activity;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.text.format.DateFormat;
@@ -50,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
-    private MyTextView mtvScore, mtvTime;
     private ActivityMainBinding viewBinding;
 
     // utils from the system \
@@ -87,28 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
         viewBinding.myToolbar.setContentInsetsAbsolute(0, 0);
 
-        // setting show-scores-button and set-speed-button \
-        MyTextView mtvShowScores = null, mtvSetSpeed = null;
-        // TODO: 30.07.2020 remove these findViewById's and eliminate difference in _L & _P naming
-
-        if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) {
-            mtvShowScores = findViewById(R.id.mtvShowScores_P);
-            mtvSetSpeed = findViewById(R.id.mtvSetSpeed_P);
-        } else if (screenOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mtvShowScores = findViewById(R.id.mtvShowScores_L);
-            mtvSetSpeed = findViewById(R.id.mtvSetSpeed_L);
-        }
-
-        assert mtvShowScores != null;
-        mtvShowScores.setOnClickListener(new View.OnClickListener() {
+        viewBinding.mtvShowScores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showScoresDialog();
             }
         });
 
-        assert mtvSetSpeed != null;
-        mtvSetSpeed.setOnClickListener(new View.OnClickListener() {
+        viewBinding.mtvSetSpeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showSetSpeedDialog();
@@ -124,10 +108,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // initializing other informative views \
-        mtvScore = findViewById(R.id.mtvScore);
-        mtvTime = findViewById(R.id.mtvTime);
-
         // vibrator will be used when eating food or something else happens \
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
@@ -138,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
         mBestScore = sharedPreferences.getInt(MyPSF.KEY_SCORE, 0);
         mBestTime = sharedPreferences.getLong(MyPSF.KEY_TIME, 0);
-    } // end of onCreate-method \\
+    } // onCreate \\
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
@@ -391,8 +371,8 @@ public class MainActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
 
         // setting all elements for this view \
-        MyTextView mtvCurrentScore = dialogView.findViewById(R.id.mtvCurrentScore);
-        MyTextView mtvCurrentTime = dialogView.findViewById(R.id.mtvCurrentTime);
+        final MyTextView mtvCurrentScore = dialogView.findViewById(R.id.mtvCurrentScore);
+        final MyTextView mtvCurrentTime = dialogView.findViewById(R.id.mtvCurrentTime);
         final MyTextView mtvBestScore = dialogView.findViewById(R.id.mtvBestScore);
         final MyTextView mtvBestTime = dialogView.findViewById(R.id.mtvBestTime);
 
@@ -761,7 +741,7 @@ public class MainActivity extends AppCompatActivity {
                 public void run() {
                     updateMainField();
                     String scoreComplex = getString(R.string.score) + mCurrentScore;
-                    mtvScore.setText(scoreComplex);
+                    viewBinding.mtvScore.setText(scoreComplex);
                 }
             });
 
@@ -919,7 +899,7 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    mtvTime.setText(stringToSet);
+                    viewBinding.mtvTime.setText(stringToSet);
                 }
             });
         } // end of run-method \\
