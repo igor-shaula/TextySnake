@@ -24,6 +24,7 @@ import androidx.core.content.ContextCompat;
 
 import com.igor_shaula.texty_snake.v1.R;
 import com.igor_shaula.texty_snake.v1.custom_views.MyTextView;
+import com.igor_shaula.texty_snake.v1.databinding.ActivityMainBinding;
 import com.igor_shaula.texty_snake.v1.entity.Snake;
 import com.igor_shaula.texty_snake.v1.utils.L;
 import com.igor_shaula.texty_snake.v1.utils.MyPSF;
@@ -52,7 +53,8 @@ public class MainActivity extends AppCompatActivity {
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
-    private MyTextView mtvUserGuide, mtvMainField, mtvScore, mtvTime;
+    private MyTextView mtvScore, mtvTime;
+    private ActivityMainBinding viewBinding;
 
     // utils from the system \
     private Vibrator mVibrator;
@@ -77,27 +79,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(viewBinding.getRoot());
 
         // game depends on screen orientation changes \
         int screenOrientation = getResources().getConfiguration().orientation;
 
-        // setting action bar \
-        Toolbar myToolbar = findViewById(R.id.myToolbar);
-        setSupportActionBar(myToolbar);
+        setSupportActionBar(viewBinding.myToolbar);
 
-        assert myToolbar != null;
-        myToolbar.setContentInsetsAbsolute(0, 0);
+        viewBinding.myToolbar.setContentInsetsAbsolute(0, 0);
 
-        View myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
-
-        Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
+        final View myToolbarView = getLayoutInflater().inflate(R.layout.my_toolbar_view, null);
+        final Toolbar.LayoutParams layoutParams = new Toolbar.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-
-        myToolbar.addView(myToolbarView, layoutParams);
+        viewBinding.myToolbar.addView(myToolbarView, layoutParams);
 
         // setting show-scores-button and set-speed-button \
         MyTextView mtvShowScores = null, mtvSetSpeed = null;
+        // TODO: 30.07.2020 remove these findViewById's and eliminate difference in _L & _P naming
 
         if (screenOrientation == Configuration.ORIENTATION_PORTRAIT) {
             mtvShowScores = findViewById(R.id.mtvShowScores_P);
@@ -123,9 +123,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        mtvUserGuide = findViewById(R.id.mtvUserGuide);
-        mtvUserGuide.setMovementMethod(new ScrollingMovementMethod());
-        mtvUserGuide.setOnLongClickListener(new View.OnLongClickListener() {
+        viewBinding.mtvUserGuide.setMovementMethod(new ScrollingMovementMethod());
+        viewBinding.mtvUserGuide.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 initializeGame();
@@ -137,9 +136,6 @@ public class MainActivity extends AppCompatActivity {
         mtvScore = findViewById(R.id.mtvScore);
         mtvTime = findViewById(R.id.mtvTime);
 
-        // defining main game field \
-        mtvMainField = findViewById(R.id.viewMainField);
-
         // vibrator will be used when eating food or something else happens \
         mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
@@ -147,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         mGestureDetector = new GestureDetector(this, new MyGestureListener());
 
         // reading previous achievements from SP \
-        SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
+        final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
         mBestScore = sharedPreferences.getInt(MyPSF.KEY_SCORE, 0);
         mBestTime = sharedPreferences.getLong(MyPSF.KEY_TIME, 0);
     } // end of onCreate-method \\
@@ -180,20 +176,20 @@ public class MainActivity extends AppCompatActivity {
         L.i("initializeGame started");
 
         // hiding the readme - now it's useless \
-        mtvUserGuide.setVisibility(View.GONE);
+        viewBinding.mtvUserGuide.setVisibility(View.GONE);
 
         // revealing the main field to get it ready for playing \
         final FrameLayout flMain = findViewById(R.id.flMain);
         assert flMain != null;
         flMain.setVisibility(View.VISIBLE);
 
-        mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
+        viewBinding.mtvMainField.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
 
                         // getting current screen size in pixels \
-                        mFieldPixelWidth = mtvMainField.getWidth();
+                        mFieldPixelWidth = viewBinding.mtvMainField.getWidth();
                         L.i("mFieldPixelWidth " + mFieldPixelWidth);
 
                         mFieldPixelHeight = flMain.getHeight();
@@ -202,13 +198,13 @@ public class MainActivity extends AppCompatActivity {
                         ViewTreeObserver.OnGlobalLayoutListener listener = this;
                         // now removing the listener - it's not needed any more \
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN)
-                            mtvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
+                            viewBinding.mtvMainField.getViewTreeObserver().removeOnGlobalLayoutListener(listener);
                         else
-                            mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
+                            viewBinding.mtvMainField.getViewTreeObserver().removeGlobalOnLayoutListener(listener);
 
                         // here we get pixel width of a single symbol - initial TextView has only one symbol \
-                        mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                        int measuredSymbolWidth = mtvMainField.getMeasuredWidth();
+                        viewBinding.mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+                        int measuredSymbolWidth = viewBinding.mtvMainField.getMeasuredWidth();
                         L.i("measuredSymbolWidth " + measuredSymbolWidth);
 
                         // getting our first valuable parameter - the size of main array \
@@ -234,11 +230,10 @@ public class MainActivity extends AppCompatActivity {
     private void step_1_prepareTextField() {
 
         // clearing the text field to properly initialize it for game \
-        mtvMainField.setText(null);
+        viewBinding.mtvMainField.setText(null);
 
         // fixing the total height of the line in our main field \
-        assert mtvMainField != null;
-        mtvMainField.setSquareSymbols();
+        viewBinding.mtvMainField.setSquareSymbols();
 
         // now preparing our model and initializing text field \
         int i = 0, measuredTextHeight;
@@ -256,15 +251,15 @@ public class MainActivity extends AppCompatActivity {
             mCharsArrayList.add(i, charArray);
 //            L.i("added " + new String(mCharsArrayList.get(i)));
 
-            String previousText = mtvMainField.getText().toString();
-            String newText = previousText + new String(mCharsArrayList.get(i));
-            mtvMainField.setText(newText);
+            final String previousText = viewBinding.mtvMainField.getText().toString();
+            final String newText = previousText + new String(mCharsArrayList.get(i));
+            viewBinding.mtvMainField.setText(newText);
 //            L.i("newText \n" + newText);
 
             i++;
 
-            mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            measuredTextHeight = mtvMainField.getMeasuredHeight();
+            viewBinding.mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            measuredTextHeight = viewBinding.mtvMainField.getMeasuredHeight();
 //            L.i("measuredTextHeight " + measuredTextHeight);
 
         } while (measuredTextHeight <= mFieldPixelHeight);
@@ -385,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < mFieldLinesCount; i++) {
             newStringToSet.append(mCharsArrayList.get(i));
         }
-        mtvMainField.setText(newStringToSet);
+        viewBinding.mtvMainField.setText(newStringToSet);
     }
 
     private void saveNewBestResults() {
@@ -534,7 +529,7 @@ public class MainActivity extends AppCompatActivity {
             mTimer.cancel();
             mTimer = null;
         }
-        mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.primary_light));
+        viewBinding.mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.primary_light));
     }
 
     private void actionStartGame() {
@@ -543,8 +538,8 @@ public class MainActivity extends AppCompatActivity {
         mGameEnded = false;
 
         int startTextColor = ContextCompat.getColor(getApplicationContext(), android.R.color.white);
-        mtvMainField.setTextColor(startTextColor);
-        mtvMainField.setBackgroundResource(R.color.primary_dark);
+        viewBinding.mtvMainField.setTextColor(startTextColor);
+        viewBinding.mtvMainField.setBackgroundResource(R.color.primary_dark);
         // launching everything \
         int delay; // amount of time for game to wait = realization of speed \
         try {
@@ -589,8 +584,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 int endTextColor = ContextCompat.getColor(MainActivity.this, android.R.color.primary_text_light);
-                mtvMainField.setTextColor(endTextColor);
-                mtvMainField.setBackgroundResource(R.color.primary_light);
+                viewBinding.mtvMainField.setTextColor(endTextColor);
+                viewBinding.mtvMainField.setBackgroundResource(R.color.primary_light);
             }
         });
         L.i("game ended with mCurrentScore " + mCurrentScore);

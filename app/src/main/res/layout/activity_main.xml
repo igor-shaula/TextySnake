@@ -21,7 +21,7 @@
         style="@style/MyFrameLayout">
 
         <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
-            android:id="@+id/viewMainField"
+            android:id="@+id/mtv_main_field"
             style="@style/MyText.Main.Field" />
 
     </FrameLayout>
