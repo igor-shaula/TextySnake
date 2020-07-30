@@ -367,8 +367,7 @@ public class MainActivity extends AppCompatActivity {
         actionPauseGame();
 
         // preparing view for the dialog \
-        @SuppressLint("InflateParams")
-        View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
+        final View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
 
         // setting all elements for this view \
         final MyTextView mtvCurrentScore = dialogView.findViewById(R.id.mtvCurrentScore);
@@ -413,14 +412,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // preparing builder for the dialog \
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
-
         // building and showing the dialog itself \
-        AlertDialog alertDialog = builder.create();
+        final AlertDialog alertDialog = builder.create();
         alertDialog.show();
-
-    } // end of showScoresDialog-method \\
+    } // showScoresDialog \\
 
     private void showSetSpeedDialog() {
 
