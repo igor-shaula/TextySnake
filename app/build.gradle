@@ -5,17 +5,20 @@ android {
     buildToolsVersion "30.0.1"
 
     defaultConfig {
-        applicationId "com.tryings.my.dev_challenge_2016"
+        applicationId "com.igor_shaula.texty_snake.dev_challenge_2016"
         minSdkVersion 14
         targetSdkVersion 30
-        versionCode 1
-        versionName "1.5"
+        versionCode 2
+        versionName "1.5.1"
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    buildFeatures {
+        viewBinding = true
     }
 }
 
