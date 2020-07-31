@@ -2,9 +2,7 @@ package com.igor_shaula.texty_snake.v1.logic;
 
 import android.content.Context;
 import android.text.format.DateFormat;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -43,7 +41,7 @@ public final class GameLogic {
     // definition of the snake model \
     private Snake mSnake;
     private int mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
-    private MyDirections mSnakeDirection;
+    private FourDirections mSnakeDirection, prohibitedDirection;
 
     // game parameters \
     private boolean mGameEnded = false, mGamePausedSwitch = false;
@@ -86,10 +84,10 @@ public final class GameLogic {
         L.i("mFieldPixelHeight " + mFieldPixelHeight);
     }
 
-    public void setSymbolsInFieldLine(int number) {
-        mSymbolsInFieldLine = number;
-        L.i("mSymbolsInFieldLine " + mSymbolsInFieldLine);
-    }
+//    public void setSymbolsInFieldLine(int number) {
+//        mSymbolsInFieldLine = number;
+//        L.i("mSymbolsInFieldLine " + mSymbolsInFieldLine);
+//    }
 
     public void setFieldLinesCount(int i) {
         mFieldLinesCount = i;
@@ -118,7 +116,7 @@ public final class GameLogic {
 
     private void initializeGame() {
         L.i("initializeGame started");
-        changeTextFields();
+        ui.changeTextFields();
         ui.measureAvailableSpace();
     }
 
@@ -129,7 +127,7 @@ public final class GameLogic {
         ui.setMainFieldText(null);
 
         // fixing the total height of the line in our main field \
-        viewBinding.mtvMainField.setSquareSymbols();
+        ui.setMainFieldTextSquareSymbols();
 
         // now preparing our model and initializing text field \
         int i = 0, measuredTextHeight;
@@ -148,15 +146,15 @@ public final class GameLogic {
             setCharArrayList(mCharsArrayList);
 //            L.i("added " + new String(mCharsArrayList.get(i)));
 
-            final String previousText = viewBinding.mtvMainField.getText().toString();
+            final String previousText = ui.getMainFieldText();
             final String newText = previousText + new String(mCharsArrayList.get(i));
-            viewBinding.mtvMainField.setText(newText);
+            ui.setMainFieldText(newText);
 //            L.i("newText \n" + newText);
 
             i++;
 
-            viewBinding.mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-            measuredTextHeight = viewBinding.mtvMainField.getMeasuredHeight();
+            ui.measureMainField();
+            measuredTextHeight = ui.getMainFieldHeight();
 //            L.i("measuredTextHeight " + measuredTextHeight);
 
         } while (measuredTextHeight <= mFieldPixelHeight);
@@ -179,16 +177,16 @@ public final class GameLogic {
         // defining start directions to properly set up the mSnake \
         switch (mRandom.nextInt(3) + 1) {
             case 0:
-                mSnakeDirection = MyDirections.RIGHT;
+                mSnakeDirection = FourDirections.RIGHT;
                 break;
             case 1:
-                mSnakeDirection = MyDirections.UP;
+                mSnakeDirection = FourDirections.UP;
                 break;
             case 2:
-                mSnakeDirection = MyDirections.LEFT;
+                mSnakeDirection = FourDirections.LEFT;
                 break;
             case 3:
-                mSnakeDirection = MyDirections.DOWN;
+                mSnakeDirection = FourDirections.DOWN;
         }
 
         for (int i = 0; i < MyPSF.STARTING_SNAKE_LENGTH; i++) {
@@ -275,7 +273,7 @@ public final class GameLogic {
         for (int i = 0; i < mFieldLinesCount; i++) {
             newStringToSet.append(mCharsArrayList.get(i));
         }
-        viewBinding.mtvMainField.setText(newStringToSet);
+        ui.setMainFieldText(newStringToSet.toString());
     }
 
     public void saveNewBestResults() {
@@ -300,7 +298,7 @@ public final class GameLogic {
             mTimer.cancel();
             mTimer = null;
         }
-        viewBinding.mtvMainField.setTextColor(ContextCompat.getColor(ui.getApplicationContext(), R.color.primary_light));
+        ui.setMainFieldTextColor(ContextCompat.getColor(ui.getApplicationContext(), R.color.primary_light));
     }
 
     public void actionStartGame() {
@@ -309,8 +307,8 @@ public final class GameLogic {
         mGameEnded = false;
 
         int startTextColor = ContextCompat.getColor(ui.getApplicationContext(), android.R.color.white);
-        viewBinding.mtvMainField.setTextColor(startTextColor);
-        viewBinding.mtvMainField.setBackgroundResource(R.color.primary_dark);
+        ui.setMainFieldTextColor(startTextColor);
+        ui.setMFTBackgroundResource(R.color.primary_dark);
         // launching everything \
         int delay; // amount of time for game to wait = realization of speed \
         try {
@@ -355,18 +353,11 @@ public final class GameLogic {
             @Override
             public void run() {
                 int endTextColor = ContextCompat.getColor(ui, android.R.color.primary_text_light);
-                viewBinding.mtvMainField.setTextColor(endTextColor);
-                viewBinding.mtvMainField.setBackgroundResource(R.color.primary_light);
+                ui.setMainFieldTextColor(endTextColor);
+                ui.setMFTBackgroundResource(R.color.primary_light);
             }
         });
         L.i("game ended with mCurrentScore " + mCurrentScore);
-    }
-
-    public void changeTextFields() {
-        // hiding the readme - now it's useless \
-        viewBinding.mtvUserGuide.setVisibility(View.GONE);
-        // revealing the main field to get it ready for playing \
-        viewBinding.flMain.setVisibility(View.VISIBLE);
     }
 
     public int getCurrentScore() {
@@ -393,110 +384,91 @@ public final class GameLogic {
         mSnakeSpeed = newSnakeSpeed;
     }
 
-    // MOVEMENT ========================================================================================
+    public void onDoubleTap() {
+        L.i("onDoubleTap - start / pause");
+        L.i("mGamePausedSwitch = " + mGamePausedSwitch);
+        L.i("mGameEnded = " + mGameEnded);
 
-    public enum MyDirections {RIGHT, UP, LEFT, DOWN}
+        // 1 - prepare new field after game over \
+        if (mGameEnded) prepareGameIn4Steps();
 
-    public static class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        // 2 - pause or continue game \
+        if (!mGamePausedSwitch)
+            actionPauseGame();
+        else actionStartGame();
+    }
 
-        MyDirections prohibitedDirection;
+    public void onLongPress() {
+        L.i("onLongPress - full restart from zero");
+        L.i("mGamePausedSwitch = " + mGamePausedSwitch);
+        L.i("mGameEnded = " + mGameEnded);
 
-        @Override
-        public boolean onDoubleTap(MotionEvent e) {
-            L.i("onDoubleTap - start / pause");
-            L.i("mGamePausedSwitch = " + mGamePausedSwitch);
-            L.i("mGameEnded = " + mGameEnded);
+        ui.vibrate();
 
-            // 1 - prepare new field after game over \
-            if (mGameEnded) prepareGameIn4Steps();
+        actionEndGame();
+        mCurrentScore = 0;
 
-            // 2 - pause or continue game \
-            if (!mGamePausedSwitch)
-                actionPauseGame();
-            else actionStartGame();
+        // 1 - preparing the field for the new game \
+        prepareGameIn4Steps();
 
-            return super.onDoubleTap(e);
-        }
+        // 2 - restarting the game \
+        actionStartGame();
+    }
 
-        @Override
-        public void onLongPress(MotionEvent e) {
-            L.i("onLongPress - full restart from zero");
-            L.i("mGamePausedSwitch = " + mGamePausedSwitch);
-            L.i("mGameEnded = " + mGameEnded);
-
-            vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
-
-            actionEndGame();
-            mCurrentScore = 0;
-
-            // 1 - preparing the field for the new game \
-            prepareGameIn4Steps();
-
-            // 2 - restarting the game \
-            actionStartGame();
-
-            super.onLongPress(e);
-        }
-
-        @Override
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-
-            // detecting current direction for desired move \
-            if (Math.abs(e2.getX() - e1.getX()) > Math.abs(e2.getY() - e1.getY()))
-                if (isLeftMove(velocityX, velocityY)) {
-                    L.i("turned left");
-                    mSnakeDirection = MyDirections.LEFT;
-                } else {
-                    L.i("turned right");
-                    mSnakeDirection = MyDirections.RIGHT;
-                }
-            else { // moving along Y-axis was more noticeable than along X-axis \
-                if (isUpMove(velocityX, velocityY)) {
-                    L.i("turned up");
-                    mSnakeDirection = MyDirections.UP;
-                } else {
-                    L.i("turned down");
-                    mSnakeDirection = MyDirections.DOWN;
-                }
+    public void onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        // detecting current direction for desired move \
+        if (Math.abs(e2.getX() - e1.getX()) > Math.abs(e2.getY() - e1.getY()))
+            if (isLeftMove(velocityX, velocityY)) {
+                L.i("turned left");
+                mSnakeDirection = FourDirections.LEFT;
+            } else {
+                L.i("turned right");
+                mSnakeDirection = FourDirections.RIGHT;
             }
-
-            // checking if direction is not reversed as before \
-            if (mSnakeDirection == prohibitedDirection)
-                mSnakeDirection = null;
-            else
-                // saving current last direction conditions for the next swipe \
-                switch (mSnakeDirection) {
-                    case LEFT:
-                        prohibitedDirection = MyDirections.RIGHT;
-                        break;
-                    case RIGHT:
-                        prohibitedDirection = MyDirections.LEFT;
-                        break;
-                    case UP:
-                        prohibitedDirection = MyDirections.DOWN;
-                        break;
-                    case DOWN:
-                        prohibitedDirection = MyDirections.UP;
-                        break;
-                }
-
-            return super.onFling(e1, e2, velocityX, velocityY);
+        else { // moving along Y-axis was more noticeable than along X-axis \
+            if (isUpMove(velocityX, velocityY)) {
+                L.i("turned up");
+                mSnakeDirection = FourDirections.UP;
+            } else {
+                L.i("turned down");
+                mSnakeDirection = FourDirections.DOWN;
+            }
         }
 
-        private boolean isLeftMove(float velocityX, float velocityY) {
-            return velocityX < 0 // determining the LEFT direction of the swipe \
+        // checking if direction is not reversed as before \
+        if (mSnakeDirection == prohibitedDirection)
+            mSnakeDirection = null;
+        else
+            // saving current last direction conditions for the next swipe \
+            switch (mSnakeDirection) {
+                case LEFT:
+                    prohibitedDirection = FourDirections.RIGHT;
+                    break;
+                case RIGHT:
+                    prohibitedDirection = FourDirections.LEFT;
+                    break;
+                case UP:
+                    prohibitedDirection = FourDirections.DOWN;
+                    break;
+                case DOWN:
+                    prohibitedDirection = FourDirections.UP;
+                    break;
+            }
+    }
+
+    private boolean isLeftMove(float velocityX, float velocityY) {
+        return velocityX < 0 // determining the LEFT direction of the swipe \
 //                    && absDeltaX > absDeltaY // assuring that this swipe was more along X-axis than along Y \
-                    && Math.abs(velocityX) > Math.abs(velocityY); // checking if we're right completely \
-        }
+                && Math.abs(velocityX) > Math.abs(velocityY); // checking if we're right completely \
+    }
 
-        private boolean isUpMove(float velocityX, float velocityY) {
-            return velocityY < 0 // determining the UP direction of the swipe \
+    private boolean isUpMove(float velocityX, float velocityY) {
+        return velocityY < 0 // determining the UP direction of the swipe \
 //                    && absDeltaX < absDeltaY // assuring that this swipe was more along Y-axis than along X \
-                    && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
-        }
-    } // end of MyGestureListener-class \\
+                && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
+    }
 
-    // TIMER CLASSES ===================================================================================
+    // TIMER CLASSES ===============================================================================
 
     // special class defined for repeating operations and usage of Timer \
     private class SnakeMoveTimerTask extends TimerTask {
@@ -573,7 +545,7 @@ public final class GameLogic {
                 public void run() {
                     updateMainField();
                     String scoreComplex = ui.getString(R.string.score) + mCurrentScore;
-                    viewBinding.mtvScore.setText(scoreComplex);
+                    ui.setScoreText(scoreComplex);
                 }
             });
 
@@ -594,7 +566,7 @@ public final class GameLogic {
 
         private void eatFood() {
             // user must be happy with such a vibration :)
-            vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
+            ui.vibrate();
 
             int cellPositionX, cellPositionY;
             Snake.SnakeCell currentCell;
@@ -650,7 +622,7 @@ public final class GameLogic {
             }
         } // end of eatFood-method \
 
-        private int shiftAfterFood(MyDirections direction, boolean isForX) {
+        private int shiftAfterFood(FourDirections direction, boolean isForX) {
             if (isForX)
                 switch (direction) {
                     case RIGHT: // to right - for X
@@ -731,7 +703,7 @@ public final class GameLogic {
             ui.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    viewBinding.mtvTime.setText(stringToSet);
+                    ui.setTimeText(stringToSet);
                 }
             });
         } // end of run-method \\

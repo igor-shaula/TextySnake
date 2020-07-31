@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
         vibratorService = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         // now setting the top - gesture sensitive interface \
-        gestureDetector = new GestureDetector(this, new GameLogic.MyGestureListener());
+        gestureDetector = new GestureDetector(this, new MyGestureListener());
 
         // reading previous achievements from SP \
         final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
@@ -274,10 +274,76 @@ public class MainActivity extends AppCompatActivity {
                 alertDialog.dismiss();
             }
         });
+    } // showSetSpeedDialog \\
 
-    } // end of showSetSpeedDialog-method \\
+    public void changeTextFields() {
+        // hiding the readme - now it's useless \
+        viewBinding.mtvUserGuide.setVisibility(View.GONE);
+        // revealing the main field to get it ready for playing \
+        viewBinding.flMain.setVisibility(View.VISIBLE);
+    }
 
     public void setMainFieldText(@Nullable String text) {
         viewBinding.mtvMainField.setText(text);
     }
+
+    public void setMainFieldTextSquareSymbols() {
+        viewBinding.mtvMainField.setSquareSymbols();
+    }
+
+    @NonNull
+    public String getMainFieldText() {
+        return viewBinding.mtvMainField.getText().toString();
+    }
+
+    public void measureMainField() {
+        viewBinding.mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+    }
+
+    public int getMainFieldHeight() {
+        return viewBinding.mtvMainField.getMeasuredHeight();
+    }
+
+    public void setMainFieldTextColor(int color) {
+        viewBinding.mtvMainField.setTextColor(color);
+    }
+
+    public void setMFTBackgroundResource(int colorId) {
+        viewBinding.mtvMainField.setBackgroundResource(colorId);
+    }
+
+    public void setScoreText(@NonNull String scoreComplex) {
+        viewBinding.mtvScore.setText(scoreComplex);
+    }
+
+    public void setTimeText(@NonNull String stringToSet) {
+        viewBinding.mtvTime.setText(stringToSet);
+    }
+
+    public void vibrate() {
+        vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
+    }
+
+    // MOVEMENT ====================================================================================
+
+    public class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            logic.onDoubleTap();
+            return super.onDoubleTap(e);
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            logic.onLongPress();
+            super.onLongPress(e);
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            logic.onFling(e1, e2, velocityX, velocityY);
+            return super.onFling(e1, e2, velocityX, velocityY);
+        }
+    } // MyGestureListener \\
 }
