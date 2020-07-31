@@ -1,4 +1,4 @@
-package com.igor_shaula.texty_snake.v1.activity;
+package com.igor_shaula.texty_snake.v1.ui;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.igor_shaula.texty_snake.v1.R;
 import com.igor_shaula.texty_snake.v1.custom_views.MyTextView;
@@ -39,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
             {MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS, MyPSF.LENGTH_PLUS,
                     MyPSF.LENGTH_MINUS, MyPSF.SPEED_SLOW, MyPSF.SPEED_UP};
 
+    private MainViewModel viewModel;
+
     // definition of the field \
     private char mFoodType;
     private int mFoodPositionRow, mFoodPositionSymbol;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding viewBinding;
 
     // utils from the system \
-    private Vibrator mVibrator;
+    private Vibrator vibratorService;
     private Random mRandom = new Random();
     private Timer mTimer;
 
@@ -63,10 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
     // game parameters \
     private boolean mGameEnded = false, mGamePausedSwitch = false;
-    private int mCurrentScore, mBestScore;
-    private long mCurrentTime, mBestTime;
+    private int mCurrentScore, bestScore;
+    private long mCurrentTime, bestTime;
 
-    private GestureDetector mGestureDetector;
+    private GestureDetector gestureDetector;
 
     // LIFECYCLE ===================================================================================
 
@@ -77,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
 
         viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
-
-        // game depends on screen orientation changes \
-        int screenOrientation = getResources().getConfiguration().orientation;
 
         setSupportActionBar(viewBinding.myToolbar);
 
@@ -109,21 +109,25 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // vibrator will be used when eating food or something else happens \
-        mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        vibratorService = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         // now setting the top - gesture sensitive interface \
-        mGestureDetector = new GestureDetector(this, new MyGestureListener());
+        gestureDetector = new GestureDetector(this, new MyGestureListener());
 
         // reading previous achievements from SP \
         final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
-        mBestScore = sharedPreferences.getInt(MyPSF.KEY_SCORE, 0);
-        mBestTime = sharedPreferences.getLong(MyPSF.KEY_TIME, 0);
+        bestScore = sharedPreferences.getInt(MyPSF.KEY_SCORE, 0);
+        bestTime = sharedPreferences.getLong(MyPSF.KEY_TIME, 0);
+
+        final ViewModelProvider.Factory factory =
+                ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
+        viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
     } // onCreate \\
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         L.l("onTouchEvent");
-        return mGestureDetector.onTouchEvent(motionEvent);
+        return gestureDetector.onTouchEvent(motionEvent);
     }
 
     // SAVE_RESTORE ================================================================================
@@ -357,8 +361,8 @@ public class MainActivity extends AppCompatActivity {
         getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE)
                 .edit()
                 .clear()
-                .putInt(MyPSF.KEY_SCORE, mBestScore)
-                .putLong(MyPSF.KEY_TIME, mBestTime)
+                .putInt(MyPSF.KEY_SCORE, bestScore)
+                .putLong(MyPSF.KEY_TIME, bestTime)
                 .apply();
     }
 
@@ -377,8 +381,8 @@ public class MainActivity extends AppCompatActivity {
 
         mtvCurrentScore.setText(String.valueOf(mCurrentScore));
         mtvCurrentTime.setText(DateFormat.format("mm:ss", mCurrentTime));
-        mtvBestScore.setText(String.valueOf(mBestScore));
-        mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
+        mtvBestScore.setText(String.valueOf(bestScore));
+        mtvBestTime.setText(DateFormat.format("mm:ss", bestTime));
 
         final MyTextView mtvClearBestResults = dialogView.findViewById(R.id.mtvClearBestResults);
         final LinearLayout llHidden = dialogView.findViewById(R.id.llHidden);
@@ -389,10 +393,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.mtvYes) { // other button just hides this view again \
-                    mBestScore = 0;
-                    mBestTime = 0;
-                    mtvBestScore.setText(String.valueOf(mBestScore));
-                    mtvBestTime.setText(DateFormat.format("mm:ss", mBestTime));
+                    bestScore = 0;
+                    bestTime = 0;
+                    mtvBestScore.setText(String.valueOf(bestScore));
+                    mtvBestTime.setText(DateFormat.format("mm:ss", bestTime));
                     saveNewBestResults();
                 }
                 llHidden.setVisibility(View.GONE); // click at NO-button is done by this line \
@@ -538,11 +542,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // checking if current result is the best \
-        if (mCurrentScore > mBestScore || mCurrentTime > mBestTime) {
-            if (mCurrentScore > mBestScore)
-                mBestScore = mCurrentScore;
-            if (mCurrentTime > mBestTime)
-                mBestTime = mCurrentTime;
+        if (mCurrentScore > bestScore || mCurrentTime > bestTime) {
+            if (mCurrentScore > bestScore)
+                bestScore = mCurrentScore;
+            if (mCurrentTime > bestTime)
+                bestTime = mCurrentTime;
             saveNewBestResults();
         }
 
@@ -589,7 +593,7 @@ public class MainActivity extends AppCompatActivity {
             L.i("mGamePausedSwitch = " + mGamePausedSwitch);
             L.i("mGameEnded = " + mGameEnded);
 
-            mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
+            vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
 
             actionEndGame();
             mCurrentScore = 0;
@@ -759,7 +763,7 @@ public class MainActivity extends AppCompatActivity {
 
         private void eatFood() {
             // user must be happy with such a vibration :)
-            mVibrator.vibrate(MyPSF.SHORT_VIBRATION);
+            vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
 
             int cellPositionX, cellPositionY;
             Snake.SnakeCell currentCell;
