@@ -23,7 +23,6 @@ import androidx.lifecycle.ViewModelProvider;
 import com.igor_shaula.texty_snake.v1.R;
 import com.igor_shaula.texty_snake.v1.custom_views.MyTextView;
 import com.igor_shaula.texty_snake.v1.databinding.ActivityMainBinding;
-import com.igor_shaula.texty_snake.v1.logic.GameLogic;
 import com.igor_shaula.texty_snake.v1.utils.L;
 import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
@@ -33,12 +32,9 @@ import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel viewModel;
-    private GameLogic logic;
     private ActivityMainBinding viewBinding;
 
-    // utils from the system \
     private Vibrator vibratorService;
-
     private GestureDetector gestureDetector;
 
     // STANDARD CALLBACKS ==========================================================================
@@ -48,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final ViewModelProvider.Factory factory =
+                ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
+        viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
+
         viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
 
@@ -55,19 +55,17 @@ public class MainActivity extends AppCompatActivity {
 
         viewBinding.myToolbar.setContentInsetsAbsolute(0, 0);
 
-        logic = new GameLogic(this);
-
         viewBinding.mtvShowScores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                logic.onShowScoresClick();
+                viewModel.onShowScoresClick();
             }
         });
 
         viewBinding.mtvSetSpeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                logic.onSetSpeedClick();
+                viewModel.onSetSpeedClick();
             }
         });
 
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         viewBinding.mtvUserGuide.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                logic.onUserGuideLongClick();
+                viewModel.onUserGuideLongClick();
                 return false;
             }
         });
@@ -88,12 +86,8 @@ public class MainActivity extends AppCompatActivity {
 
         // reading previous achievements from SP \
         final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
-        logic.setBestScore(sharedPreferences.getInt(MyPSF.KEY_SCORE, 0));
-        logic.setBestTime(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
-
-        final ViewModelProvider.Factory factory =
-                ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
-        viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
+        viewModel.setBestScore(sharedPreferences.getInt(MyPSF.KEY_SCORE, 0));
+        viewModel.setBestTime(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
     } // onCreate \\
 
     @Override
@@ -124,8 +118,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onGlobalLayout() {
 
                         // getting current screen size in pixels \
-                        logic.setFieldPixelWidth(viewBinding.mtvMainField.getWidth());
-                        logic.setFieldPixelHeight(viewBinding.flMain.getHeight());
+                        viewModel.setFieldPixelWidth(viewBinding.mtvMainField.getWidth());
+                        viewModel.setFieldPixelHeight(viewBinding.flMain.getHeight());
 
                         // TODO: 31.07.2020 investigate if it's safe to remove the following block
                         final ViewTreeObserver.OnGlobalLayoutListener listener = this;
@@ -141,18 +135,18 @@ public class MainActivity extends AppCompatActivity {
                         L.i("measuredSymbolWidth " + measuredSymbolWidth);
 
                         // getting our first valuable parameter - the size of main array \
-                        logic.detectSymbolsInFieldLine(measuredSymbolWidth);
+                        viewModel.detectSymbolsInFieldLine(measuredSymbolWidth);
 //                        logic.setSymbolsInFieldLine(mFieldPixelWidth / measuredSymbolWidth);
 
-                        logic.prepareGameIn4Steps();
-                        logic.actionStartGame();
+                        viewModel.prepareGameIn4Steps();
+                        viewModel.actionStartGame();
                     }
                 });
     } // measureAvailableSpace \\
 
     public void showScoresDialog() {
 
-        logic.actionPauseGame();
+        viewModel.actionPauseGame();
 
         // preparing view for the dialog \
         final View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
@@ -163,10 +157,10 @@ public class MainActivity extends AppCompatActivity {
         final MyTextView mtvBestScore = dialogView.findViewById(R.id.mtvBestScore);
         final MyTextView mtvBestTime = dialogView.findViewById(R.id.mtvBestTime);
 
-        mtvCurrentScore.setText(String.valueOf(logic.getCurrentScore()));
-        mtvCurrentTime.setText(DateFormat.format("mm:ss", logic.getCurrentTime()));
-        mtvBestScore.setText(String.valueOf(logic.getBestScore()));
-        mtvBestTime.setText(DateFormat.format("mm:ss", logic.getBestTime()));
+        mtvCurrentScore.setText(String.valueOf(viewModel.getCurrentScore()));
+        mtvCurrentTime.setText(DateFormat.format("mm:ss", viewModel.getCurrentTime()));
+        mtvBestScore.setText(String.valueOf(viewModel.getBestScore()));
+        mtvBestTime.setText(DateFormat.format("mm:ss", viewModel.getBestTime()));
 
         final MyTextView mtvClearBestResults = dialogView.findViewById(R.id.mtvClearBestResults);
         final LinearLayout llHidden = dialogView.findViewById(R.id.llHidden);
@@ -177,10 +171,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.mtvYes) { // other button just hides this view again \
-                    logic.setBestScore(0);
-                    logic.setBestTime(0);
-                    mtvBestScore.setText(String.valueOf(logic.getBestScore()));
-                    mtvBestTime.setText(DateFormat.format("mm:ss", logic.getBestTime()));
+                    viewModel.setBestScore(0);
+                    viewModel.setBestTime(0);
+                    mtvBestScore.setText(String.valueOf(viewModel.getBestScore()));
+                    mtvBestTime.setText(DateFormat.format("mm:ss", viewModel.getBestTime()));
                     saveNewBestResults(0, 0);
                 }
                 llHidden.setVisibility(View.GONE); // click at NO-button is done by this line \
@@ -209,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showSetSpeedDialog() {
 
-        logic.actionPauseGame();
+        viewModel.actionPauseGame();
 
         // preparing view for the dialog \
         @SuppressLint("InflateParams")
@@ -238,9 +232,9 @@ public class MainActivity extends AppCompatActivity {
                 R.id.mrb9
         };
         try {
-            rgSpeed.check(radioButtons[logic.getSnakeSpeed() - 1]);
+            rgSpeed.check(radioButtons[viewModel.getSnakeSpeed() - 1]);
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-            L.i("ArrayIndexOutOfBoundsException: mSnakeSpeed = " + logic.getSnakeSpeed());
+            L.i("ArrayIndexOutOfBoundsException: mSnakeSpeed = " + viewModel.getSnakeSpeed());
         }
         rgSpeed.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -268,7 +262,7 @@ public class MainActivity extends AppCompatActivity {
                         newSnakeSpeed++;
                 }
                 L.i("newSnakeSpeed = " + newSnakeSpeed);
-                logic.setSnakeSpeed(newSnakeSpeed);
+                viewModel.setSnakeSpeed(newSnakeSpeed);
 
                 alertDialog.dismiss();
             }
@@ -342,19 +336,19 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            logic.onDoubleTap();
+            viewModel.onDoubleTap();
             return super.onDoubleTap(e);
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
-            logic.onLongPress();
+            viewModel.onLongPress();
             super.onLongPress(e);
         }
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            logic.onFling(e1, e2, velocityX, velocityY);
+            viewModel.onFling(e1, e2, velocityX, velocityY);
             return super.onFling(e1, e2, velocityX, velocityY);
         }
     } // MyGestureListener \\

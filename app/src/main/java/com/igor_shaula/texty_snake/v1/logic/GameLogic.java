@@ -47,7 +47,7 @@ public final class GameLogic {
     private int mCurrentScore, bestScore;
     private long mCurrentTime, bestTime;
 
-    @NonNull
+    //    @NonNull
     private MainActivity ui;
 
     // TODO: 31.07.2020 replace passing MainActivity here by an interface - avoid direct linking
@@ -437,6 +437,10 @@ public final class GameLogic {
         return velocityY < 0 // determining the UP direction of the swipe \
 //                    && absDeltaX < absDeltaY // assuring that this swipe was more along Y-axis than along X \
                 && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
+    }
+
+    public void clearUiLink() {
+        ui = null;
     }
 
     // TIMER CLASSES ===============================================================================
