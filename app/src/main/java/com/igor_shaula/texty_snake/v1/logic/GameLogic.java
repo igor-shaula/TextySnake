@@ -1,6 +1,5 @@
 package com.igor_shaula.texty_snake.v1.logic;
 
-import android.content.Context;
 import android.text.format.DateFormat;
 import android.view.MotionEvent;
 
@@ -58,14 +57,6 @@ public final class GameLogic {
 
     // SETTERS =====================================================================================
 
-    public void onShowScoresClick() {
-        ui.showScoresDialog();
-    }
-
-    public void onSetSpeedClick() {
-        ui.showSetSpeedDialog();
-    }
-
     public void setBestScore(int bestScore) {
         this.bestScore = bestScore;
     }
@@ -84,281 +75,11 @@ public final class GameLogic {
         L.i("mFieldPixelHeight " + mFieldPixelHeight);
     }
 
-//    public void setSymbolsInFieldLine(int number) {
-//        mSymbolsInFieldLine = number;
-//        L.i("mSymbolsInFieldLine " + mSymbolsInFieldLine);
-//    }
-
-    public void setFieldLinesCount(int i) {
-        mFieldLinesCount = i;
-        L.i("mFieldLinesCount " + mFieldLinesCount);
-    }
-
-    public void setCharArrayList(@NonNull ArrayList<char[]> mCharsArrayList) {
-        this.mCharsArrayList = mCharsArrayList;
+    public void setSnakeSpeed(int newSnakeSpeed) {
+        mSnakeSpeed = newSnakeSpeed;
     }
 
     // GETTERS =====================================================================================
-
-    public void onUserGuideLongClick() {
-        initializeGame();
-    }
-
-    // main repeatable sequence of steps \
-    public void prepareGameIn4Steps() {
-        step_1_prepareTextField(); // 1
-        step_2_setFieldBorders(); // 2
-        step_3_setInitialSnake(); // 3
-        step_4_setInitialFood(); // 4
-    }
-
-    // PRIVATE =====================================================================================
-
-    private void initializeGame() {
-        L.i("initializeGame started");
-        ui.changeTextFields();
-        ui.measureAvailableSpace();
-    }
-
-    // 2 - from onGlobalLayout-method
-    public void step_1_prepareTextField() {
-
-        // clearing the text field to properly initialize it for game \
-        ui.setMainFieldText(null);
-
-        // fixing the total height of the line in our main field \
-        ui.setMainFieldTextSquareSymbols();
-
-        // now preparing our model and initializing text field \
-        int i = 0, measuredTextHeight;
-        mCharsArrayList = new ArrayList<>();
-        do {
-            // filling up out TextView to measure its lines and set initial state at once \
-            char[] charArray = new char[mSymbolsInFieldLine + 1];
-            // setting end element for a new line on the next array \
-            charArray[mSymbolsInFieldLine] = '\n';
-            // setting other elements to their default values \
-            for (int j = 0; j < mSymbolsInFieldLine; j++) {
-                charArray[j] = MyPSF.SPACE;
-            }
-            // now single char array is ready and has to be added to the list \
-            mCharsArrayList.add(i, charArray);
-            setCharArrayList(mCharsArrayList);
-//            L.i("added " + new String(mCharsArrayList.get(i)));
-
-            final String previousText = ui.getMainFieldText();
-            final String newText = previousText + new String(mCharsArrayList.get(i));
-            ui.setMainFieldText(newText);
-//            L.i("newText \n" + newText);
-
-            i++;
-
-            ui.measureMainField();
-            measuredTextHeight = ui.getMainFieldHeight();
-//            L.i("measuredTextHeight " + measuredTextHeight);
-
-        } while (measuredTextHeight <= mFieldPixelHeight);
-
-        setFieldLinesCount(i);
-    } // step_1_prepareTextField \\
-
-    private void step_2_setFieldBorders() {
-        for (int i = 0; i < mFieldLinesCount; i++)
-            for (int j = 0; j < mSymbolsInFieldLine; j++)
-                if (i == 0 || i == mFieldLinesCount - 1 || j == 0 || j == mSymbolsInFieldLine - 1)
-                    mCharsArrayList.get(i)[j] = MyPSF.BORDER;
-    }
-
-    // 3 - from onGlobalLayout-method
-    private void step_3_setInitialSnake() {
-
-        mSnake = new Snake();
-
-        // defining start directions to properly set up the mSnake \
-        switch (mRandom.nextInt(3) + 1) {
-            case 0:
-                mSnakeDirection = FourDirections.RIGHT;
-                break;
-            case 1:
-                mSnakeDirection = FourDirections.UP;
-                break;
-            case 2:
-                mSnakeDirection = FourDirections.LEFT;
-                break;
-            case 3:
-                mSnakeDirection = FourDirections.DOWN;
-        }
-
-        for (int i = 0; i < MyPSF.STARTING_SNAKE_LENGTH; i++) {
-            // here we define position of every mSnake's cell \
-            int cellPositionX = 0, cellPositionY = 0;
-            // setting tail in the opposite direction here - to free space for head \
-            switch (mSnakeDirection) {
-                case RIGHT: {
-                    cellPositionX = mSymbolsInFieldLine / 2 - i;
-                    cellPositionY = mFieldLinesCount / 2;
-                    break;
-                }
-                case UP: {
-                    cellPositionX = mSymbolsInFieldLine / 2;
-                    cellPositionY = mFieldLinesCount / 2 + i;
-                    break;
-                }
-                case LEFT: {
-                    cellPositionX = mSymbolsInFieldLine / 2 + i;
-                    cellPositionY = mFieldLinesCount / 2;
-                    break;
-                }
-                case DOWN: {
-                    cellPositionX = mSymbolsInFieldLine / 2;
-                    cellPositionY = mFieldLinesCount / 2 - i;
-                    break;
-                }
-            }
-            // now it is time to create new mSnake cell \
-            Snake.SnakeCell newCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
-            // updating the mSnake's model \
-            mSnake.addCell(i, newCell);
-            // placing the this mSnake cell to our field \
-            mCharsArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SNAKE;
-        } // end of for-loop
-        updateMainField();
-    } // end of step_3_setInitialSnake-method \\
-
-    // 4 - from onGlobalLayout-method
-    private void step_4_setInitialFood() {
-        updateFood();
-        updateMainField();
-    } // end of step_4_setInitialFood-method \\
-
-    // UTILS =======================================================================================
-
-    private void updateFood() {
-/*
-        this method gets called after the mSnake is initialized -so we have to check collisions \
-        i decided to do all in one cycle because of low probability of collisions \
-*/
-        // first of all clearing old place \
-        char replaceToSpace = mCharsArrayList.get(mOldFoodPositionY)[mOldFoodPositionX];
-        if (replaceToSpace != MyPSF.BORDER) // this might happen at the very start \
-            mCharsArrayList.get(mOldFoodPositionY)[mOldFoodPositionX] = MyPSF.SPACE;
-        // now everything is clear and we can set new food type and position \
-        do {
-            /*
-            range for mRandom:
-            decreased by 2 to exclude visible field borders \
-            again decreased by 2 to exclude near-border dangerous positions \
-            increased by 1 to include the whole range of values because of method specifics \
-            */
-            mFoodPositionRow = mRandom.nextInt(mFieldLinesCount - 2 - 2) + 1;
-            mFoodPositionSymbol = mRandom.nextInt(mSymbolsInFieldLine - 2 - 2) + 1;
-            // -1 instead of +1 just to avoid placing food on the boards \
-            L.i("mRandom mFoodPositionRow " + mFoodPositionRow);
-            L.i("mRandom mFoodPositionSymbol " + mFoodPositionSymbol);
-        } while (mCharsArrayList.get(mFoodPositionRow)[mFoodPositionSymbol] == MyPSF.SNAKE);
-
-        mOldFoodPositionX = mFoodPositionSymbol;
-        mOldFoodPositionY = mFoodPositionRow;
-
-        mFoodType = mFoodTypeArray[mRandom.nextInt(mFoodTypeArray.length)];
-
-        // subtracting 1 because we know that these are indexes - counted from zero \
-        mCharsArrayList.get(mFoodPositionRow)[mFoodPositionSymbol] = mFoodType;
-//        mCharsArrayList.get(mFoodPositionRow - 1)[mFoodPositionSymbol - 1] = FOOD;
-    }
-
-    private void updateMainField() {
-
-        final StringBuilder newStringToSet = new StringBuilder();
-        for (int i = 0; i < mFieldLinesCount; i++) {
-            newStringToSet.append(mCharsArrayList.get(i));
-        }
-        ui.setMainFieldText(newStringToSet.toString());
-    }
-
-    public void saveNewBestResults() {
-        ui.getSharedPreferences(MyPSF.S_P_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .clear()
-                .putInt(MyPSF.KEY_SCORE, bestScore)
-                .putLong(MyPSF.KEY_TIME, bestTime)
-                .apply();
-    }
-
-    public void detectSymbolsInFieldLine(int measuredSymbolWidth) {
-        mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
-    }
-
-
-    public void actionPauseGame() {
-
-        mGamePausedSwitch = true;
-
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
-        ui.setMainFieldTextColor(ContextCompat.getColor(ui.getApplicationContext(), R.color.primary_light));
-    }
-
-    public void actionStartGame() {
-
-        mGamePausedSwitch = false;
-        mGameEnded = false;
-
-        int startTextColor = ContextCompat.getColor(ui.getApplicationContext(), android.R.color.white);
-        ui.setMainFieldTextColor(startTextColor);
-        ui.setMFTBackgroundResource(R.color.primary_dark);
-        // launching everything \
-        int delay; // amount of time for game to wait = realization of speed \
-        try {
-            delay = 500 / mSnakeSpeed;
-        } catch (ArithmeticException ae) {
-            L.i("ArithmeticException with delay = 500 / 0: mSnakeSpeed = 0");
-            actionEndGame();
-            return;
-        }
-        mTimer = new Timer();
-        mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
-        mTimer.schedule(new TimeUpdateTimerTask(), 0, 1000);
-//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
-        mTimer.schedule(new FoodUpdateTimerTask(),
-                MyPSF.STARTING_UPDATE_FOOD_PERIOD,
-                MyPSF.STARTING_UPDATE_FOOD_PERIOD);
-    }
-
-    public void actionEndGame() {
-
-        mGameEnded = true;
-        mGamePausedSwitch = true;
-
-        // stopping all timers \
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer.purge();
-            mTimer = null;
-        }
-
-        // checking if current result is the best \
-        if (mCurrentScore > bestScore || mCurrentTime > bestTime) {
-            if (mCurrentScore > bestScore)
-                bestScore = mCurrentScore;
-            if (mCurrentTime > bestTime)
-                bestTime = mCurrentTime;
-            saveNewBestResults();
-        }
-
-        // resetting the start-stop button to its primary state \
-        ui.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int endTextColor = ContextCompat.getColor(ui, android.R.color.primary_text_light);
-                ui.setMainFieldTextColor(endTextColor);
-                ui.setMFTBackgroundResource(R.color.primary_light);
-            }
-        });
-        L.i("game ended with mCurrentScore " + mCurrentScore);
-    }
 
     public int getCurrentScore() {
         return mCurrentScore;
@@ -380,8 +101,21 @@ public final class GameLogic {
         return mSnakeSpeed;
     }
 
-    public void setSnakeSpeed(int newSnakeSpeed) {
-        mSnakeSpeed = newSnakeSpeed;
+    // REACTIONS ===================================================================================
+
+    public void onShowScoresClick() {
+        ui.showScoresDialog();
+    }
+
+    public void onSetSpeedClick() {
+        ui.showSetSpeedDialog();
+    }
+
+    public void onUserGuideLongClick() {
+        // initialize the game
+        L.i("initializeGame started");
+        ui.changeTextFields();
+        ui.measureAvailableSpace();
     }
 
     public void onDoubleTap() {
@@ -454,6 +188,243 @@ public final class GameLogic {
                     prohibitedDirection = FourDirections.UP;
                     break;
             }
+    }
+
+    // PUBLIC ======================================================================================
+
+    public void detectSymbolsInFieldLine(int measuredSymbolWidth) {
+        mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
+    }
+
+    public void actionPauseGame() {
+
+        mGamePausedSwitch = true;
+
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer = null;
+        }
+        ui.setMainFieldTextColor(ContextCompat.getColor(ui.getApplicationContext(), R.color.primary_light));
+    }
+
+    public void actionStartGame() {
+
+        mGamePausedSwitch = false;
+        mGameEnded = false;
+
+        int startTextColor = ContextCompat.getColor(ui.getApplicationContext(), android.R.color.white);
+        ui.setMainFieldTextColor(startTextColor);
+        ui.setMFTBackgroundResource(R.color.primary_dark);
+        // launching everything \
+        int delay; // amount of time for game to wait = realization of speed \
+        try {
+            delay = 500 / mSnakeSpeed;
+        } catch (ArithmeticException ae) {
+            L.i("ArithmeticException with delay = 500 / 0: mSnakeSpeed = 0");
+            actionEndGame();
+            return;
+        }
+        mTimer = new Timer();
+        mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
+        mTimer.schedule(new TimeUpdateTimerTask(), 0, 1000);
+//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
+        mTimer.schedule(new FoodUpdateTimerTask(),
+                MyPSF.STARTING_UPDATE_FOOD_PERIOD,
+                MyPSF.STARTING_UPDATE_FOOD_PERIOD);
+    }
+
+    public void actionEndGame() {
+
+        mGameEnded = true;
+        mGamePausedSwitch = true;
+
+        // stopping all timers \
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer.purge();
+            mTimer = null;
+        }
+
+        // checking if current result is the best \
+        if (mCurrentScore > bestScore || mCurrentTime > bestTime) {
+            if (mCurrentScore > bestScore)
+                bestScore = mCurrentScore;
+            if (mCurrentTime > bestTime)
+                bestTime = mCurrentTime;
+            ui.saveNewBestResults(bestScore, bestTime);
+        }
+
+        // resetting the start-stop button to its primary state \
+        ui.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                int endTextColor = ContextCompat.getColor(ui, android.R.color.primary_text_light);
+                ui.setMainFieldTextColor(endTextColor);
+                ui.setMFTBackgroundResource(R.color.primary_light);
+            }
+        });
+        L.i("game ended with mCurrentScore " + mCurrentScore);
+    }
+
+    // main repeatable sequence of steps \
+    public void prepareGameIn4Steps() {
+        step_1_prepareTextField(); // 1
+        step_2_setFieldBorders(); // 2
+        step_3_setInitialSnake(); // 3
+        step_4_setInitialFood(); // 4
+    }
+
+    // PRIVATE =====================================================================================
+
+    private void step_1_prepareTextField() {
+
+        // clearing the text field to properly initialize it for game \
+        ui.setMainFieldText(null);
+
+        // fixing the total height of the line in our main field \
+        ui.setMainFieldTextSquareSymbols();
+
+        // now preparing our model and initializing text field \
+        int i = 0, measuredTextHeight;
+        mCharsArrayList = new ArrayList<>();
+        do {
+            // filling up out TextView to measure its lines and set initial state at once \
+            char[] charArray = new char[mSymbolsInFieldLine + 1];
+            // setting end element for a new line on the next array \
+            charArray[mSymbolsInFieldLine] = '\n';
+            // setting other elements to their default values \
+            for (int j = 0; j < mSymbolsInFieldLine; j++) {
+                charArray[j] = MyPSF.SPACE;
+            }
+            // now single char array is ready and has to be added to the list \
+            mCharsArrayList.add(i, charArray);
+//            L.i("added " + new String(mCharsArrayList.get(i)));
+
+            final String previousText = ui.getMainFieldText();
+            final String newText = previousText + new String(mCharsArrayList.get(i));
+            ui.setMainFieldText(newText);
+//            L.i("newText \n" + newText);
+
+            i++;
+
+            ui.measureMainField();
+            measuredTextHeight = ui.getMainFieldHeight();
+//            L.i("measuredTextHeight " + measuredTextHeight);
+
+        } while (measuredTextHeight <= mFieldPixelHeight);
+
+        mFieldLinesCount = i;
+        L.i("mFieldLinesCount " + mFieldLinesCount);
+    } // step_1_prepareTextField \\
+
+    private void step_2_setFieldBorders() {
+        for (int i = 0; i < mFieldLinesCount; i++)
+            for (int j = 0; j < mSymbolsInFieldLine; j++)
+                if (i == 0 || i == mFieldLinesCount - 1 || j == 0 || j == mSymbolsInFieldLine - 1)
+                    mCharsArrayList.get(i)[j] = MyPSF.BORDER;
+    } // step_2_setFieldBorders \\
+
+    private void step_3_setInitialSnake() {
+
+        mSnake = new Snake();
+
+        // defining start directions to properly set up the mSnake \
+        switch (mRandom.nextInt(3) + 1) {
+            case 0:
+                mSnakeDirection = FourDirections.RIGHT;
+                break;
+            case 1:
+                mSnakeDirection = FourDirections.UP;
+                break;
+            case 2:
+                mSnakeDirection = FourDirections.LEFT;
+                break;
+            case 3:
+                mSnakeDirection = FourDirections.DOWN;
+        }
+
+        for (int i = 0; i < MyPSF.STARTING_SNAKE_LENGTH; i++) {
+            // here we define position of every mSnake's cell \
+            int cellPositionX = 0, cellPositionY = 0;
+            // setting tail in the opposite direction here - to free space for head \
+            switch (mSnakeDirection) {
+                case RIGHT: {
+                    cellPositionX = mSymbolsInFieldLine / 2 - i;
+                    cellPositionY = mFieldLinesCount / 2;
+                    break;
+                }
+                case UP: {
+                    cellPositionX = mSymbolsInFieldLine / 2;
+                    cellPositionY = mFieldLinesCount / 2 + i;
+                    break;
+                }
+                case LEFT: {
+                    cellPositionX = mSymbolsInFieldLine / 2 + i;
+                    cellPositionY = mFieldLinesCount / 2;
+                    break;
+                }
+                case DOWN: {
+                    cellPositionX = mSymbolsInFieldLine / 2;
+                    cellPositionY = mFieldLinesCount / 2 - i;
+                    break;
+                }
+            }
+            // now it is time to create new mSnake cell \
+            Snake.SnakeCell newCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
+            // updating the mSnake's model \
+            mSnake.addCell(i, newCell);
+            // placing the this mSnake cell to our field \
+            mCharsArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SNAKE;
+        } // end of for-loop
+        updateMainField();
+    } // step_3_setInitialSnake \\
+
+    private void step_4_setInitialFood() {
+        updateFood();
+        updateMainField();
+    } // step_4_setInitialFood \\
+
+    private void updateFood() {
+/*
+        this method gets called after the mSnake is initialized -so we have to check collisions \
+        i decided to do all in one cycle because of low probability of collisions \
+*/
+        // first of all clearing old place \
+        char replaceToSpace = mCharsArrayList.get(mOldFoodPositionY)[mOldFoodPositionX];
+        if (replaceToSpace != MyPSF.BORDER) // this might happen at the very start \
+            mCharsArrayList.get(mOldFoodPositionY)[mOldFoodPositionX] = MyPSF.SPACE;
+        // now everything is clear and we can set new food type and position \
+        do {
+            /*
+            range for mRandom:
+            decreased by 2 to exclude visible field borders \
+            again decreased by 2 to exclude near-border dangerous positions \
+            increased by 1 to include the whole range of values because of method specifics \
+            */
+            mFoodPositionRow = mRandom.nextInt(mFieldLinesCount - 2 - 2) + 1;
+            mFoodPositionSymbol = mRandom.nextInt(mSymbolsInFieldLine - 2 - 2) + 1;
+            // -1 instead of +1 just to avoid placing food on the boards \
+            L.i("mRandom mFoodPositionRow " + mFoodPositionRow);
+            L.i("mRandom mFoodPositionSymbol " + mFoodPositionSymbol);
+        } while (mCharsArrayList.get(mFoodPositionRow)[mFoodPositionSymbol] == MyPSF.SNAKE);
+
+        mOldFoodPositionX = mFoodPositionSymbol;
+        mOldFoodPositionY = mFoodPositionRow;
+
+        mFoodType = mFoodTypeArray[mRandom.nextInt(mFoodTypeArray.length)];
+
+        // subtracting 1 because we know that these are indexes - counted from zero \
+        mCharsArrayList.get(mFoodPositionRow)[mFoodPositionSymbol] = mFoodType;
+//        mCharsArrayList.get(mFoodPositionRow - 1)[mFoodPositionSymbol - 1] = FOOD;
+    }
+
+    private void updateMainField() {
+
+        final StringBuilder newStringToSet = new StringBuilder();
+        for (int i = 0; i < mFieldLinesCount; i++) {
+            newStringToSet.append(mCharsArrayList.get(i));
+        }
+        ui.setMainFieldText(newStringToSet.toString());
     }
 
     private boolean isLeftMove(float velocityX, float velocityY) {

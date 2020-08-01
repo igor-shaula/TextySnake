@@ -1,6 +1,7 @@
 package com.igor_shaula.texty_snake.v1.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -182,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
                     logic.setBestTime(0);
                     mtvBestScore.setText(String.valueOf(logic.getBestScore()));
                     mtvBestTime.setText(DateFormat.format("mm:ss", logic.getBestTime()));
-                    logic.saveNewBestResults();
+                    saveNewBestResults(0, 0);
                 }
                 llHidden.setVisibility(View.GONE); // click at NO-button is done by this line \
                 longButtonClickedOnce[0] = false;
@@ -322,6 +323,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void vibrate() {
         vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
+    }
+
+    public void saveNewBestResults(int bestScore, long bestTime) {
+        getSharedPreferences(MyPSF.S_P_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .putInt(MyPSF.KEY_SCORE, bestScore)
+                .putLong(MyPSF.KEY_TIME, bestTime)
+                .apply();
     }
 
     // MOVEMENT ====================================================================================
