@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private GestureDetector gestureDetector;
 
-    // LIFECYCLE ===================================================================================
+    // STANDARD CALLBACKS ==========================================================================
 
     @SuppressLint("InflateParams")
     @Override
@@ -97,14 +97,6 @@ public class MainActivity extends AppCompatActivity {
     } // onCreate \\
 
     @Override
-    public boolean onTouchEvent(MotionEvent motionEvent) {
-        L.l("onTouchEvent");
-        return gestureDetector.onTouchEvent(motionEvent);
-    }
-
-    // SAVE_RESTORE ================================================================================
-
-    @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         L.i("onSaveInstanceState worked");
@@ -116,7 +108,13 @@ public class MainActivity extends AppCompatActivity {
         L.i("onRestoreInstanceState worked");
     }
 
-    // MAIN SEQUENCE ===============================================================================
+    @Override
+    public boolean onTouchEvent(MotionEvent motionEvent) {
+        L.l("onTouchEvent");
+        return gestureDetector.onTouchEvent(motionEvent);
+    }
+
+    // PUBLIC ======================================================================================
 
     // TODO: 31.07.2020 simplify this monstrous construction
     public void measureAvailableSpace() {
@@ -284,29 +282,35 @@ public class MainActivity extends AppCompatActivity {
         viewBinding.flMain.setVisibility(View.VISIBLE);
     }
 
-    public void setMainFieldText(@Nullable String text) {
-        viewBinding.mtvMainField.setText(text);
-    }
-
-    public void setMainFieldTextSquareSymbols() {
-        viewBinding.mtvMainField.setSquareSymbols();
-    }
-
-    @NonNull
-    public String getMainFieldText() {
-        return viewBinding.mtvMainField.getText().toString();
-    }
-
     public void measureMainField() {
         viewBinding.mtvMainField.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
     }
 
-    public int getMainFieldHeight() {
-        return viewBinding.mtvMainField.getMeasuredHeight();
+    public void fireNonVisualReaction() {
+        vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
+    }
+
+    public void saveNewBestResults(int bestScore, long bestTime) {
+        getSharedPreferences(MyPSF.S_P_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .clear()
+                .putInt(MyPSF.KEY_SCORE, bestScore)
+                .putLong(MyPSF.KEY_TIME, bestTime)
+                .apply();
+    }
+
+    // SETTERS =====================================================================================
+
+    public void setMainFieldText(@Nullable String text) {
+        viewBinding.mtvMainField.setText(text);
     }
 
     public void setMainFieldTextColor(int color) {
         viewBinding.mtvMainField.setTextColor(color);
+    }
+
+    public void setMainFieldTextSquareSymbols() {
+        viewBinding.mtvMainField.setSquareSymbols();
     }
 
     public void setMFTBackgroundResource(int colorId) {
@@ -321,17 +325,15 @@ public class MainActivity extends AppCompatActivity {
         viewBinding.mtvTime.setText(stringToSet);
     }
 
-    public void vibrate() {
-        vibratorService.vibrate(MyPSF.SHORT_VIBRATION);
+    // GETTERS =====================================================================================
+
+    @NonNull
+    public String getMainFieldText() {
+        return viewBinding.mtvMainField.getText().toString();
     }
 
-    public void saveNewBestResults(int bestScore, long bestTime) {
-        getSharedPreferences(MyPSF.S_P_NAME, Context.MODE_PRIVATE)
-                .edit()
-                .clear()
-                .putInt(MyPSF.KEY_SCORE, bestScore)
-                .putLong(MyPSF.KEY_TIME, bestTime)
-                .apply();
+    public int getMainFieldHeight() {
+        return viewBinding.mtvMainField.getMeasuredHeight();
     }
 
     // MOVEMENT ====================================================================================

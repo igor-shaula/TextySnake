@@ -137,7 +137,7 @@ public final class GameLogic {
         L.i("mGamePausedSwitch = " + mGamePausedSwitch);
         L.i("mGameEnded = " + mGameEnded);
 
-        ui.vibrate();
+        ui.fireNonVisualReaction();
 
         actionEndGame();
         mCurrentScore = 0;
@@ -537,7 +537,7 @@ public final class GameLogic {
 
         private void eatFood() {
             // user must be happy with such a vibration :)
-            ui.vibrate();
+            ui.fireNonVisualReaction();
 
             int cellPositionX, cellPositionY;
             Snake.SnakeCell currentCell;
