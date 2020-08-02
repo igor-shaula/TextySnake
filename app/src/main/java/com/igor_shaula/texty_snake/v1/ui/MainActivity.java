@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.igor_shaula.texty_snake.v1.R;
@@ -99,6 +101,19 @@ public class MainActivity extends AppCompatActivity {
         final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
         viewModel.setBestScore(sharedPreferences.getInt(MyPSF.KEY_SCORE, 0));
         viewModel.setBestTime(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
+
+        viewModel.getMainFieldTextColorId().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                viewBinding.mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), integer));
+            }
+        });
+        viewModel.getMainFieldBackgroundColorId().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                viewBinding.mtvMainField.setBackgroundResource(integer);
+            }
+        });
     } // onCreate \\
 
     @Override
@@ -318,16 +333,8 @@ public class MainActivity extends AppCompatActivity {
         viewBinding.mtvMainField.setText(text);
     }
 
-    public void setMainFieldTextColor(int color) {
-        viewBinding.mtvMainField.setTextColor(color);
-    }
-
     public void setMainFieldTextSquareSymbols() {
         viewBinding.mtvMainField.setSquareSymbols();
-    }
-
-    public void setMFTBackgroundResource(int colorId) {
-        viewBinding.mtvMainField.setBackgroundResource(colorId);
     }
 
     public void setScoreText(@NonNull String scoreComplex) {

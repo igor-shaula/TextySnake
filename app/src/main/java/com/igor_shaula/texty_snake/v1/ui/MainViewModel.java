@@ -5,6 +5,7 @@ import android.view.MotionEvent;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.igor_shaula.texty_snake.v1.R;
@@ -22,6 +23,10 @@ public final class MainViewModel extends ViewModel {
     // field only parameters
     private int mFieldPixelWidth, mFieldPixelHeight; // in pixels
     private int mSymbolsInFieldLine, mFieldLinesCount; // in items - for arrays \
+    @NonNull
+    private MutableLiveData<Integer> mainFieldTextColorId = new MutableLiveData<>();
+    @NonNull
+    private MutableLiveData<Integer> mainFieldBackgroundColorId = new MutableLiveData<>();
 
     // snake only parameters
     private int mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
@@ -39,6 +44,8 @@ public final class MainViewModel extends ViewModel {
 
     public void initGameLogic(@NonNull MainActivity ui) {
         logic = new GameLogic(ui);
+        mainFieldTextColorId.setValue(R.color.primary_dark);
+        mainFieldBackgroundColorId.setValue(android.R.color.white);
     }
 
     public void destroyGameLogic() {
@@ -90,6 +97,16 @@ public final class MainViewModel extends ViewModel {
 
     public int getSnakeSpeed() {
         return mSnakeSpeed;
+    }
+
+    @NonNull
+    public MutableLiveData<Integer> getMainFieldTextColorId() {
+        return mainFieldTextColorId;
+    }
+
+    @NonNull
+    public MutableLiveData<Integer> getMainFieldBackgroundColorId() {
+        return mainFieldBackgroundColorId;
     }
 
     // REACTIONS ===================================================================================
@@ -149,7 +166,7 @@ public final class MainViewModel extends ViewModel {
             mTimer.cancel();
             mTimer = null;
         }
-        ui.setMainFieldTextColor(ContextCompat.getColor(ui.getApplicationContext(), R.color.primary_light));
+        mainFieldTextColorId.setValue(R.color.primary_light);
     }
 
     public void actionStartGame() {
@@ -157,9 +174,9 @@ public final class MainViewModel extends ViewModel {
         mGamePausedSwitch = false;
         mGameEnded = false;
 
-        int startTextColor = ContextCompat.getColor(ui.getApplicationContext(), android.R.color.white);
-        ui.setMainFieldTextColor(startTextColor);
-        ui.setMFTBackgroundResource(R.color.primary_dark);
+        mainFieldTextColorId.setValue(android.R.color.white);
+        mainFieldBackgroundColorId.setValue(R.color.primary_dark);
+
         // launching everything \
         int delay; // amount of time for game to wait = realization of speed \
         try {
