@@ -98,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel.setBestTime(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
     } // onCreate \\
 
+/*
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -109,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestoreInstanceState(savedInstanceState);
         L.i("onRestoreInstanceState worked");
     }
+*/
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
@@ -154,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showScoresDialog() {
 
-        viewModel.actionPauseGame();
+        viewModel.onShowDialogAction();
 
         // preparing view for the dialog \
         final View dialogView = getLayoutInflater().inflate(R.layout.scores, null);
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void showSetSpeedDialog() {
 
-        viewModel.actionPauseGame();
+        viewModel.onShowDialogAction();
 
         // preparing view for the dialog \
         @SuppressLint("InflateParams")

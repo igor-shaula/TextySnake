@@ -48,10 +48,7 @@ public final class GameLogic {
 
     // PUBLIC ======================================================================================
 
-
-    // PRIVATE =====================================================================================
-
-    private void step_1_prepareTextField() {
+    public void step_1_prepareTextField() {
 
         // clearing the text field to properly initialize it for game \
         ui.setMainFieldText(null);
@@ -92,14 +89,14 @@ public final class GameLogic {
         L.i("mFieldLinesCount " + mFieldLinesCount);
     } // step_1_prepareTextField \\
 
-    private void step_2_setFieldBorders() {
+    public void step_2_setFieldBorders() {
         for (int i = 0; i < mFieldLinesCount; i++)
             for (int j = 0; j < mSymbolsInFieldLine; j++)
                 if (i == 0 || i == mFieldLinesCount - 1 || j == 0 || j == mSymbolsInFieldLine - 1)
                     mCharsArrayList.get(i)[j] = MyPSF.BORDER;
     } // step_2_setFieldBorders \\
 
-    private void step_3_setInitialSnake() {
+    public void step_3_setInitialSnake() {
 
         mSnake = new Snake();
 
@@ -154,7 +151,7 @@ public final class GameLogic {
         updateMainField();
     } // step_3_setInitialSnake \\
 
-    private void step_4_setInitialFood() {
+    public void step_4_setInitialFood() {
         updateFood();
         updateMainField();
     } // step_4_setInitialFood \\

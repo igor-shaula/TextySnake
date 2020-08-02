@@ -103,7 +103,7 @@ public final class MainViewModel extends ViewModel {
 
         // 2 - pause or continue game \
         if (!mGamePausedSwitch)
-            actionPauseGame();
+            onShowDialogAction();
         else actionStartGame();
     }
 
@@ -167,7 +167,7 @@ public final class MainViewModel extends ViewModel {
         mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
     }
 
-    public void actionPauseGame() {
+    public void onShowDialogAction() {
 
         mGamePausedSwitch = true;
 
@@ -239,9 +239,9 @@ public final class MainViewModel extends ViewModel {
 
     // main repeatable sequence of steps \
     public void prepareGameIn4Steps() {
-        step_1_prepareTextField(); // 1
-        step_2_setFieldBorders(); // 2
-        step_3_setInitialSnake(); // 3
-        step_4_setInitialFood(); // 4
+        logic.step_1_prepareTextField(); // 1
+        logic.step_2_setFieldBorders(); // 2
+        logic.step_3_setInitialSnake(); // 3
+        logic.step_4_setInitialFood(); // 4
     }
 }
