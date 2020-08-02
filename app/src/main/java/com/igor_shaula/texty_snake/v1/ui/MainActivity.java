@@ -44,36 +44,44 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // preparing viewModel
         final ViewModelProvider.Factory factory =
                 ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
         viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
 
+        // preparing viewBinding
         viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
 
+        // left from older codebase
         setSupportActionBar(viewBinding.myToolbar);
 
+        // left from the older codebase
         viewBinding.myToolbar.setContentInsetsAbsolute(0, 0);
 
         viewBinding.mtvShowScores.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.onShowScoresClick();
+                showScoresDialog();
             }
         });
 
         viewBinding.mtvSetSpeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                viewModel.onSetSpeedClick();
+                showSetSpeedDialog();
             }
         });
 
+        // left from the older codebase
         viewBinding.mtvUserGuide.setMovementMethod(new ScrollingMovementMethod());
         viewBinding.mtvUserGuide.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                viewModel.onUserGuideLongClick();
+                // initialize the game
+                L.i("game started");
+                changeTextFields();
+                measureAvailableSpace();
                 return false;
             }
         });
@@ -342,6 +350,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onLongPress(MotionEvent e) {
+            fireNonVisualReaction();
             viewModel.onLongPress();
             super.onLongPress(e);
         }
@@ -351,5 +360,5 @@ public class MainActivity extends AppCompatActivity {
             viewModel.onFling(e1, e2, velocityX, velocityY);
             return super.onFling(e1, e2, velocityX, velocityY);
         }
-    } // MyGestureListener \\
+    }
 }

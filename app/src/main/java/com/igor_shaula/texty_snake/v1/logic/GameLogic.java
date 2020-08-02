@@ -1,10 +1,8 @@
 package com.igor_shaula.texty_snake.v1.logic;
 
 import android.text.format.DateFormat;
-import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import com.igor_shaula.texty_snake.v1.R;
 import com.igor_shaula.texty_snake.v1.entity.Snake;
@@ -14,8 +12,12 @@ import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
 import java.util.TimerTask;
+
+import static com.igor_shaula.texty_snake.v1.logic.FourDirections.DOWN;
+import static com.igor_shaula.texty_snake.v1.logic.FourDirections.LEFT;
+import static com.igor_shaula.texty_snake.v1.logic.FourDirections.RIGHT;
+import static com.igor_shaula.texty_snake.v1.logic.FourDirections.UP;
 
 // this class describes game engine and must not have any Android specific dependencies
 public final class GameLogic {
@@ -28,26 +30,15 @@ public final class GameLogic {
     private char mFoodType;
     private int mFoodPositionRow, mFoodPositionSymbol;
     private int mOldFoodPositionX, mOldFoodPositionY;
-    private int mFieldPixelWidth, mFieldPixelHeight; // in pixels
-    private int mSymbolsInFieldLine, mFieldLinesCount; // in items - for arrays \
 
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
     private Random mRandom = new Random();
-    private Timer mTimer;
 
     // definition of the snake model \
     private Snake mSnake;
-    private int mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
-    private FourDirections mSnakeDirection, prohibitedDirection;
 
-    // game parameters \
-    private boolean mGameEnded = false, mGamePausedSwitch = false;
-    private int mCurrentScore, bestScore;
-    private long mCurrentTime, bestTime;
-
-    //    @NonNull
     private MainActivity ui;
 
     // TODO: 31.07.2020 replace passing MainActivity here by an interface - avoid direct linking
@@ -55,224 +46,8 @@ public final class GameLogic {
         this.ui = ui;
     }
 
-    // SETTERS =====================================================================================
-
-    public void setBestScore(int bestScore) {
-        this.bestScore = bestScore;
-    }
-
-    public void setBestTime(long bestTime) {
-        this.bestTime = bestTime;
-    }
-
-    public void setFieldPixelWidth(int width) {
-        mFieldPixelWidth = width;
-        L.i("fieldPixelWidth " + mFieldPixelWidth);
-    }
-
-    public void setFieldPixelHeight(int height) {
-        mFieldPixelHeight = height;
-        L.i("mFieldPixelHeight " + mFieldPixelHeight);
-    }
-
-    public void setSnakeSpeed(int newSnakeSpeed) {
-        mSnakeSpeed = newSnakeSpeed;
-    }
-
-    // GETTERS =====================================================================================
-
-    public int getCurrentScore() {
-        return mCurrentScore;
-    }
-
-    public long getCurrentTime() {
-        return mCurrentTime;
-    }
-
-    public int getBestScore() {
-        return bestScore;
-    }
-
-    public long getBestTime() {
-        return bestTime;
-    }
-
-    public int getSnakeSpeed() {
-        return mSnakeSpeed;
-    }
-
-    // REACTIONS ===================================================================================
-
-    public void onShowScoresClick() {
-        ui.showScoresDialog();
-    }
-
-    public void onSetSpeedClick() {
-        ui.showSetSpeedDialog();
-    }
-
-    public void onUserGuideLongClick() {
-        // initialize the game
-        L.i("initializeGame started");
-        ui.changeTextFields();
-        ui.measureAvailableSpace();
-    }
-
-    public void onDoubleTap() {
-        L.i("onDoubleTap - start / pause");
-        L.i("mGamePausedSwitch = " + mGamePausedSwitch);
-        L.i("mGameEnded = " + mGameEnded);
-
-        // 1 - prepare new field after game over \
-        if (mGameEnded) prepareGameIn4Steps();
-
-        // 2 - pause or continue game \
-        if (!mGamePausedSwitch)
-            actionPauseGame();
-        else actionStartGame();
-    }
-
-    public void onLongPress() {
-        L.i("onLongPress - full restart from zero");
-        L.i("mGamePausedSwitch = " + mGamePausedSwitch);
-        L.i("mGameEnded = " + mGameEnded);
-
-        ui.fireNonVisualReaction();
-
-        actionEndGame();
-        mCurrentScore = 0;
-
-        // 1 - preparing the field for the new game \
-        prepareGameIn4Steps();
-
-        // 2 - restarting the game \
-        actionStartGame();
-    }
-
-    public void onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        // detecting current direction for desired move \
-        if (Math.abs(e2.getX() - e1.getX()) > Math.abs(e2.getY() - e1.getY()))
-            if (isLeftMove(velocityX, velocityY)) {
-                L.i("turned left");
-                mSnakeDirection = FourDirections.LEFT;
-            } else {
-                L.i("turned right");
-                mSnakeDirection = FourDirections.RIGHT;
-            }
-        else { // moving along Y-axis was more noticeable than along X-axis \
-            if (isUpMove(velocityX, velocityY)) {
-                L.i("turned up");
-                mSnakeDirection = FourDirections.UP;
-            } else {
-                L.i("turned down");
-                mSnakeDirection = FourDirections.DOWN;
-            }
-        }
-
-        // checking if direction is not reversed as before \
-        if (mSnakeDirection == prohibitedDirection)
-            mSnakeDirection = null;
-        else
-            // saving current last direction conditions for the next swipe \
-            switch (mSnakeDirection) {
-                case LEFT:
-                    prohibitedDirection = FourDirections.RIGHT;
-                    break;
-                case RIGHT:
-                    prohibitedDirection = FourDirections.LEFT;
-                    break;
-                case UP:
-                    prohibitedDirection = FourDirections.DOWN;
-                    break;
-                case DOWN:
-                    prohibitedDirection = FourDirections.UP;
-                    break;
-            }
-    }
-
     // PUBLIC ======================================================================================
 
-    public void detectSymbolsInFieldLine(int measuredSymbolWidth) {
-        mSymbolsInFieldLine = mFieldPixelWidth / measuredSymbolWidth;
-    }
-
-    public void actionPauseGame() {
-
-        mGamePausedSwitch = true;
-
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
-        ui.setMainFieldTextColor(ContextCompat.getColor(ui.getApplicationContext(), R.color.primary_light));
-    }
-
-    public void actionStartGame() {
-
-        mGamePausedSwitch = false;
-        mGameEnded = false;
-
-        int startTextColor = ContextCompat.getColor(ui.getApplicationContext(), android.R.color.white);
-        ui.setMainFieldTextColor(startTextColor);
-        ui.setMFTBackgroundResource(R.color.primary_dark);
-        // launching everything \
-        int delay; // amount of time for game to wait = realization of speed \
-        try {
-            delay = 500 / mSnakeSpeed;
-        } catch (ArithmeticException ae) {
-            L.i("ArithmeticException with delay = 500 / 0: mSnakeSpeed = 0");
-            actionEndGame();
-            return;
-        }
-        mTimer = new Timer();
-        mTimer.schedule(new SnakeMoveTimerTask(), 0, delay);
-        mTimer.schedule(new TimeUpdateTimerTask(), 0, 1000);
-//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
-        mTimer.schedule(new FoodUpdateTimerTask(),
-                MyPSF.STARTING_UPDATE_FOOD_PERIOD,
-                MyPSF.STARTING_UPDATE_FOOD_PERIOD);
-    }
-
-    public void actionEndGame() {
-
-        mGameEnded = true;
-        mGamePausedSwitch = true;
-
-        // stopping all timers \
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer.purge();
-            mTimer = null;
-        }
-
-        // checking if current result is the best \
-        if (mCurrentScore > bestScore || mCurrentTime > bestTime) {
-            if (mCurrentScore > bestScore)
-                bestScore = mCurrentScore;
-            if (mCurrentTime > bestTime)
-                bestTime = mCurrentTime;
-            ui.saveNewBestResults(bestScore, bestTime);
-        }
-
-        // resetting the start-stop button to its primary state \
-        ui.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int endTextColor = ContextCompat.getColor(ui, android.R.color.primary_text_light);
-                ui.setMainFieldTextColor(endTextColor);
-                ui.setMFTBackgroundResource(R.color.primary_light);
-            }
-        });
-        L.i("game ended with mCurrentScore " + mCurrentScore);
-    }
-
-    // main repeatable sequence of steps \
-    public void prepareGameIn4Steps() {
-        step_1_prepareTextField(); // 1
-        step_2_setFieldBorders(); // 2
-        step_3_setInitialSnake(); // 3
-        step_4_setInitialFood(); // 4
-    }
 
     // PRIVATE =====================================================================================
 
@@ -331,16 +106,16 @@ public final class GameLogic {
         // defining start directions to properly set up the mSnake \
         switch (mRandom.nextInt(3) + 1) {
             case 0:
-                mSnakeDirection = FourDirections.RIGHT;
+                mSnakeDirection = RIGHT;
                 break;
             case 1:
-                mSnakeDirection = FourDirections.UP;
+                mSnakeDirection = UP;
                 break;
             case 2:
-                mSnakeDirection = FourDirections.LEFT;
+                mSnakeDirection = LEFT;
                 break;
             case 3:
-                mSnakeDirection = FourDirections.DOWN;
+                mSnakeDirection = DOWN;
         }
 
         for (int i = 0; i < MyPSF.STARTING_SNAKE_LENGTH; i++) {
@@ -446,7 +221,7 @@ public final class GameLogic {
     // TIMER CLASSES ===============================================================================
 
     // special class defined for repeating operations and usage of Timer \
-    private class SnakeMoveTimerTask extends TimerTask {
+    public class SnakeMoveTimerTask extends TimerTask {
 
         // this method handles movement of the mSnake \
         @Override
@@ -650,7 +425,7 @@ public final class GameLogic {
         }
     } // end of SnakeMoveTimerTask-class \\
 
-    private class FoodUpdateTimerTask extends TimerTask {
+    public class FoodUpdateTimerTask extends TimerTask {
 
         @Override
         public void run() {
@@ -665,7 +440,7 @@ public final class GameLogic {
         }
     }
 
-    private class TimeUpdateTimerTask extends TimerTask {
+    public class TimeUpdateTimerTask extends TimerTask {
         // code here is called every millisecond - it has to be really fast \
         private long initialSystemTime = System.currentTimeMillis();
 
