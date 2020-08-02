@@ -41,12 +41,55 @@ public final class GameLogic {
 
     private MainActivity ui;
 
+    // PUBLIC ======================================================================================
+
     // TODO: 31.07.2020 replace passing MainActivity here by an interface - avoid direct linking
     public GameLogic(@NonNull MainActivity ui) {
         this.ui = ui;
     }
 
-    // PUBLIC ======================================================================================
+    public void clearUiLink() {
+        ui = null;
+    }
+
+    @NonNull
+    public FourDirections detectSnakeDirection(float deltaX, float deltaY, float velocityX, float velocityY) {
+        FourDirections mSnakeDirection;
+        if (Math.abs(deltaX) > Math.abs(deltaY))
+            if (isLeftMove(velocityX, velocityY)) {
+                L.i("turned left");
+                mSnakeDirection = LEFT;
+            } else {
+                L.i("turned right");
+                mSnakeDirection = RIGHT;
+            }
+        else { // moving along Y-axis was more noticeable than along X-axis \
+            if (isUpMove(velocityX, velocityY)) {
+                L.i("turned up");
+                mSnakeDirection = UP;
+            } else {
+                L.i("turned down");
+                mSnakeDirection = DOWN;
+            }
+        }
+        return mSnakeDirection;
+    }
+
+    @NonNull
+    public FourDirections detectProhibitedDirection(@NonNull FourDirections mSnakeDirection) {
+        switch (mSnakeDirection) {
+            case LEFT:
+                return RIGHT;
+            case RIGHT:
+                return LEFT;
+            case UP:
+                return DOWN;
+            case DOWN:
+                return UP;
+            default:
+                return null; // this will never happen but is required for compiling
+        }
+    }
 
     public void step_1_prepareTextField() {
 
@@ -209,10 +252,6 @@ public final class GameLogic {
         return velocityY < 0 // determining the UP direction of the swipe \
 //                    && absDeltaX < absDeltaY // assuring that this swipe was more along Y-axis than along X \
                 && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
-    }
-
-    public void clearUiLink() {
-        ui = null;
     }
 
     // TIMER CLASSES ===============================================================================

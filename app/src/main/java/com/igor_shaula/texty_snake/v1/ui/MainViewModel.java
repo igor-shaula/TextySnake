@@ -3,6 +3,7 @@ package com.igor_shaula.texty_snake.v1.ui;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModel;
 
@@ -13,11 +14,6 @@ import com.igor_shaula.texty_snake.v1.utils.L;
 import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
 import java.util.Timer;
-
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.DOWN;
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.LEFT;
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.RIGHT;
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.UP;
 
 public final class MainViewModel extends ViewModel {
 
@@ -34,6 +30,7 @@ public final class MainViewModel extends ViewModel {
     private Timer mTimer;
 
     private int mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
+    @Nullable
     private FourDirections mSnakeDirection, prohibitedDirection;
 
     public void initGameLogic(@NonNull MainActivity ui) {
@@ -122,45 +119,18 @@ public final class MainViewModel extends ViewModel {
         actionStartGame();
     }
 
-    public void onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+    public void onFling(@NonNull MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
         // detecting current direction for desired move \
-        if (Math.abs(e2.getX() - e1.getX()) > Math.abs(e2.getY() - e1.getY()))
-            if (isLeftMove(velocityX, velocityY)) {
-                L.i("turned left");
-                mSnakeDirection = LEFT;
-            } else {
-                L.i("turned right");
-                mSnakeDirection = RIGHT;
-            }
-        else { // moving along Y-axis was more noticeable than along X-axis \
-            if (isUpMove(velocityX, velocityY)) {
-                L.i("turned up");
-                mSnakeDirection = UP;
-            } else {
-                L.i("turned down");
-                mSnakeDirection = DOWN;
-            }
-        }
-
+        final float deltaX = e2.getX() - e1.getX();
+        final float deltaY = e2.getY() - e1.getY();
+        mSnakeDirection = logic.detectSnakeDirection(deltaX, deltaY, velocityX, velocityY);
         // checking if direction is not reversed as before \
-        if (mSnakeDirection == prohibitedDirection)
+        if (mSnakeDirection == prohibitedDirection) {
+            L.w("onFling ` very strange case: mSnakeDirection == prohibitedDirection");
             mSnakeDirection = null;
-        else
+        } else
             // saving current last direction conditions for the next swipe \
-            switch (mSnakeDirection) {
-                case LEFT:
-                    prohibitedDirection = RIGHT;
-                    break;
-                case RIGHT:
-                    prohibitedDirection = LEFT;
-                    break;
-                case UP:
-                    prohibitedDirection = DOWN;
-                    break;
-                case DOWN:
-                    prohibitedDirection = UP;
-                    break;
-            }
+            prohibitedDirection = logic.detectProhibitedDirection(mSnakeDirection);
     }
 
     public void detectSymbolsInFieldLine(int measuredSymbolWidth) {
