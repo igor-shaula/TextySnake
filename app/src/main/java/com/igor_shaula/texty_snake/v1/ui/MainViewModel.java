@@ -19,19 +19,23 @@ public final class MainViewModel extends ViewModel {
 
     private GameLogic logic;
 
+    // field only parameters
     private int mFieldPixelWidth, mFieldPixelHeight; // in pixels
-    private boolean mGameEnded = false, mGamePausedSwitch = false;
-
-    // game parameters \
-    private int mCurrentScore, bestScore;
-    private long mCurrentTime, bestTime;
-
     private int mSymbolsInFieldLine, mFieldLinesCount; // in items - for arrays \
-    private Timer mTimer;
 
+    // snake only parameters
     private int mSnakeSpeed = MyPSF.STARTING_SNAKE_SPEED;
     @Nullable
     private FourDirections mSnakeDirection, prohibitedDirection;
+
+    // game parameters
+    private int mCurrentScore, bestScore;
+    private long mCurrentTime, bestTime;
+    private boolean mGameEnded = false, mGamePausedSwitch = false;
+
+    private Timer mTimer;
+
+    // LINKING =====================================================================================
 
     public void initGameLogic(@NonNull MainActivity ui) {
         logic = new GameLogic(ui);

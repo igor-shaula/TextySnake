@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 ViewModelProvider.AndroidViewModelFactory.getInstance(getApplication());
         viewModel = new ViewModelProvider(this, factory).get(MainViewModel.class);
 
+        // temporary way of linking with logic
+        viewModel.initGameLogic(this);
+
         // preparing viewBinding
         viewBinding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(viewBinding.getRoot());
@@ -98,7 +101,13 @@ public class MainActivity extends AppCompatActivity {
         viewModel.setBestTime(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
     } // onCreate \\
 
-/*
+    @Override
+    protected void onDestroy() {
+        viewModel.destroyGameLogic();
+        super.onDestroy();
+    }
+
+    /*
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
