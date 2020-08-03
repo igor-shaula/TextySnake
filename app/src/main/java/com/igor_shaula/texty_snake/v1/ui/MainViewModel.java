@@ -4,7 +4,6 @@ import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -193,18 +192,12 @@ public final class MainViewModel extends ViewModel {
                 mldBestScore.setValue(mCurrentScore);
             if (mCurrentTime > mldBestTime.getValue())
                 mldBestTime.setValue(mCurrentTime);
-            ui.saveNewBestResults(bestScore, bestTime);
+//            ui.saveNewBestResults(bestScore, bestTime);
         }
 
         // resetting the start-stop button to its primary state \
-        ui.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                int endTextColor = ContextCompat.getColor(ui, android.R.color.primary_text_light);
-                ui.setMainFieldTextColor(endTextColor);
-                ui.setMFTBackgroundResource(R.color.primary_light);
-            }
-        });
+        mainFieldTextColorId.setValue(android.R.color.primary_text_light);
+        mainFieldBackgroundColorId.setValue(R.color.primary_light);
         L.i("game ended with mCurrentScore " + mCurrentScore);
     }
 

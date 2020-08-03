@@ -104,20 +104,36 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.getMainFieldTextColorId().observe(this, new Observer<Integer>() {
             @Override
-            public void onChanged(Integer integer) {
-                viewBinding.mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), integer));
+            public void onChanged(final Integer integer) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewBinding.mtvMainField.setTextColor(ContextCompat.getColor(getApplicationContext(), integer));
+                    }
+                });
             }
         });
         viewModel.getMainFieldBackgroundColorId().observe(this, new Observer<Integer>() {
             @Override
-            public void onChanged(Integer integer) {
-                viewBinding.mtvMainField.setBackgroundResource(integer);
+            public void onChanged(final Integer integer) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        viewBinding.mtvMainField.setBackgroundResource(integer);
+                    }
+                });
             }
         });
         viewModel.getMldBestScore().observe(this, new Observer<Integer>() {
             @Override
             public void onChanged(Integer integer) {
-
+                saveNewBestResults(integer, viewModel.getMldBestTime().getValue());
+            }
+        });
+        viewModel.getMldBestTime().observe(this, new Observer<Long>() {
+            @Override
+            public void onChanged(Long aLong) {
+                saveNewBestResults(viewModel.getMldBestScore().getValue(), aLong);
             }
         });
     } // onCreate \\
