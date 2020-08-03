@@ -32,8 +32,12 @@ public final class MainViewModel extends ViewModel {
     private FourDirections mSnakeDirection, prohibitedDirection;
 
     // game parameters
-    private int mCurrentScore, bestScore;
-    private long mCurrentTime, bestTime;
+    private int mCurrentScore;
+    private long mCurrentTime;
+    @NonNull
+    private MutableLiveData<Integer> mldBestScore = new MutableLiveData<>();
+    @NonNull
+    private MutableLiveData<Long> mldBestTime = new MutableLiveData<>();
     private boolean mGameEnded = false, mGamePausedSwitch = false;
 
     // LINKING =====================================================================================
@@ -42,6 +46,8 @@ public final class MainViewModel extends ViewModel {
         logic = new GameLogic(ui);
         mainFieldTextColorId.setValue(R.color.primary_dark);
         mainFieldBackgroundColorId.setValue(android.R.color.white);
+        mldBestScore.setValue(0);
+        mldBestTime.setValue(0L);
     }
 
     public void destroyGameLogic() {
@@ -50,14 +56,6 @@ public final class MainViewModel extends ViewModel {
     }
 
     // SETTERS =====================================================================================
-
-    public void setBestScore(int bestScore) {
-        this.bestScore = bestScore;
-    }
-
-    public void setBestTime(long bestTime) {
-        this.bestTime = bestTime;
-    }
 
     public void setFieldPixelWidth(int width) {
         mFieldPixelWidth = width;
@@ -83,14 +81,6 @@ public final class MainViewModel extends ViewModel {
         return mCurrentTime;
     }
 
-    public int getBestScore() {
-        return bestScore;
-    }
-
-    public long getBestTime() {
-        return bestTime;
-    }
-
     public int getSnakeSpeed() {
         return mSnakeSpeed;
     }
@@ -103,6 +93,16 @@ public final class MainViewModel extends ViewModel {
     @NonNull
     public MutableLiveData<Integer> getMainFieldBackgroundColorId() {
         return mainFieldBackgroundColorId;
+    }
+
+    @NonNull
+    public MutableLiveData<Integer> getMldBestScore() {
+        return mldBestScore;
+    }
+
+    @NonNull
+    public MutableLiveData<Long> getMldBestTime() {
+        return mldBestTime;
     }
 
     // REACTIONS ===================================================================================
@@ -188,11 +188,11 @@ public final class MainViewModel extends ViewModel {
         logic.stopAllTimers();
 
         // checking if current result is the best \
-        if (mCurrentScore > bestScore || mCurrentTime > bestTime) {
-            if (mCurrentScore > bestScore)
-                bestScore = mCurrentScore;
-            if (mCurrentTime > bestTime)
-                bestTime = mCurrentTime;
+        if (mCurrentScore > mldBestScore.getValue() || mCurrentTime > mldBestTime.getValue()) {
+            if (mCurrentScore > mldBestScore.getValue())
+                mldBestScore.setValue(mCurrentScore);
+            if (mCurrentTime > mldBestTime.getValue())
+                mldBestTime.setValue(mCurrentTime);
             ui.saveNewBestResults(bestScore, bestTime);
         }
 

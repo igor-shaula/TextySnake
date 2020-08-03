@@ -99,8 +99,8 @@ public class MainActivity extends AppCompatActivity {
 
         // reading previous achievements from SP \
         final SharedPreferences sharedPreferences = getSharedPreferences(MyPSF.S_P_NAME, MODE_PRIVATE);
-        viewModel.setBestScore(sharedPreferences.getInt(MyPSF.KEY_SCORE, 0));
-        viewModel.setBestTime(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
+        viewModel.getMldBestScore().setValue(sharedPreferences.getInt(MyPSF.KEY_SCORE, 0));
+        viewModel.getMldBestTime().setValue(sharedPreferences.getLong(MyPSF.KEY_TIME, 0));
 
         viewModel.getMainFieldTextColorId().observe(this, new Observer<Integer>() {
             @Override
@@ -112,6 +112,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(Integer integer) {
                 viewBinding.mtvMainField.setBackgroundResource(integer);
+            }
+        });
+        viewModel.getMldBestScore().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+
             }
         });
     } // onCreate \\
@@ -193,8 +199,8 @@ public class MainActivity extends AppCompatActivity {
 
         mtvCurrentScore.setText(String.valueOf(viewModel.getCurrentScore()));
         mtvCurrentTime.setText(DateFormat.format("mm:ss", viewModel.getCurrentTime()));
-        mtvBestScore.setText(String.valueOf(viewModel.getBestScore()));
-        mtvBestTime.setText(DateFormat.format("mm:ss", viewModel.getBestTime()));
+        mtvBestScore.setText(String.valueOf(viewModel.getMldBestScore().getValue()));
+        mtvBestTime.setText(DateFormat.format("mm:ss", viewModel.getMldBestTime().getValue()));
 
         final MyTextView mtvClearBestResults = dialogView.findViewById(R.id.mtvClearBestResults);
         final LinearLayout llHidden = dialogView.findViewById(R.id.llHidden);
@@ -205,10 +211,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (v.getId() == R.id.mtvYes) { // other button just hides this view again \
-                    viewModel.setBestScore(0);
-                    viewModel.setBestTime(0);
-                    mtvBestScore.setText(String.valueOf(viewModel.getBestScore()));
-                    mtvBestTime.setText(DateFormat.format("mm:ss", viewModel.getBestTime()));
+                    viewModel.getMldBestScore().setValue(0);
+                    viewModel.getMldBestTime().setValue(0L);
+                    mtvBestScore.setText(String.valueOf(viewModel.getMldBestScore()));
+                    mtvBestTime.setText(DateFormat.format("mm:ss", viewModel.getMldBestTime().getValue()));
                     saveNewBestResults(0, 0);
                 }
                 llHidden.setVisibility(View.GONE); // click at NO-button is done by this line \
