@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import com.igor_shaula.texty_snake.v1.R;
 import com.igor_shaula.texty_snake.v1.entity.Snake;
 import com.igor_shaula.texty_snake.v1.ui.MainActivity;
+import com.igor_shaula.texty_snake.v1.ui.MainViewModel;
 import com.igor_shaula.texty_snake.v1.utils.L;
 import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
@@ -45,17 +46,22 @@ public final class GameLogic {
     @Nullable
     private Timer mTimer;
 
+    //    @Nullable
     private MainActivity ui;
+    //    @Nullable
+    private MainViewModel viewModel;
 
     // PUBLIC ======================================================================================
 
     // TODO: 31.07.2020 replace passing MainActivity here by an interface - avoid direct linking
-    public GameLogic(@NonNull MainActivity ui) {
+    public GameLogic(@NonNull MainActivity ui, @NonNull MainViewModel viewModel) {
         this.ui = ui;
+        this.viewModel = viewModel;
     }
 
     public void clearUiLink() {
         ui = null;
+        viewModel = null;
     }
 
     @NonNull
@@ -97,7 +103,7 @@ public final class GameLogic {
         }
     }
 
-    public void step_1_prepareTextField() {
+    public void step_1_prepareTextField(int mSymbolsInFieldLine, int mFieldPixelHeight) {
 
         // clearing the text field to properly initialize it for game \
         ui.setMainFieldText(null);
@@ -134,18 +140,18 @@ public final class GameLogic {
 
         } while (measuredTextHeight <= mFieldPixelHeight);
 
-        mFieldLinesCount = i;
-        L.i("mFieldLinesCount " + mFieldLinesCount);
+        L.i("mFieldLinesCount " + i);
+        viewModel.setFieldLinesCount(i);
     } // step_1_prepareTextField \\
 
-    public void step_2_setFieldBorders() {
+    public void step_2_setFieldBorders(int mFieldLinesCount, int mSymbolsInFieldLine) {
         for (int i = 0; i < mFieldLinesCount; i++)
             for (int j = 0; j < mSymbolsInFieldLine; j++)
                 if (i == 0 || i == mFieldLinesCount - 1 || j == 0 || j == mSymbolsInFieldLine - 1)
                     mCharsArrayList.get(i)[j] = MyPSF.BORDER;
     } // step_2_setFieldBorders \\
 
-    public void step_3_setInitialSnake() {
+    public void step_3_setInitialSnake(FourDirections mSnakeDirection, int mSymbolsInFieldLine, int mFieldLinesCount) {
 
         // defining start directions to properly set up the mSnake \
         switch (mRandom.nextInt(3) + 1) {
@@ -195,15 +201,15 @@ public final class GameLogic {
             // placing the this mSnake cell to our field \
             mCharsArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SNAKE;
         } // end of for-loop
-        updateMainField();
+        updateMainField(mFieldLinesCount);
     } // step_3_setInitialSnake \\
 
-    public void step_4_setInitialFood() {
-        updateFood();
-        updateMainField();
+    public void step_4_setInitialFood(int mFieldLinesCount, int mSymbolsInFieldLine) {
+        updateFood(mFieldLinesCount, mSymbolsInFieldLine);
+        updateMainField(mFieldLinesCount);
     } // step_4_setInitialFood \\
 
-    private void updateFood() {
+    private void updateFood(int mFieldLinesCount, int mSymbolsInFieldLine) {
 /*
         this method gets called after the mSnake is initialized -so we have to check collisions \
         i decided to do all in one cycle because of low probability of collisions \
@@ -237,7 +243,7 @@ public final class GameLogic {
 //        mCharsArrayList.get(mFoodPositionRow - 1)[mFoodPositionSymbol - 1] = FOOD;
     }
 
-    private void updateMainField() {
+    private void updateMainField(int mFieldLinesCount) {
 
         final StringBuilder newStringToSet = new StringBuilder();
         for (int i = 0; i < mFieldLinesCount; i++) {

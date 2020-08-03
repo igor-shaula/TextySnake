@@ -70,6 +70,10 @@ public final class MainViewModel extends ViewModel {
         mSnakeSpeed = newSnakeSpeed;
     }
 
+    public void setFieldLinesCount(int number) {
+        mFieldLinesCount = number;
+    }
+
     // GETTERS =====================================================================================
 
     public int getCurrentScore() {
@@ -203,9 +207,9 @@ public final class MainViewModel extends ViewModel {
 
     // main repeatable sequence of steps \
     public void prepareGameIn4Steps() {
-        logic.step_1_prepareTextField(); // 1
-        logic.step_2_setFieldBorders(); // 2
-        logic.step_3_setInitialSnake(); // 3
-        logic.step_4_setInitialFood(); // 4
+        logic.step_1_prepareTextField(mSymbolsInFieldLine, mFieldPixelHeight); // 1
+        logic.step_2_setFieldBorders(mFieldLinesCount, mSymbolsInFieldLine); // 2
+        logic.step_3_setInitialSnake(mSnakeDirection, mSymbolsInFieldLine, mFieldLinesCount); // 3
+        logic.step_4_setInitialFood(mFieldLinesCount, mSymbolsInFieldLine); // 4
     }
 }
