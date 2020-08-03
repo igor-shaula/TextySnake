@@ -14,8 +14,6 @@ import com.igor_shaula.texty_snake.v1.logic.GameLogic;
 import com.igor_shaula.texty_snake.v1.utils.L;
 import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
-import java.util.Timer;
-
 public final class MainViewModel extends ViewModel {
 
     private GameLogic logic;
@@ -37,8 +35,6 @@ public final class MainViewModel extends ViewModel {
     private int mCurrentScore, bestScore;
     private long mCurrentTime, bestTime;
     private boolean mGameEnded = false, mGamePausedSwitch = false;
-
-    private Timer mTimer;
 
     // LINKING =====================================================================================
 
@@ -159,13 +155,8 @@ public final class MainViewModel extends ViewModel {
     }
 
     public void onShowDialogAction() {
-
         mGamePausedSwitch = true;
-
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
+        logic.stopAllTimers();
         mainFieldTextColorId.setValue(R.color.primary_light);
     }
 
@@ -186,13 +177,7 @@ public final class MainViewModel extends ViewModel {
             actionEndGame();
             return;
         }
-        mTimer = new Timer();
-        mTimer.schedule(new GameLogic.SnakeMoveTimerTask(), 0, delay);
-        mTimer.schedule(new GameLogic.TimeUpdateTimerTask(), 0, 1000);
-//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
-        mTimer.schedule(new GameLogic.FoodUpdateTimerTask(),
-                MyPSF.STARTING_UPDATE_FOOD_PERIOD,
-                MyPSF.STARTING_UPDATE_FOOD_PERIOD);
+        logic.startAllTimers(delay);
     }
 
     public void actionEndGame() {
@@ -200,12 +185,7 @@ public final class MainViewModel extends ViewModel {
         mGameEnded = true;
         mGamePausedSwitch = true;
 
-        // stopping all timers \
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer.purge();
-            mTimer = null;
-        }
+        logic.stopAllTimers();
 
         // checking if current result is the best \
         if (mCurrentScore > bestScore || mCurrentTime > bestTime) {

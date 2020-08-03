@@ -3,6 +3,7 @@ package com.igor_shaula.texty_snake.v1.logic;
 import android.text.format.DateFormat;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.igor_shaula.texty_snake.v1.R;
 import com.igor_shaula.texty_snake.v1.entity.Snake;
@@ -12,6 +13,7 @@ import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
 import java.util.TimerTask;
 
 import static com.igor_shaula.texty_snake.v1.logic.FourDirections.DOWN;
@@ -34,10 +36,14 @@ public final class GameLogic {
     // main data storage \
     private ArrayList<char[]> mCharsArrayList;
 
+    @NonNull
     private Random mRandom = new Random();
 
-    // definition of the snake model \
-    private Snake mSnake;
+    @NonNull
+    private Snake mSnake = new Snake();
+
+    @Nullable
+    private Timer mTimer;
 
     private MainActivity ui;
 
@@ -140,8 +146,6 @@ public final class GameLogic {
     } // step_2_setFieldBorders \\
 
     public void step_3_setInitialSnake() {
-
-        mSnake = new Snake();
 
         // defining start directions to properly set up the mSnake \
         switch (mRandom.nextInt(3) + 1) {
@@ -252,6 +256,24 @@ public final class GameLogic {
         return velocityY < 0 // determining the UP direction of the swipe \
 //                    && absDeltaX < absDeltaY // assuring that this swipe was more along Y-axis than along X \
                 && Math.abs(velocityX) < Math.abs(velocityY); // checking if we're right completely \
+    }
+
+    public void startAllTimers(int delay) {
+        mTimer = new Timer();
+        mTimer.schedule(new GameLogic.SnakeMoveTimerTask(), 0, delay);
+        mTimer.schedule(new GameLogic.TimeUpdateTimerTask(), 0, 1000);
+//                    mTimer.schedule(new TimeUpdateTimerTask(), 0, 1); // requirements of dev-challenge \
+        mTimer.schedule(new GameLogic.FoodUpdateTimerTask(),
+                MyPSF.STARTING_UPDATE_FOOD_PERIOD,
+                MyPSF.STARTING_UPDATE_FOOD_PERIOD);
+    }
+
+    public void stopAllTimers() {
+        if (mTimer != null) {
+            mTimer.cancel();
+            mTimer.purge();
+            mTimer = null;
+        }
     }
 
     // TIMER CLASSES ===============================================================================
