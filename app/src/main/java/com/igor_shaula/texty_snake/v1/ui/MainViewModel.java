@@ -42,7 +42,7 @@ public final class MainViewModel extends ViewModel {
     // LINKING =====================================================================================
 
     public void initGameLogic(@NonNull MainActivity ui) {
-        logic = new GameLogic(ui);
+        logic = new GameLogic(ui, this);
         mainFieldTextColorId.setValue(R.color.primary_dark);
         mainFieldBackgroundColorId.setValue(android.R.color.white);
         mldBestScore.setValue(0);
@@ -207,9 +207,42 @@ public final class MainViewModel extends ViewModel {
 
     // main repeatable sequence of steps \
     public void prepareGameIn4Steps() {
-        logic.step_1_prepareTextField(mSymbolsInFieldLine, mFieldPixelHeight); // 1
-        logic.step_2_setFieldBorders(mFieldLinesCount, mSymbolsInFieldLine); // 2
-        logic.step_3_setInitialSnake(mSnakeDirection, mSymbolsInFieldLine, mFieldLinesCount); // 3
-        logic.step_4_setInitialFood(mFieldLinesCount, mSymbolsInFieldLine); // 4
+        logic.step_1_prepareTextField(mSymbolsInFieldLine, mFieldPixelHeight);
+        logic.step_2_setFieldBorders(mFieldLinesCount, mSymbolsInFieldLine);
+        logic.step_3_setInitialSnake(mSnakeDirection, mSymbolsInFieldLine, mFieldLinesCount);
+        logic.step_4_setInitialFood();
+    }
+
+    @Nullable
+    public FourDirections getSnakeDirection() {
+        return mSnakeDirection;
+    }
+
+    public int getFieldLinesCount() {
+        return mFieldLinesCount;
+    }
+
+    public void incrementCurrentScore() {
+        mCurrentScore++;
+    }
+
+    public void incrementSnakeSpeed() {
+        mSnakeSpeed++;
+    }
+
+    public void addToCurrentScore(int i) {
+        mCurrentScore += i;
+    }
+
+    public void decrementSnakeSpeed() {
+        mSnakeSpeed--;
+    }
+
+    public int getSymbolsInFieldLine() {
+        return mSymbolsInFieldLine;
+    }
+
+    public void setCurrentTime(long l) {
+        mCurrentTime = l;
     }
 }

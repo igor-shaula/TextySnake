@@ -201,15 +201,15 @@ public final class GameLogic {
             // placing the this mSnake cell to our field \
             mCharsArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SNAKE;
         } // end of for-loop
-        updateMainField(mFieldLinesCount);
+        updateMainField();
     } // step_3_setInitialSnake \\
 
-    public void step_4_setInitialFood(int mFieldLinesCount, int mSymbolsInFieldLine) {
-        updateFood(mFieldLinesCount, mSymbolsInFieldLine);
-        updateMainField(mFieldLinesCount);
-    } // step_4_setInitialFood \\
+    public void step_4_setInitialFood() {
+        updateFood();
+        updateMainField();
+    }
 
-    private void updateFood(int mFieldLinesCount, int mSymbolsInFieldLine) {
+    private void updateFood() {
 /*
         this method gets called after the mSnake is initialized -so we have to check collisions \
         i decided to do all in one cycle because of low probability of collisions \
@@ -226,8 +226,8 @@ public final class GameLogic {
             again decreased by 2 to exclude near-border dangerous positions \
             increased by 1 to include the whole range of values because of method specifics \
             */
-            mFoodPositionRow = mRandom.nextInt(mFieldLinesCount - 2 - 2) + 1;
-            mFoodPositionSymbol = mRandom.nextInt(mSymbolsInFieldLine - 2 - 2) + 1;
+            mFoodPositionRow = mRandom.nextInt(viewModel.getFieldLinesCount() - 2 - 2) + 1;
+            mFoodPositionSymbol = mRandom.nextInt(viewModel.getSymbolsInFieldLine() - 2 - 2) + 1;
             // -1 instead of +1 just to avoid placing food on the boards \
             L.i("mRandom mFoodPositionRow " + mFoodPositionRow);
             L.i("mRandom mFoodPositionSymbol " + mFoodPositionSymbol);
@@ -243,10 +243,10 @@ public final class GameLogic {
 //        mCharsArrayList.get(mFoodPositionRow - 1)[mFoodPositionSymbol - 1] = FOOD;
     }
 
-    private void updateMainField(int mFieldLinesCount) {
+    private void updateMainField() {
 
         final StringBuilder newStringToSet = new StringBuilder();
-        for (int i = 0; i < mFieldLinesCount; i++) {
+        for (int i = 0; i < viewModel.getFieldLinesCount(); i++) {
             newStringToSet.append(mCharsArrayList.get(i));
         }
         ui.setMainFieldText(newStringToSet.toString());
@@ -292,7 +292,7 @@ public final class GameLogic {
         public void run() {
 
             // is null when direction is prohibited - have to check it here to avoid crash \
-            if (mSnakeDirection == null) return;
+            if (viewModel.getSnakeDirection() == null) return;
 
             // defining all reusable variables here \
             int newCellX = 0, newCellY = 0;
@@ -318,7 +318,7 @@ public final class GameLogic {
 
             // 3 - finally moving mSnake's head to selected direction \
             snakeCell = mSnake.getCell(0); // for head of the mSnake
-            switch (mSnakeDirection) {
+            switch (viewModel.getSnakeDirection()) {
                 case RIGHT: // tail to right - head moves to left \
                     newCellX = snakeCell.getIndexByX() + 1;
                     newCellY = snakeCell.getIndexByY();
@@ -358,18 +358,19 @@ public final class GameLogic {
                 @Override
                 public void run() {
                     updateMainField();
-                    String scoreComplex = ui.getString(R.string.score) + mCurrentScore;
+                    String scoreComplex = ui.getString(R.string.score) + viewModel.getCurrentScore();
                     ui.setScoreText(scoreComplex);
                 }
             });
 
             // exit conditions check is the last thing to do \
-            if (collisionHappened()) actionEndGame(); // this is the only way out from loop \
-            else mCurrentScore++;
+            if (collisionHappened())
+                viewModel.actionEndGame(); // this is the only way out from loop \
+            else viewModel.incrementCurrentScore();
 
             // now handling eating of food and bonuses - it's taken by the head only \
             if (isFoodFound()) eatFood();
-        } // end of run-method \\
+        } // run \\
 
         // VERIFICATIONS ===========================================================================
 
@@ -394,13 +395,13 @@ public final class GameLogic {
                     new cell will get visible only at the end of the move \
                     right now i 'm only updating the model - not the view \
                     */
-                    cellPositionX = mFoodPositionSymbol + shiftAfterFood(mSnakeDirection, true);
-                    cellPositionY = mFoodPositionRow + shiftAfterFood(mSnakeDirection, false);
+                    cellPositionX = mFoodPositionSymbol + shiftAfterFood(viewModel.getSnakeDirection(), true);
+                    cellPositionY = mFoodPositionRow + shiftAfterFood(viewModel.getSnakeDirection(), false);
                     currentCell = new Snake.SnakeCell(cellPositionX, cellPositionY);
                     mSnake.addCell(mSnake.getLength(), currentCell);
-                    mSnakeSpeed++;
+                    viewModel.incrementSnakeSpeed();
                     L.i("LENGTH_PLUS taken!");
-                    mCurrentScore += 100;
+                    viewModel.addToCurrentScore(100);
                     break;
 
                 case MyPSF.LENGTH_MINUS: // length -1
@@ -413,28 +414,28 @@ public final class GameLogic {
                         mCharsArrayList.get(cellPositionY)[cellPositionX] = MyPSF.SPACE;
                         // now it is safe to update the model \
                         mSnake.removeCell(mSnake.getLength() - 1);
-                        if (mSnakeSpeed > 1) mSnakeSpeed--;
+                        if (viewModel.getSnakeSpeed() > 1) viewModel.decrementSnakeSpeed();
                     }
                     L.i("LENGTH_MINUS taken!");
-                    mCurrentScore -= 100;
+                    viewModel.addToCurrentScore(-100);
                     break;
 
                 case MyPSF.SPEED_UP: // speed +1
-                    if (mSnakeSpeed < 9) {
-                        mSnakeSpeed++;
-                        mCurrentScore += 50;
-                    } else mCurrentScore += 150;
+                    if (viewModel.getSnakeSpeed() < 9) {
+                        viewModel.incrementSnakeSpeed();
+                        viewModel.addToCurrentScore(50);
+                    } else viewModel.addToCurrentScore(150);
                     L.i("SPEED_UP taken!");
                     break;
 
                 case MyPSF.SPEED_SLOW: // speed -1
-                    if (mSnakeSpeed > 1) // to avoid falling after division by zero \
-                        mSnakeSpeed--;
+                    if (viewModel.getSnakeSpeed() > 1) // to avoid falling after division by zero \
+                        viewModel.decrementSnakeSpeed();
                     L.i("SPEED_SLOW taken!");
-                    mCurrentScore -= 50;
+                    viewModel.addToCurrentScore(-50);
                     break;
             }
-        } // end of eatFood-method \
+        } // eatFood \\
 
         private int shiftAfterFood(FourDirections direction, boolean isForX) {
             if (isForX)
@@ -471,8 +472,8 @@ public final class GameLogic {
         // connected to collisionHappened-method \
         private boolean touchedBounds(int snakeHeadY, int snakeHeadX) {
             // we can avoid loop here assuming that mSnake's head has index of 0 \
-            return snakeHeadY == 0 || snakeHeadY == mFieldLinesCount - 1 ||
-                    snakeHeadX == 0 || snakeHeadX == mSymbolsInFieldLine - 1;
+            return snakeHeadY == 0 || snakeHeadY == viewModel.getFieldLinesCount() - 1 ||
+                    snakeHeadX == 0 || snakeHeadX == viewModel.getSymbolsInFieldLine() - 1;
         }
 
         // connected to collisionHappened-method \
@@ -487,7 +488,7 @@ public final class GameLogic {
             }
             return false;
         }
-    } // end of SnakeMoveTimerTask-class \\
+    } // SnakeMoveTimerTask \\
 
     public class FoodUpdateTimerTask extends TimerTask {
 
@@ -510,16 +511,16 @@ public final class GameLogic {
 
         @Override
         public void run() {
-            mCurrentTime = System.currentTimeMillis() - initialSystemTime;
+            viewModel.setCurrentTime(System.currentTimeMillis() - initialSystemTime);
 
             final String stringToSet = ui.getString(R.string.time)
-                    + DateFormat.format("mm:ss", mCurrentTime);
+                    + DateFormat.format("mm:ss", viewModel.getCurrentTime());
             ui.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ui.setTimeText(stringToSet);
                 }
             });
-        } // end of run-method \\
-    } // end of TimeUpdateTimerTask-class \\
+        } // run \\
+    } // TimeUpdateTimerTask \\
 }
