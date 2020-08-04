@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/MyVG_MatchMatchVert"
+    tools:context=".activity.MainActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/myToolbar"
+        style="@style/MyToolbar"
+        android:layout_height="wrap_content" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvUserGuide"
+        style="@style/MyText.Main.Guide"
+        android:scrollbars="vertical" />
+
+    <!--this ViewGroup is needed to measure its dimensions in code-->
+    <FrameLayout
+        android:id="@+id/flMain"
+        style="@style/MyFrameLayout">
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            android:id="@+id/viewMainField"
+            style="@style/MyText.Main.Field" />
+
+    </FrameLayout>
+
+</LinearLayout>

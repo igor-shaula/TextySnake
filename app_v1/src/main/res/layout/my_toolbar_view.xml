@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MyVG_MatchWrapHoriz"
+    android:background="@color/primary">
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvScore"
+        style="@style/MyText.Weight.Land"
+        android:text="@string/defaultScore" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        style="@style/MyText.Weight.Land"
+        android:background="@color/primary_dark"
+        android:text="@string/appName" />
+
+    <com.igor.shaula.snake_in_text.custom_views.MyTextView
+        android:id="@+id/mtvTime"
+        style="@style/MyText.Weight.Land"
+        android:text="@string/defaultTime" />
+
+</LinearLayout>

@@ -1,0 +1,57 @@
+<resources>
+
+    <string name="appName">Texty Snake</string>
+    <string name="score">Score\n</string>
+    <string name="time">Time\n</string>
+    <string name="defaultScore">Score\n0</string>
+    <string name="defaultTime">Time\n00:00</string>
+    <!--<string name="defaultTime">Time\n00:00:000</string>-->
+    <string name="oneSymbol">O</string>
+
+    <string name="speedKey">speed key</string>
+    <string name="setSpeed1">Set Speed</string>
+    <string name="setSpeed2">Set\nSpeed</string>
+    <string name="viewScores1">View Scores</string>
+    <string name="viewScores2">View\nScores</string>
+
+    <string name="howFastIsTheSnake">How fast is the snake ?</string>
+    <string name="speedTooSlow">SLOWEST (1)</string>
+    <string name="speedVerySlow">very slow (2)</string>
+    <string name="speedSlow">SLOW (3)</string>
+    <string name="speedAbitSlow">a bit slow (4)</string>
+    <string name="speedNormal">NORMAL (5)</string>
+    <string name="speedAbitFast">a bit fast (6)</string>
+    <string name="speedFast">FAST (7)</string>
+    <string name="speedVeryFast">very fast (8)</string>
+    <string name="speedTooFast">FASTEST (9)</string>
+
+    <string name="results">Results</string>
+    <string name="your">Your</string>
+    <string name="best">Best</string>
+    <string name="clearBestResults">Clear best results</string>
+    <string name="no">NO!</string>
+    <string name="yes">YES</string>
+
+    <string name="userGuide">
+        \n
+        Hi, dear player!
+        \n
+        Texty Snake is waiting for you ;)
+        \n\n
+        @@@
+        \n\n
+        1 - Long click to start/restart
+        \n\n
+        2 - Swipe right/left/up/down here
+        \n
+        to set new direction for the snake
+        \n\n
+        3 - Double tap to pause/continue
+        \n\n
+        @@@@@@
+        \n\n
+        Have fun and gain high scores :)
+        \n
+    </string>
+
+</resources>

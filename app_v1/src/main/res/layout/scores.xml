@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MyVG_WrapWrapCenter">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/MyVG_WrapWrapCenter"
+        android:layout_gravity="start"
+        android:background="@color/primary_dark"
+        android:orientation="vertical"
+        android:padding="@dimen/size_16">
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            style="@style/MyText.Dialog"
+            android:layout_margin="@dimen/size_0"
+            android:text="@string/results" />
+
+        <View style="@style/MyHorizLine" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <LinearLayout style="@style/MyVG_WrapWrapCenter.WeightVertical">
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    style="@style/MyText.Dialog"
+                    android:text="@string/your" />
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    android:id="@+id/mtvCurrentScore"
+                    style="@style/MyText.Dialog"
+                    android:text="@string/appName" />
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    android:id="@+id/mtvCurrentTime"
+                    style="@style/MyText.Dialog"
+                    android:text="@string/appName" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="@dimen/size_2"
+                android:layout_height="match_parent"
+                android:background="@color/primary_light" />
+
+            <LinearLayout style="@style/MyVG_WrapWrapCenter.WeightVertical">
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    style="@style/MyText.Dialog"
+                    android:text="@string/best" />
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    android:id="@+id/mtvBestScore"
+                    style="@style/MyText.Dialog"
+                    android:text="@string/appName" />
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    android:id="@+id/mtvBestTime"
+                    style="@style/MyText.Dialog"
+                    android:text="@string/appName" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            android:id="@+id/mtvClearBestResults"
+            style="@style/MyText.Dialog"
+            android:layout_margin="@dimen/size_0"
+            android:background="@drawable/main_button_states"
+            android:padding="@dimen/size_16"
+            android:text="@string/clearBestResults"
+            android:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/llHidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <View
+                style="@style/MyHorizLine"
+                android:layout_marginTop="@dimen/size_0" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    android:id="@+id/mtvNo"
+                    style="@style/MyText.Weight"
+                    android:background="@drawable/main_button_states"
+                    android:padding="@dimen/size_16"
+                    android:text="@string/no" />
+
+                <View
+                    android:layout_width="@dimen/size_2"
+                    android:layout_height="match_parent"
+                    android:background="@color/primary_light" />
+
+                <com.igor.shaula.snake_in_text.custom_views.MyTextView
+                    android:id="@+id/mtvYes"
+                    style="@style/MyText.Weight"
+                    android:background="@drawable/main_button_states"
+                    android:padding="@dimen/size_16"
+                    android:text="@string/yes" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

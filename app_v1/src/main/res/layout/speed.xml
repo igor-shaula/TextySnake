@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/MyVG_WrapWrapCenter">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/MyVG_WrapWrapCenter"
+        android:layout_gravity="start"
+        android:background="@color/primary_dark"
+        android:orientation="vertical"
+        android:padding="@dimen/size_16">
+
+        <com.igor.shaula.snake_in_text.custom_views.MyTextView
+            style="@style/MyText.Dialog"
+            android:layout_margin="@dimen/size_0"
+            android:text="@string/howFastIsTheSnake" />
+
+        <View style="@style/MyHorizLine" />
+
+        <RadioGroup
+            android:id="@+id/rgSpeed"
+            style="@style/MyVG_WrapWrapCenter"
+            android:layout_width="match_parent"
+            android:layout_marginTop="@dimen/size_16"
+            android:gravity="center">
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb1"
+                style="@style/MyRadioButton"
+                android:text="@string/speedTooSlow" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb2"
+                style="@style/MyRadioButton"
+                android:text="@string/speedVerySlow" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb4"
+                style="@style/MyRadioButton"
+                android:text="@string/speedSlow" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb3"
+                style="@style/MyRadioButton"
+                android:text="@string/speedAbitSlow" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb5"
+                style="@style/MyRadioButton"
+                android:text="@string/speedNormal" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb7"
+                style="@style/MyRadioButton"
+                android:text="@string/speedAbitFast" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb6"
+                style="@style/MyRadioButton"
+                android:text="@string/speedFast" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb8"
+                style="@style/MyRadioButton"
+                android:text="@string/speedVeryFast" />
+
+            <com.igor.shaula.snake_in_text.custom_views.MyRadioButton
+                android:id="@+id/mrb9"
+                style="@style/MyRadioButton"
+                android:text="@string/speedTooFast" />
+
+        </RadioGroup>
+
+    </LinearLayout>
+
+</ScrollView>
