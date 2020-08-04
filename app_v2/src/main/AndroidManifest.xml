@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <activity android:name="com.igor_shaula.texty_snake.v1.com.igor_shaula.temp.ui.MainActivity">
+        <activity android:name="com.igor_shaula.texty_snake.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
