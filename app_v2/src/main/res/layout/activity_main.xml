@@ -15,17 +15,17 @@
             style="@style/MyVG_MatchWrapHoriz"
             android:background="@color/primary">
 
-            <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+            <com.igor_shaula.texty_snake.custom_views.MyTextView
                 android:id="@+id/mtvScore"
                 style="@style/MyText.Weight.Land"
                 android:text="@string/defaultScore" />
 
-            <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+            <com.igor_shaula.texty_snake.custom_views.MyTextView
                 style="@style/MyText.Weight.Land"
                 android:background="@color/primary_dark"
                 android:text="@string/appName" />
 
-            <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+            <com.igor_shaula.texty_snake.custom_views.MyTextView
                 android:id="@+id/mtvTime"
                 style="@style/MyText.Weight.Land"
                 android:text="@string/defaultTime" />
@@ -34,7 +34,7 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+    <com.igor_shaula.texty_snake.custom_views.MyTextView
         android:id="@+id/mtvUserGuide"
         style="@style/MyText.Main.Guide"
         android:scrollbars="vertical" />
@@ -44,7 +44,7 @@
         android:id="@+id/flMain"
         style="@style/MyFrameLayout">
 
-        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.custom_views.MyTextView
             android:id="@+id/mtv_main_field"
             style="@style/MyText.Main.Field" />
 
@@ -57,7 +57,7 @@
         android:gravity="center"
         android:orientation="horizontal">
 
-        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.custom_views.MyTextView
             android:id="@+id/mtvShowScores"
             style="@style/MyText.Weight.Land.Active"
             android:text="@string/viewScores1" />
@@ -67,7 +67,7 @@
             android:layout_height="match_parent"
             android:background="@color/primary_dark" />
 
-        <com.igor_shaula.texty_snake.v1.custom_views.MyTextView
+        <com.igor_shaula.texty_snake.custom_views.MyTextView
             android:id="@+id/mtvSetSpeed"
             style="@style/MyText.Weight.Land.Active"
             android:text="@string/setSpeed1" />

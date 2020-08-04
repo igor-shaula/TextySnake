@@ -1,4 +1,4 @@
-package com.igor_shaula.texty_snake.v1.custom_views;
+package com.igor_shaula.texty_snake.custom_views;
 
 import android.content.Context;
 import android.graphics.Typeface;

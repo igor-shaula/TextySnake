@@ -1,26 +1,26 @@
-package com.igor_shaula.texty_snake.v1.logic;
+package com.igor_shaula.texty_snake.logic;
 
 import android.text.format.DateFormat;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.igor_shaula.texty_snake.entity.Snake;
+import com.igor_shaula.texty_snake.ui.MainActivity;
+import com.igor_shaula.texty_snake.ui.MainViewModel;
+import com.igor_shaula.texty_snake.utils.L;
+import com.igor_shaula.texty_snake.utils.MyPSF;
 import com.igor_shaula.texty_snake.v1.R;
-import com.igor_shaula.texty_snake.v1.entity.Snake;
-import com.igor_shaula.texty_snake.v1.ui.MainActivity;
-import com.igor_shaula.texty_snake.v1.ui.MainViewModel;
-import com.igor_shaula.texty_snake.v1.utils.L;
-import com.igor_shaula.texty_snake.v1.utils.MyPSF;
 
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.DOWN;
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.LEFT;
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.RIGHT;
-import static com.igor_shaula.texty_snake.v1.logic.FourDirections.UP;
+import static com.igor_shaula.texty_snake.logic.FourDirections.DOWN;
+import static com.igor_shaula.texty_snake.logic.FourDirections.LEFT;
+import static com.igor_shaula.texty_snake.logic.FourDirections.RIGHT;
+import static com.igor_shaula.texty_snake.logic.FourDirections.UP;
 
 // this class describes game engine and must not have any Android specific dependencies
 public final class GameLogic {

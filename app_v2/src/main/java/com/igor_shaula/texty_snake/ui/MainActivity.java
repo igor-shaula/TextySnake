@@ -1,4 +1,4 @@
-package com.igor_shaula.texty_snake.v1.ui;
+package com.igor_shaula.texty_snake.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -23,10 +23,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.igor_shaula.texty_snake.v1.R;
-import com.igor_shaula.texty_snake.v1.custom_views.MyTextView;
+import com.igor_shaula.texty_snake.custom_views.MyTextView;
 import com.igor_shaula.texty_snake.v1.databinding.ActivityMainBinding;
-import com.igor_shaula.texty_snake.v1.utils.L;
-import com.igor_shaula.texty_snake.v1.utils.MyPSF;
+import com.igor_shaula.texty_snake.utils.L;
+import com.igor_shaula.texty_snake.utils.MyPSF;
 
 /**
  * Created by igor_shaula texty_snake - main class holding others to avoid too many code lines \

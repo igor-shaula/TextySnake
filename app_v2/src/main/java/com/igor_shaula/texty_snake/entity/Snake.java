@@ -1,4 +1,4 @@
-package com.igor_shaula.texty_snake.v1.entity;
+package com.igor_shaula.texty_snake.entity;
 
 import android.os.Parcel;
 import android.os.Parcelable;

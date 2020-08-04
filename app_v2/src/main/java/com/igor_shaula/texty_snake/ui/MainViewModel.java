@@ -1,4 +1,4 @@
-package com.igor_shaula.texty_snake.v1.ui;
+package com.igor_shaula.texty_snake.ui;
 
 import android.view.MotionEvent;
 
@@ -8,10 +8,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.igor_shaula.texty_snake.v1.R;
-import com.igor_shaula.texty_snake.v1.logic.FourDirections;
-import com.igor_shaula.texty_snake.v1.logic.GameLogic;
-import com.igor_shaula.texty_snake.v1.utils.L;
-import com.igor_shaula.texty_snake.v1.utils.MyPSF;
+import com.igor_shaula.texty_snake.logic.FourDirections;
+import com.igor_shaula.texty_snake.logic.GameLogic;
+import com.igor_shaula.texty_snake.utils.L;
+import com.igor_shaula.texty_snake.utils.MyPSF;
 
 public final class MainViewModel extends ViewModel {
 
